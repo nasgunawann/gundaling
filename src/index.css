@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: #47614a;
+    --color-on-primary: #ffffff;
+    --color-primary-container: #5f7a61;
+    --color-on-primary-container: #efffec;
+    --color-secondary: #974822;
+    --color-on-secondary: #ffffff;
+    --color-secondary-container: #ff996d;
+    --color-on-secondary-container: #77300b;
+    --color-tertiary: #785059;
+    --color-on-tertiary: #ffffff;
+    --color-tertiary-container: #936871;
+    --color-on-tertiary-container: #fffaf9;
+    --color-surface: #fcf9f8;
+    --color-on-surface: #1c1b1b;
+    --color-surface-variant: #e5e2e1;
+    --color-on-surface-variant: #434842;
+    --color-surface-dim: #dcd9d9;
+    --color-surface-bright: #fcf9f8;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #f6f3f2;
+    --color-surface-container: #f0eded;
+    --color-surface-container-high: #eae7e7;
+    --color-surface-container-highest: #e5e2e1;
+    --color-outline: #737971;
+    --color-outline-variant: #c3c8bf;
+    --color-error: #ba1a1a;
+    --color-on-error: #ffffff;
+    --color-error-container: #ffdad6;
+    --color-on-error-container: #93000a;
+    --color-background: #fcf9f8;
+    --color-on-background: #1c1b1b;
+    --color-inverse-surface: #313030;
+    --color-inverse-on-surface: #f3f0ef;
+    --color-inverse-primary: #b1ceb1;
+  }
+
+  body {
+    @apply bg-background text-on-surface font-body;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  select.appearance-none {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: none !important;
+  }
+  select.appearance-none::-ms-expand {
+    display: none !important;
+  }
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-outline-variant);
+  border-radius: 10px;
+}
