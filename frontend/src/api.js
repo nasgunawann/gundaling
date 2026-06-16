@@ -17,6 +17,10 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  // Inject X-Socket-ID if Laravel Echo is initialized and connected
+  if (window.Echo && typeof window.Echo.socketId === 'function' && window.Echo.socketId()) {
+    config.headers['X-Socket-ID'] = window.Echo.socketId();
+  }
   return config;
 }, (error) => {
   return Promise.reject(error);

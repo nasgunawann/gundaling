@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import useStore from '../store';
 import { useNotification } from '../components/NotificationProvider';
 import api from '../api';
+import WebsocketStatus from '../components/WebsocketStatus';
 
 export default function FloorPlan({ onTableClick, user, tableCarts, tables: backendTables }) {
   const { showToast, showConfirm } = useNotification();
@@ -173,9 +174,12 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
     <div className="flex-1 flex flex-col bg-background h-full w-full overflow-hidden">
       {/* Top Header */}
       <header className="h-20 bg-surface/80 backdrop-blur-md flex justify-between items-center px-container_margin border-b border-outline-variant/10 z-10 font-display">
-        <div>
-          <h2 className="text-xl font-bold text-on-surface leading-tight">Table Management</h2>
-          <p className="text-xs text-on-surface-variant/80 uppercase tracking-widest mt-0.5">Floor Plan • Main Dining Room</p>
+        <div className="flex items-center gap-4">
+          <div>
+            <h2 className="text-xl font-bold text-on-surface leading-tight">Table Management</h2>
+            <p className="text-xs text-on-surface-variant/80 uppercase tracking-widest mt-0.5">Floor Plan • Main Dining Room</p>
+          </div>
+          <WebsocketStatus />
         </div>
         
         {isManager && (

@@ -103,7 +103,7 @@ class OrderController extends Controller
         $this->recalculateOrderTotal($order);
 
         if ($incomingSentCount > 0) {
-            broadcast(new OrderSent($order))->toOthers();
+            event(new OrderSent($order));
         }
 
         return response()->json($order->load(['table', 'user', 'items.product']));
@@ -129,7 +129,7 @@ class OrderController extends Controller
 
             $order->table->update(['status' => 'Occupied']);
 
-            broadcast(new OrderSent($order))->toOthers();
+            event(new OrderSent($order));
         }
 
         return response()->json($order->load(['table', 'user', 'items.product']));
@@ -147,13 +147,13 @@ class OrderController extends Controller
         if ($request->status === 'paid') {
             $order->table->update(['status' => 'Available']);
             $order->items()->update(['sent' => true]);
-            broadcast(new OrderPaid($order))->toOthers();
+            event(new OrderPaid($order));
         } elseif ($request->status === 'preparing') {
-            broadcast(new OrderPreparing($order))->toOthers();
+            event(new OrderPreparing($order));
         } elseif ($request->status === 'ready') {
-            broadcast(new OrderReady($order))->toOthers();
+            event(new OrderReady($order));
         } elseif ($request->status === 'served') {
-            broadcast(new OrderServed($order))->toOthers();
+            event(new OrderServed($order));
         }
 
         return response()->json($order->load(['table', 'user', 'items.product']));

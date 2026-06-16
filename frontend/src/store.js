@@ -43,6 +43,7 @@ const useStore = create((set, get) => ({
       localStorage.setItem('gundaling_user', JSON.stringify(user));
       
       const echo = initEcho(token);
+      window.Echo = echo;
       
       set({ user, token, echo, loading: false });
       
@@ -66,6 +67,7 @@ const useStore = create((set, get) => ({
     if (echo) {
       echo.disconnect();
     }
+    window.Echo = null;
     set({ user: null, token: null, echo: null, products: [], tables: [], orders: [], reservations: [] });
   },
 
@@ -80,6 +82,7 @@ const useStore = create((set, get) => ({
       localStorage.setItem('gundaling_user', JSON.stringify(user));
       
       const echo = initEcho(token);
+      window.Echo = echo;
       
       set({ user, echo });
       

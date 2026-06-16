@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNotification } from '../components/NotificationProvider'
 import ReceiptModal from '../components/ReceiptModal'
 import useStore from '../store'
+import WebsocketStatus from '../components/WebsocketStatus'
 
 export default function TableOrderView({ selectedTable, setSelectedTable, products, tableCarts, setTableCarts }) {
   const { showToast, showConfirm } = useNotification()
@@ -189,35 +190,39 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
 
         {/* Header with Table Selection Selector */}
         <header className="h-20 bg-surface/80 backdrop-blur-md flex justify-between items-center px-container_margin border-b border-outline-variant/10 z-10 font-display">
-          <div className="flex items-center gap-4">
-            <div className="flex flex-col">
-              <label className="text-[9px] font-bold text-on-surface-variant/80 uppercase tracking-widest leading-none mb-1">Serving Table</label>
-              <div className="relative">
-                <select
-                  value={selectedTable}
-                  onChange={(e) => setSelectedTable(e.target.value)}
-                  className="bg-primary/10 border-none font-bold text-primary px-4 py-2 rounded-xl text-base focus:ring-2 focus:ring-primary appearance-none pr-8 cursor-pointer shadow-sm"
-                >
-                  {tablesList.map(t => (
-                    <option key={t} value={t} className="text-on-surface bg-surface font-semibold">{t}</option>
-                  ))}
-                </select>
-                <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
-                  <span className="material-symbols-outlined text-sm">expand_more</span>
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-4">
+              <div className="flex flex-col">
+                <label className="text-[9px] font-bold text-on-surface-variant/80 uppercase tracking-widest leading-none mb-1">Serving Table</label>
+                <div className="relative">
+                  <select
+                    value={selectedTable}
+                    onChange={(e) => setSelectedTable(e.target.value)}
+                    className="bg-primary/10 border-none font-bold text-primary px-4 py-2 rounded-xl text-base focus:ring-2 focus:ring-primary appearance-none pr-8 cursor-pointer shadow-sm"
+                  >
+                    {tablesList.map(t => (
+                      <option key={t} value={t} className="text-on-surface bg-surface font-semibold">{t}</option>
+                    ))}
+                  </select>
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
+                    <span className="material-symbols-outlined text-sm">expand_more</span>
+                  </div>
                 </div>
+              </div>
+
+              <div className="relative w-full max-w-[320px] ml-0 lg:ml-4">
+                <span className="material-symbols-outlined absolute left-4.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-base">search</span>
+                <input
+                  type="text"
+                  placeholder="Search menu..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-surface-container-low border-none rounded-full py-2 pl-11 pr-4 text-xs font-semibold focus:ring-2 focus:ring-primary/20 shadow-sm"
+                />
               </div>
             </div>
 
-            <div className="relative w-full max-w-[320px] ml-0 lg:ml-4">
-              <span className="material-symbols-outlined absolute left-4.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-base">search</span>
-              <input
-                type="text"
-                placeholder="Search menu..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-surface-container-low border-none rounded-full py-2 pl-11 pr-4 text-xs font-semibold focus:ring-2 focus:ring-primary/20 shadow-sm"
-              />
-            </div>
+            <WebsocketStatus />
           </div>
         </header>
 

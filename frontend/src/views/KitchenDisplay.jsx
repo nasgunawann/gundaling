@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import useStore from '../store';
 import { useNotification } from '../components/NotificationProvider';
+import WebsocketStatus from '../components/WebsocketStatus';
 
 export default function KitchenDisplay() {
   const { showToast } = useNotification();
@@ -152,10 +153,7 @@ export default function KitchenDisplay() {
           <h2 className="text-xl font-bold text-on-surface leading-tight">Kitchen Displays</h2>
           <p className="text-xs text-on-surface-variant/80 uppercase tracking-widest mt-0.5">Kitchen Production System (KDS) • Real-time</p>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 bg-green-500 rounded-full animate-ping"></span>
-          <span className="text-[10px] font-bold text-outline uppercase tracking-wider">Websocket Live</span>
-        </div>
+        <WebsocketStatus />
       </header>
 
       {/* Kanban Layout */}
