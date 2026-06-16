@@ -5,6 +5,7 @@ import FloorPlan from './views/FloorPlan'
 import TableOrderView from './views/TableOrderView'
 import ProductEnrichment from './views/ProductEnrichment'
 import Reservations from './views/Reservations'
+import KitchenDisplay from './views/KitchenDisplay'
 import useStore from './store'
 import { useNotification } from './components/NotificationProvider'
 
@@ -121,6 +122,9 @@ export default function App() {
             reservations={reservations} 
             setReservations={() => {}}
           />
+        )}
+        {currentView === 'kitchen-queue' && (
+          <KitchenDisplay />
         )}
       </div>
     </div>
