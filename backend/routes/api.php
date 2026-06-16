@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\TableController;
 use App\Http\Controllers\Api\ReservationController;
+use App\Http\Controllers\Api\OrderController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/staff-members', [AuthController::class, 'staff']);
@@ -37,4 +38,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/reservations', [ReservationController::class, 'store'])->middleware('role:Server,Manager');
     Route::put('/reservations/{reservation}', [ReservationController::class, 'update'])->middleware('role:Server,Manager');
     Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->middleware('role:Manager');
+
+    // Orders
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::post('/orders', [OrderController::class, 'store']);
+    Route::post('/orders/{order}/transmit', [OrderController::class, 'transmit']);
+    Route::put('/orders/{order}/status', [OrderController::class, 'updateStatus']);
+    Route::get('/orders/kitchen', [OrderController::class, 'kitchenQueue']);
 });
