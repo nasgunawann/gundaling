@@ -11,8 +11,8 @@ import { useNotification } from './components/NotificationProvider'
 
 export default function App() {
   const { showToast } = useNotification()
-  const [currentView, setCurrentView] = useState('floor-plan')
-  const [selectedTable, setSelectedTable] = useState('Table 12')
+  const [currentView, setCurrentView] = useState(() => localStorage.getItem('gundaling_current_view') || 'floor-plan')
+  const [selectedTable, setSelectedTable] = useState(() => localStorage.getItem('gundaling_selected_table') || 'Table 12')
   const [tableCarts, setTableCarts] = useState({})
 
   const user = useStore((state) => state.user)
@@ -22,6 +22,14 @@ export default function App() {
   const reservations = useStore((state) => state.reservations)
   const logoutStore = useStore((state) => state.logout)
   const tryAutoLogin = useStore((state) => state.tryAutoLogin)
+
+  useEffect(() => {
+    localStorage.setItem('gundaling_current_view', currentView)
+  }, [currentView])
+
+  useEffect(() => {
+    localStorage.setItem('gundaling_selected_table', selectedTable)
+  }, [selectedTable])
 
   // Attach showToast to window for Zustand websocket access
   useEffect(() => {
@@ -56,6 +64,8 @@ export default function App() {
 
   const handleLogout = async () => {
     await logoutStore()
+    localStorage.removeItem('gundaling_current_view')
+    localStorage.removeItem('gundaling_selected_table')
     setCurrentView('floor-plan')
   }
 

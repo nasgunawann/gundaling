@@ -9,6 +9,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
 
   const updateTablePosition = useStore((state) => state.updateTablePosition);
   const fetchInitialData = useStore((state) => state.fetchInitialData);
+  const loading = useStore((state) => state.loading);
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [localTables, setLocalTables] = useState([]);
@@ -31,7 +32,8 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
     { id: 12, name: 'Table 12', seats: 4, shape: 'circle', pos_x: 90, pos_y: 45, status: 'Occupied' }
   ];
 
-  const rawTables = backendTables && backendTables.length > 0 ? backendTables : defaultTables;
+  const isLoading = loading && (!backendTables || backendTables.length === 0);
+  const rawTables = backendTables && backendTables.length > 0 ? backendTables : (isLoading ? [] : defaultTables);
 
   // Process live dynamic status
   const tables = rawTables.map(t => {
@@ -234,74 +236,85 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
             backgroundSize: '30px 30px'
           }}
         >
-          {localTables.map((table) => {
-            const shapeClass = table.shape === 'circle' 
-              ? 'rounded-full aspect-square' 
-              : table.shape === 'rectangle' 
-              ? 'rounded-2xl w-40 h-28' 
-              : 'rounded-2xl w-32 h-32';
-
-            const diameterClass = table.shape === 'circle' ? 'w-32 h-32' : '';
-
-            return (
-              <div
-                key={table.id}
-                onMouseDown={(e) => handleMouseDown(e, table)}
-                style={{
-                  position: 'absolute',
-                  left: `${table.pos_x}%`,
-                  top: `${table.pos_y}%`,
-                  transform: 'translate(-50%, -50%)',
-                  cursor: isEditMode ? 'move' : 'pointer',
-                  zIndex: 20
-                }}
-                className={`transition-shadow duration-200 ${isEditMode ? 'hover:scale-102 hover:shadow-lg' : ''}`}
-              >
-                <button
-                  onClick={() => !isEditMode && onTableClick(table.name)}
-                  disabled={isEditMode}
-                  className={`border p-4 flex flex-col justify-between text-left group shadow-sm select-none ${shapeClass} ${diameterClass} ${getStatusColor(table.status)}`}
-                >
-                  <div className="flex justify-between items-center w-full">
-                    <h3 className="text-[11px] font-bold font-display leading-none text-current">
-                      {table.name}
-                    </h3>
-                    {!isEditMode && (
-                      <span className={`text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full border leading-none ${getBadgeStyle(table.status)}`}>
-                        {table.status}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="text-[9px] font-semibold opacity-85 text-current mt-1">
-                    {table.seats} Seats
-                  </div>
-
-                  <div className="border-t border-current/20 pt-2 flex justify-between items-center w-full mt-2">
-                    {table.bill > 0 ? (
-                      <span className="text-[10px] font-bold font-display font-mono leading-none text-current">
-                        Rp {Math.floor(table.bill).toLocaleString('id-ID')}
-                      </span>
-                    ) : (
-                      <span className="text-[7px] font-bold opacity-80 uppercase tracking-widest text-current">
-                        {table.status === 'Reserved' ? 'Reserved' : 'Ready'}
-                      </span>
-                    )}
-                  </div>
-                </button>
-
-                {isEditMode && (
-                  <button
-                    onClick={(e) => handleDeleteTable(table, e)}
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-error text-on-error rounded-full flex items-center justify-center shadow-md hover:scale-110 active:scale-95 transition-all border border-surface"
-                    title="Delete Table"
-                  >
-                    <span className="material-symbols-outlined text-xs font-bold">close</span>
-                  </button>
-                )}
+          {isLoading ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-surface/30 backdrop-blur-sm z-30">
+              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-3 text-primary animate-spin">
+                <span className="material-symbols-outlined text-2xl font-bold">sync</span>
               </div>
-            );
-          })}
+              <p className="text-[10px] font-bold text-primary uppercase tracking-widest animate-pulse">
+                Syncing Floor Plan...
+              </p>
+            </div>
+          ) : (
+            localTables.map((table) => {
+              const shapeClass = table.shape === 'circle' 
+                ? 'rounded-full aspect-square' 
+                : table.shape === 'rectangle' 
+                ? 'rounded-2xl w-40 h-28' 
+                : 'rounded-2xl w-32 h-32';
+
+              const diameterClass = table.shape === 'circle' ? 'w-32 h-32' : '';
+
+              return (
+                <div
+                  key={table.id}
+                  onMouseDown={(e) => handleMouseDown(e, table)}
+                  style={{
+                    position: 'absolute',
+                    left: `${table.pos_x}%`,
+                    top: `${table.pos_y}%`,
+                    transform: 'translate(-50%, -50%)',
+                    cursor: isEditMode ? 'move' : 'pointer',
+                    zIndex: 20
+                  }}
+                  className={`transition-shadow duration-200 ${isEditMode ? 'hover:scale-102 hover:shadow-lg' : ''}`}
+                >
+                  <button
+                    onClick={() => !isEditMode && onTableClick(table.name)}
+                    disabled={isEditMode}
+                    className={`border p-4 flex flex-col justify-between text-left group shadow-sm select-none ${shapeClass} ${diameterClass} ${getStatusColor(table.status)}`}
+                  >
+                    <div className="flex justify-between items-center w-full">
+                      <h3 className="text-[11px] font-bold font-display leading-none text-current">
+                        {table.name}
+                      </h3>
+                      {!isEditMode && (
+                        <span className={`text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full border leading-none ${getBadgeStyle(table.status)}`}>
+                          {table.status}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="text-[9px] font-semibold opacity-85 text-current mt-1">
+                      {table.seats} Seats
+                    </div>
+
+                    <div className="border-t border-current/20 pt-2 flex justify-between items-center w-full mt-2">
+                      {table.bill > 0 ? (
+                        <span className="text-[10px] font-bold font-display font-mono leading-none text-current">
+                          Rp {Math.floor(table.bill).toLocaleString('id-ID')}
+                        </span>
+                      ) : (
+                        <span className="text-[7px] font-bold opacity-80 uppercase tracking-widest text-current">
+                          {table.status === 'Reserved' ? 'Reserved' : 'Ready'}
+                        </span>
+                      )}
+                    </div>
+                  </button>
+
+                  {isEditMode && (
+                    <button
+                      onClick={(e) => handleDeleteTable(table, e)}
+                      className="absolute -top-2 -right-2 w-6 h-6 bg-error text-on-error rounded-full flex items-center justify-center shadow-md hover:scale-110 active:scale-95 transition-all border border-surface"
+                      title="Delete Table"
+                    >
+                      <span className="material-symbols-outlined text-xs font-bold">close</span>
+                    </button>
+                  )}
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
 

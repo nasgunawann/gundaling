@@ -14,6 +14,7 @@ Route::get('/staff-members', [AuthController::class, 'staff']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+    Route::get('/bootstrap', [AuthController::class, 'bootstrap']);
 
     // Products
     Route::get('/products', [ProductController::class, 'index']);

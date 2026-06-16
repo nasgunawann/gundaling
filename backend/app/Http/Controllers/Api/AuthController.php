@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Product;
+use App\Models\Table;
+use App\Models\Order;
+use App\Models\Reservation;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -49,5 +53,15 @@ class AuthController extends Controller
     {
         $staff = User::select('id', 'name', 'role')->get();
         return response()->json($staff);
+    }
+
+    public function bootstrap()
+    {
+        return response()->json([
+            'products' => Product::with('category')->get(),
+            'tables' => Table::all(),
+            'orders' => Order::with(['table', 'user', 'items.product'])->where('status', '!=', 'paid')->get(),
+            'reservations' => Reservation::with('table')->orderBy('time')->get(),
+        ]);
     }
 }

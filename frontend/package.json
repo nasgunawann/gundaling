@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --host --port 5173",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "concurrently -n \"VITE,LARAVEL,REVERB\" -c \"cyan,green,yellow\" \"vite --host --port 5173\" \"php -S 127.0.0.1:8000 -t ../backend/public\" \"php ../backend/artisan reverb:start --host=127.0.0.1 --port=8080\""
   },
   "dependencies": {
     "axios": "^1.18.0",
@@ -22,6 +23,7 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
+    "concurrently": "^10.0.3",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
     "vite": "^5.3.1"

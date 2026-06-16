@@ -1,9 +1,27 @@
 import { create } from 'zustand';
 import api, { initEcho } from './api';
 
+const getInitialState = () => {
+  const token = localStorage.getItem('gundaling_token');
+  let user = null;
+  if (token) {
+    try {
+      const savedUser = localStorage.getItem('gundaling_user');
+      if (savedUser) {
+        user = JSON.parse(savedUser);
+      }
+    } catch (e) {
+      console.error('Failed to parse saved user', e);
+    }
+  }
+  return { token, user };
+};
+
+const { token: initialToken, user: initialUser } = getInitialState();
+
 const useStore = create((set, get) => ({
-  user: null,
-  token: null,
+  user: initialUser,
+  token: initialToken,
   products: [],
   tables: [],
   orders: [],
@@ -21,6 +39,7 @@ const useStore = create((set, get) => ({
       const res = await api.post('/api/login', { id, pin });
       const { user, token } = res.data;
       localStorage.setItem('gundaling_token', token);
+      localStorage.setItem('gundaling_user', JSON.stringify(user));
       
       const echo = initEcho(token);
       
@@ -41,6 +60,7 @@ const useStore = create((set, get) => ({
       await api.post('/api/logout');
     } catch (e) {}
     localStorage.removeItem('gundaling_token');
+    localStorage.removeItem('gundaling_user');
     const { echo } = get();
     if (echo) {
       echo.disconnect();
@@ -56,16 +76,20 @@ const useStore = create((set, get) => ({
     try {
       const res = await api.get('/api/me');
       const user = res.data;
+      localStorage.setItem('gundaling_user', JSON.stringify(user));
+      
       const echo = initEcho(token);
       
-      set({ user, echo, loading: false });
+      set({ user, echo });
       
       await get().fetchInitialData();
       get().subscribeToChannels(echo);
       
+      set({ loading: false });
       return true;
     } catch (err) {
       localStorage.removeItem('gundaling_token');
+      localStorage.removeItem('gundaling_user');
       set({ token: null, user: null, loading: false });
       return false;
     }
@@ -73,17 +97,12 @@ const useStore = create((set, get) => ({
 
   fetchInitialData: async () => {
     try {
-      const [prodRes, tabRes, ordRes, resRes] = await Promise.all([
-        api.get('/api/products'),
-        api.get('/api/tables'),
-        api.get('/api/orders'),
-        api.get('/api/reservations'),
-      ]);
+      const res = await api.get('/api/bootstrap');
       set({
-        products: prodRes.data,
-        tables: tabRes.data,
-        orders: ordRes.data,
-        reservations: resRes.data,
+        products: res.data.products,
+        tables: res.data.tables,
+        orders: res.data.orders,
+        reservations: res.data.reservations,
       });
     } catch (err) {
       console.error('Failed to fetch initial data', err);
@@ -103,10 +122,12 @@ const useStore = create((set, get) => ({
         } else {
           newOrders.push(updatedOrder);
         }
-        return { orders: newOrders };
+        const newTables = state.tables.map((t) => 
+          t.id === updatedOrder.table_id ? updatedOrder.table : t
+        );
+        return { orders: newOrders, tables: newTables };
       });
 
-      await get().fetchInitialData();
       return updatedOrder;
     } catch (err) {
       console.error(err);
@@ -120,9 +141,11 @@ const useStore = create((set, get) => ({
       const updatedOrder = res.data;
       set((state) => {
         const newOrders = state.orders.map((o) => o.id === orderId ? updatedOrder : o);
-        return { orders: newOrders };
+        const newTables = state.tables.map((t) => 
+          t.id === updatedOrder.table_id ? updatedOrder.table : t
+        );
+        return { orders: newOrders, tables: newTables };
       });
-      await get().fetchInitialData();
       return updatedOrder;
     } catch (err) {
       console.error(err);
@@ -136,9 +159,11 @@ const useStore = create((set, get) => ({
       const updatedOrder = res.data;
       set((state) => {
         const newOrders = state.orders.map((o) => o.id === orderId ? updatedOrder : o);
-        return { orders: newOrders };
+        const newTables = state.tables.map((t) => 
+          t.id === updatedOrder.table_id ? updatedOrder.table : t
+        );
+        return { orders: newOrders, tables: newTables };
       });
-      await get().fetchInitialData();
       return updatedOrder;
     } catch (err) {
       console.error(err);
@@ -151,7 +176,6 @@ const useStore = create((set, get) => ({
       const res = await api.post('/api/reservations', data);
       const newRes = res.data;
       set((state) => ({ reservations: [...state.reservations, newRes] }));
-      await get().fetchInitialData();
       return newRes;
     } catch (err) {
       console.error(err);
@@ -166,7 +190,6 @@ const useStore = create((set, get) => ({
       set((state) => ({
         reservations: state.reservations.map((r) => r.id === id ? updated : r),
       }));
-      await get().fetchInitialData();
       return updated;
     } catch (err) {
       console.error(err);
@@ -190,42 +213,45 @@ const useStore = create((set, get) => ({
     const { user } = get();
     if (!user) return;
 
+    const handleOrderUpdate = (order) => {
+      set((state) => {
+        const index = state.orders.findIndex((o) => o.id === order.id);
+        const newOrders = [...state.orders];
+        if (index > -1) {
+          newOrders[index] = order;
+        } else {
+          newOrders.push(order);
+        }
+        const newTables = state.tables.map((t) => 
+          t.id === order.table_id ? order.table : t
+        );
+        return { orders: newOrders, tables: newTables };
+      });
+    };
+
     if (user.role === 'Chef' || user.role === 'Manager') {
       echo.private('kitchen-orders')
         .listen('.OrderSent', (e) => {
-          set((state) => {
-            const index = state.orders.findIndex((o) => o.id === e.order.id);
-            const newOrders = [...state.orders];
-            if (index > -1) {
-              newOrders[index] = e.order;
-            } else {
-              newOrders.push(e.order);
-            }
-            return { orders: newOrders };
-          });
-          get().fetchInitialData();
+          handleOrderUpdate(e.order);
         })
         .listen('.OrderServed', (e) => {
-          get().fetchInitialData();
+          handleOrderUpdate(e.order);
         });
     }
 
     if (user.role === 'Server' || user.role === 'Manager') {
       echo.private('waiter-floor')
-        .listen('.OrderAccepted', (e) => {
-          get().fetchInitialData();
-        })
         .listen('.OrderPreparing', (e) => {
-          get().fetchInitialData();
+          handleOrderUpdate(e.order);
         })
         .listen('.OrderReady', (e) => {
-          get().fetchInitialData();
+          handleOrderUpdate(e.order);
           if (window.showToast) {
             window.showToast(`Order for ${e.order.table?.name || 'Table'} is ready for pickup!`, 'success');
           }
         })
         .listen('.OrderPaid', (e) => {
-          get().fetchInitialData();
+          handleOrderUpdate(e.order);
         });
     }
   },

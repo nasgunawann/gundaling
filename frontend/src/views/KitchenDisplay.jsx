@@ -11,11 +11,11 @@ export default function KitchenDisplay() {
   const [activeTab, setActiveTab] = useState('all');
 
   const activeOrders = orders.filter((o) => 
-    ['pending', 'accepted', 'preparing', 'ready'].includes(o.status)
+    ['pending', 'preparing', 'ready'].includes(o.status)
   );
 
   const pendingOrders = activeOrders.filter((o) => o.status === 'pending');
-  const preparingOrders = activeOrders.filter((o) => ['accepted', 'preparing'].includes(o.status));
+  const preparingOrders = activeOrders.filter((o) => o.status === 'preparing');
   const readyOrders = activeOrders.filter((o) => o.status === 'ready');
 
   // Audio synthezier alert for new orders
@@ -110,15 +110,6 @@ export default function KitchenDisplay() {
 
         <div className="pt-3 border-t border-outline-variant/10 mt-2 flex gap-2">
           {order.status === 'pending' && (
-            <button
-              onClick={() => handleStatusTransition(order.id, 'accepted')}
-              className="w-full py-2.5 bg-primary text-on-primary rounded-xl font-bold hover:opacity-90 active:scale-95 transition-all text-[11px] uppercase tracking-wider shadow-sm"
-            >
-              Accept Ticket
-            </button>
-          )}
-
-          {order.status === 'accepted' && (
             <button
               onClick={() => handleStatusTransition(order.id, 'preparing')}
               className="w-full py-2.5 bg-amber-600 text-white rounded-xl font-bold hover:opacity-90 active:scale-95 transition-all text-[11px] uppercase tracking-wider shadow-sm"

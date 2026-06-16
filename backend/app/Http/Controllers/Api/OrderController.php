@@ -9,7 +9,6 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Table;
 use App\Events\OrderSent;
-use App\Events\OrderAccepted;
 use App\Events\OrderPreparing;
 use App\Events\OrderReady;
 use App\Events\OrderServed;
@@ -123,7 +122,7 @@ class OrderController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|string|in:pending,accepted,preparing,ready,served,paid',
+            'status' => 'required|string|in:pending,preparing,ready,served,paid',
         ]);
 
         $order = Order::findOrFail($id);
@@ -133,8 +132,6 @@ class OrderController extends Controller
             $order->table->update(['status' => 'Available']);
             $order->items()->update(['sent' => true]);
             broadcast(new OrderPaid($order))->toOthers();
-        } elseif ($request->status === 'accepted') {
-            broadcast(new OrderAccepted($order))->toOthers();
         } elseif ($request->status === 'preparing') {
             broadcast(new OrderPreparing($order))->toOthers();
         } elseif ($request->status === 'ready') {
@@ -149,7 +146,7 @@ class OrderController extends Controller
     public function kitchenQueue()
     {
         $orders = Order::with(['table', 'user', 'items.product'])
-            ->whereIn('status', ['pending', 'accepted', 'preparing', 'ready'])
+            ->whereIn('status', ['pending', 'preparing', 'ready'])
             ->orderBy('created_at', 'asc')
             ->get();
 

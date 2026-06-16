@@ -55,7 +55,6 @@ C:\laragon\www\gundaling\
 │   │   │   └── Reservation.php
 │   │   └── Events/
 │   │       ├── OrderSent.php
-│   │       ├── OrderAccepted.php
 │   │       ├── OrderPreparing.php
 │   │       ├── OrderReady.php
 │   │       ├── OrderServed.php
@@ -213,10 +212,7 @@ GET  /api/me       → current user
  pending        Waiter sends items to kitchen
     │
     ▼
- accepted      Chef acknowledges the order (KDS)
-    │
-    ▼
- preparing     Chef starts cooking
+ preparing     Chef starts cooking immediately (no accept step)
     │
     ▼
  ready         Chef marks done
@@ -233,7 +229,6 @@ GET  /api/me       → current user
 | Event | Broadcast Channel | Payload | When |
 |-------|-------------------|---------|------|
 | `OrderSent` | `kitchen-orders` | `{order_id, table_name, items, created_at}` | Waiter clicks "Send to Kitchen" |
-| `OrderAccepted` | `waiter-floor` | `{order_id, table_name}` | Chef accepts |
 | `OrderPreparing` | `waiter-floor` | `{order_id, table_name}` | Chef starts cooking |
 | `OrderReady` | `waiter-floor` | `{order_id, table_name}` | Chef marks done |
 | `OrderServed` | `kitchen-orders` | `{order_id, table_name}` | Waiter serves |
