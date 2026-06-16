@@ -53,7 +53,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
   // Keep local tables in sync with database unless actively dragging
   useEffect(() => {
     setLocalTables(tables);
-  }, [backendTables, tableCarts]);
+  }, [backendTables, orders]);
 
   const handleDragStart = (e, table) => {
     if (!isEditMode) return;

@@ -30,7 +30,7 @@ export const initEcho = (token) => {
   return new Echo({
     broadcaster: 'reverb',
     key: 'gundalingkey',
-    wsHost: '127.0.0.1',
+    wsHost: window.location.hostname,
     wsPort: 8080,
     forceTLS: false,
     enabledTransports: ['ws', 'wss'],
