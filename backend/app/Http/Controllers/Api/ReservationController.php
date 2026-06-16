@@ -26,6 +26,16 @@ class ReservationController extends Controller
 
         $reservation = Reservation::create($validated);
 
+        // Update status of the associated table
+        $table = $reservation->table;
+        if ($table) {
+            if ($reservation->status === 'Seated') {
+                $table->update(['status' => 'Occupied']);
+            } elseif (in_array($reservation->status, ['Confirmed', 'Arrived'])) {
+                $table->update(['status' => 'Reserved']);
+            }
+        }
+
         return response()->json($reservation->load('table'), 201);
     }
 
@@ -45,7 +55,28 @@ class ReservationController extends Controller
             'status' => 'string|in:Confirmed,Arrived,Seated,Cancelled',
         ]);
 
+        $oldTableId = $reservation->table_id;
+
         $reservation->update($validated);
+
+        $table = $reservation->table;
+        if ($table) {
+            if ($reservation->status === 'Seated') {
+                $table->update(['status' => 'Occupied']);
+            } elseif (in_array($reservation->status, ['Confirmed', 'Arrived'])) {
+                $table->update(['status' => 'Reserved']);
+            } elseif ($reservation->status === 'Cancelled') {
+                $table->update(['status' => 'Available']);
+            }
+        }
+
+        // If the table was changed, revert the old table back to Available
+        if ($oldTableId !== $reservation->table_id) {
+            $oldTable = \App\Models\Table::find($oldTableId);
+            if ($oldTable) {
+                $oldTable->update(['status' => 'Available']);
+            }
+        }
 
         return response()->json($reservation->load('table'));
     }

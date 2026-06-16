@@ -10,6 +10,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
   const updateTablePosition = useStore((state) => state.updateTablePosition);
   const fetchInitialData = useStore((state) => state.fetchInitialData);
   const loading = useStore((state) => state.loading);
+  const orders = useStore((state) => state.orders);
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [localTables, setLocalTables] = useState([]);
@@ -23,20 +24,26 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
   const isLoading = loading && (!backendTables || backendTables.length === 0);
   const rawTables = backendTables && backendTables.length > 0 ? backendTables : [];
 
-  // Process live dynamic status
+  // Process live dynamic status based on orders
   const tables = rawTables.map(t => {
-    const cart = tableCarts[t.name] || [];
-    const hasItems = cart.length > 0;
-
-    let status = t.status || 'Available';
+    const activeOrder = orders.find(o => o.table_id === t.id && o.status !== 'paid');
+    
+    let status = 'Available';
     let billTotal = 0;
 
-    if (hasItems) {
-      const hasUnsent = cart.some(item => !item.sent);
-      status = hasUnsent ? 'Pending Kitchen' : 'Occupied';
-      billTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0) * 1.1;
-    } else if (status.startsWith('Occupied') || status === 'Pending Kitchen') {
-      status = 'Available';
+    if (activeOrder) {
+      billTotal = Number(activeOrder.total);
+      if (activeOrder.status === 'pending') {
+        status = 'Waiting Kitchen';
+      } else if (activeOrder.status === 'preparing') {
+        status = 'Cooking';
+      } else if (activeOrder.status === 'ready') {
+        status = 'Ready to Serve';
+      } else if (activeOrder.status === 'served') {
+        status = 'Awaiting Payment';
+      }
+    } else {
+      status = t.status === 'Reserved' ? 'Reserved' : 'Available';
     }
 
     return {
@@ -151,8 +158,10 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
   };
 
   const getStatusColor = (status) => {
-    if (status.startsWith('Occupied')) return 'bg-status-occupied border-status-occupied text-status-on-occupied';
-    if (status === 'Pending Kitchen') return 'bg-status-pending border-status-pending text-status-on-pending';
+    if (status === 'Waiting Kitchen') return 'bg-status-pending border-status-pending text-status-on-pending';
+    if (status === 'Cooking') return 'bg-status-warning border-status-warning text-status-on-warning';
+    if (status === 'Ready to Serve') return 'bg-status-success border-status-success text-status-on-success';
+    if (status === 'Awaiting Payment') return 'bg-status-occupied border-status-occupied text-status-on-occupied';
     if (status === 'Reserved') return 'bg-status-reserved border-status-reserved text-status-on-reserved';
     return 'bg-surface border-outline-variant/35 text-on-surface';
   };
@@ -207,18 +216,26 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
       <div className="flex-1 p-container_margin overflow-hidden bg-surface-container-lowest/40 flex flex-col gap-6 relative select-none">
         
         {/* Status Indicators bar */}
-        <div className="flex gap-6 py-3 px-6 bg-surface border border-outline-variant/20 rounded-2xl w-fit shadow-sm text-xs font-bold uppercase tracking-wider z-10">
+        <div className="flex flex-wrap gap-4 py-3 px-6 bg-surface border border-outline-variant/20 rounded-2xl w-fit shadow-sm text-xs font-bold uppercase tracking-wider z-10">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-outline-variant"></div>
             <span className="text-on-surface-variant">Available</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-status-pending"></div>
-            <span className="text-status-pending">Pending Kitchen</span>
+            <span className="text-status-pending">Waiting Kitchen</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-status-warning"></div>
+            <span className="text-status-warning">Cooking</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-status-success"></div>
+            <span className="text-status-success">Ready to Serve</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-status-occupied"></div>
-            <span className="text-status-occupied">Occupied</span>
+            <span className="text-status-occupied">Awaiting Payment</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-status-reserved"></div>
