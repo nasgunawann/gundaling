@@ -21,7 +21,7 @@ class ReservationController extends Controller
             'guests' => 'required|integer|min:1',
             'table_id' => 'required|exists:tables,id',
             'time' => 'required|date',
-            'status' => 'string|in:Confirmed,Arrived,Seated,Cancelled',
+            'status' => 'string|in:Confirmed,Seated,Cancelled',
         ]);
 
         $reservation = Reservation::create($validated);
@@ -31,7 +31,7 @@ class ReservationController extends Controller
         if ($table) {
             if ($reservation->status === 'Seated') {
                 $table->update(['status' => 'Occupied']);
-            } elseif (in_array($reservation->status, ['Confirmed', 'Arrived'])) {
+            } elseif ($reservation->status === 'Confirmed') {
                 $table->update(['status' => 'Reserved']);
             }
         }
@@ -52,7 +52,7 @@ class ReservationController extends Controller
             'guests' => 'sometimes|required|integer|min:1',
             'table_id' => 'sometimes|required|exists:tables,id',
             'time' => 'sometimes|required|date',
-            'status' => 'string|in:Confirmed,Arrived,Seated,Cancelled',
+            'status' => 'string|in:Confirmed,Seated,Cancelled',
         ]);
 
         $oldTableId = $reservation->table_id;
@@ -63,7 +63,7 @@ class ReservationController extends Controller
         if ($table) {
             if ($reservation->status === 'Seated') {
                 $table->update(['status' => 'Occupied']);
-            } elseif (in_array($reservation->status, ['Confirmed', 'Arrived'])) {
+            } elseif ($reservation->status === 'Confirmed') {
                 $table->update(['status' => 'Reserved']);
             } elseif ($reservation->status === 'Cancelled') {
                 $table->update(['status' => 'Available']);

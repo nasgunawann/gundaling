@@ -20,7 +20,7 @@ export default function Reservations({ reservations }) {
   const [newTime, setNewTime] = useState('19:00');
   const [newDate, setNewDate] = useState(() => new Date().toISOString().split('T')[0]);
 
-  const filterStatuses = ['All', 'Confirmed', 'Arrived', 'Seated'];
+  const filterStatuses = ['All', 'Confirmed', 'Seated', 'Cancelled'];
 
   const handleStatusChange = async (id, newStatus) => {
     try {
@@ -189,8 +189,8 @@ export default function Reservations({ reservations }) {
                         <span className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm border ${
                           res.status === 'Seated' 
                             ? 'bg-status-success/10 border-status-success/20 text-status-success' 
-                            : res.status === 'Arrived' 
-                            ? 'bg-status-warning/10 border-status-warning/20 text-status-warning' 
+                            : res.status === 'Cancelled'
+                            ? 'bg-status-danger/10 border-status-danger/20 text-status-danger'
                             : 'bg-status-reserved/10 border-status-reserved/20 text-status-reserved'
                         }`}>
                           {res.status}
@@ -201,25 +201,31 @@ export default function Reservations({ reservations }) {
                       <td className="py-5 px-6 text-right">
                         <div className="flex gap-2 justify-end">
                           {res.status === 'Confirmed' && (
-                            <button 
-                              onClick={() => handleStatusChange(res.id, 'Arrived')}
-                              className="px-3.5 py-2 bg-status-warning text-status-on-warning font-bold rounded-xl text-xs transition-colors shadow-sm hover:opacity-90 active:scale-95"
-                            >
-                              Mark Arrived
-                            </button>
-                          )}
-                          {res.status === 'Arrived' && (
-                            <button 
-                              onClick={() => handleStatusChange(res.id, 'Seated')}
-                              className="px-3.5 py-2 bg-status-success text-status-on-success font-bold rounded-xl text-xs transition-colors shadow-sm hover:opacity-90 active:scale-95"
-                            >
-                              Seat Guest
-                            </button>
+                            <>
+                              <button 
+                                onClick={() => handleStatusChange(res.id, 'Seated')}
+                                className="px-3.5 py-2 bg-status-success text-status-on-success font-bold rounded-xl text-xs transition-colors shadow-sm hover:opacity-90 active:scale-95"
+                              >
+                                Seat Guest
+                              </button>
+                              <button 
+                                onClick={() => handleStatusChange(res.id, 'Cancelled')}
+                                className="px-3.5 py-2 border border-status-danger/30 text-status-danger font-bold rounded-xl text-xs transition-colors shadow-sm hover:bg-status-danger/5 active:scale-95"
+                              >
+                                Cancel
+                              </button>
+                            </>
                           )}
                           {res.status === 'Seated' && (
-                            <span className="text-xs font-bold text-outline uppercase tracking-wider pr-3 py-2 leading-none flex items-center gap-1.5 justify-end">
-                              <span className="material-symbols-outlined text-sm text-status-success">check_circle</span>
+                            <span className="text-xs font-bold text-status-success uppercase tracking-wider pr-3 py-2 leading-none flex items-center gap-1.5 justify-end">
+                              <span className="material-symbols-outlined text-sm">check_circle</span>
                               Seated
+                            </span>
+                          )}
+                          {res.status === 'Cancelled' && (
+                            <span className="text-xs font-bold text-outline uppercase tracking-wider pr-3 py-2 leading-none flex items-center gap-1.5 justify-end">
+                              <span className="material-symbols-outlined text-sm">cancel</span>
+                              Cancelled
                             </span>
                           )}
                         </div>
@@ -294,9 +300,17 @@ export default function Reservations({ reservations }) {
                   <select 
                     value={newTable} 
                     onChange={(e) => setNewTable(e.target.value)}
-                    className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold shadow-sm focus:ring-2 focus:ring-primary"
+                    className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold shadow-sm focus:ring-2 focus:ring-primary cursor-pointer"
                   >
-                    {storeTables.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                    {storeTables.map(t => {
+                      const capacityOk = t.seats >= parseInt(newGuests || 1);
+                      const prefix = capacityOk ? '' : '⚠️ [Capacity Low] ';
+                      return (
+                        <option key={t.id} value={t.id} className="text-on-surface bg-surface font-semibold">
+                          {prefix}{t.name} ({t.seats} Seats) — {t.status}
+                        </option>
+                      );
+                    })}
                   </select>
                 </div>
               </div>

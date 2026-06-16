@@ -33,14 +33,10 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
 
     if (activeOrder) {
       billTotal = Number(activeOrder.total);
-      if (activeOrder.status === 'pending') {
-        status = 'Waiting Kitchen';
-      } else if (activeOrder.status === 'preparing') {
-        status = 'Cooking';
-      } else if (activeOrder.status === 'ready') {
-        status = 'Ready to Serve';
+      if (['pending', 'preparing', 'ready'].includes(activeOrder.status)) {
+        status = 'Dining';
       } else if (activeOrder.status === 'served') {
-        status = 'Awaiting Payment';
+        status = 'Billed';
       }
     } else {
       status = t.status === 'Reserved' ? 'Reserved' : 'Available';
@@ -158,10 +154,8 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
   };
 
   const getStatusColor = (status) => {
-    if (status === 'Waiting Kitchen') return 'bg-status-pending border-status-pending text-status-on-pending';
-    if (status === 'Cooking') return 'bg-status-warning border-status-warning text-status-on-warning';
-    if (status === 'Ready to Serve') return 'bg-status-success border-status-success text-status-on-success';
-    if (status === 'Awaiting Payment') return 'bg-status-occupied border-status-occupied text-status-on-occupied';
+    if (status === 'Dining') return 'bg-status-occupied border-status-occupied text-status-on-occupied';
+    if (status === 'Billed') return 'bg-status-warning border-status-warning text-status-on-warning';
     if (status === 'Reserved') return 'bg-status-reserved border-status-reserved text-status-on-reserved';
     return 'bg-surface border-outline-variant/35 text-on-surface';
   };
@@ -222,20 +216,12 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
             <span className="text-on-surface-variant">Available</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-status-pending"></div>
-            <span className="text-status-pending">Waiting Kitchen</span>
+            <div className="w-3 h-3 rounded-full bg-status-occupied"></div>
+            <span className="text-status-occupied">Dining</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-status-warning"></div>
-            <span className="text-status-warning">Cooking</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-status-success"></div>
-            <span className="text-status-success">Ready to Serve</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-status-occupied"></div>
-            <span className="text-status-occupied">Awaiting Payment</span>
+            <span className="text-status-warning">Billed</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-status-reserved"></div>
