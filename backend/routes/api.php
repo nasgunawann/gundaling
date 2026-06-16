@@ -7,14 +7,15 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\TableController;
 use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\BootstrapController;
 
-Route::post('/login', [AuthController::class, 'login']);
-Route::get('/staff-members', [AuthController::class, 'staff']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
+Route::get('/staff-members', [AuthController::class, 'staff'])->middleware('throttle:60,1');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
-    Route::get('/bootstrap', [AuthController::class, 'bootstrap']);
+    Route::get('/bootstrap', BootstrapController::class);
 
     // Products
     Route::get('/products', [ProductController::class, 'index']);
@@ -45,5 +46,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders', [OrderController::class, 'store']);
     Route::post('/orders/{order}/transmit', [OrderController::class, 'transmit']);
     Route::put('/orders/{order}/status', [OrderController::class, 'updateStatus']);
-    Route::get('/orders/kitchen', [OrderController::class, 'kitchenQueue']);
 });

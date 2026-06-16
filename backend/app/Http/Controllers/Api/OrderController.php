@@ -41,6 +41,7 @@ class OrderController extends Controller
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.qty' => 'required|integer|min:1',
             'items.*.sent' => 'boolean',
+            'items.*.note' => 'nullable|string',
         ]);
 
         $table = Table::findOrFail($request->table_id);
@@ -61,29 +62,40 @@ class OrderController extends Controller
         }
 
         $incomingSentCount = 0;
+        $productIds = collect($request->items)->pluck('product_id')->toArray();
+        $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+        $existingItems = OrderItem::where('order_id', $order->id)->get()->groupBy(function ($item) {
+            return $item->product_id . '_' . ($item->sent ? '1' : '0');
+        });
 
         foreach ($request->items as $item) {
-            $product = Product::findOrFail($item['product_id']);
+            $productId = $item['product_id'];
+            $product = $products->get($productId);
+            if (!$product) {
+                continue;
+            }
             $sent = $item['sent'] ?? false;
 
             if ($sent) {
                 $incomingSentCount++;
             }
 
-            $orderItem = OrderItem::where('order_id', $order->id)
-                ->where('product_id', $product->id)
-                ->where('sent', $sent)
-                ->first();
+            $key = $productId . '_' . ($sent ? '1' : '0');
+            $orderItem = isset($existingItems[$key]) ? $existingItems[$key]->first() : null;
 
             if ($orderItem) {
-                $orderItem->update(['qty' => $item['qty']]);
+                $orderItem->update([
+                    'qty' => $item['qty'],
+                    'note' => $item['note'] ?? null,
+                ]);
             } else {
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'product_id' => $product->id,
+                    'product_id' => $productId,
                     'qty' => $item['qty'],
                     'unit_price' => $product->price,
                     'sent' => $sent,
+                    'note' => $item['note'] ?? null,
                 ]);
             }
         }
@@ -100,6 +112,10 @@ class OrderController extends Controller
     public function transmit(Request $request, $id)
     {
         $order = Order::findOrFail($id);
+
+        if ($order->status === 'paid') {
+            return response()->json(['message' => 'Cannot transmit items to a paid order.'], 422);
+        }
 
         $unsentItems = $order->items()->where('sent', false)->get();
 
@@ -143,23 +159,10 @@ class OrderController extends Controller
         return response()->json($order->load(['table', 'user', 'items.product']));
     }
 
-    public function kitchenQueue()
-    {
-        $orders = Order::with(['table', 'user', 'items.product'])
-            ->whereIn('status', ['pending', 'preparing', 'ready'])
-            ->orderBy('created_at', 'asc')
-            ->get();
-
-        return response()->json($orders);
-    }
-
     private function recalculateOrderTotal(Order $order)
     {
-        $subtotal = 0;
-        foreach ($order->items as $item) {
-            $subtotal += $item->unit_price * $item->qty;
-        }
-        $total = $subtotal * 1.1; // Including 10% service charge
+        $subtotal = $order->items()->sum(\Illuminate\Support\Facades\DB::raw('unit_price * qty'));
+        $total = $subtotal * 1.1;
         $order->update(['total' => $total]);
     }
 }

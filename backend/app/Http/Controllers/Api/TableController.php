@@ -26,7 +26,7 @@ class TableController extends Controller
 
         $table = Table::create($validated);
 
-        return response()->json($table, 21);
+        return response()->json($table, 201);
     }
 
     public function show(Table $table)
@@ -53,6 +53,6 @@ class TableController extends Controller
     public function destroy(Table $table)
     {
         $table->delete();
-        return response()->json(null, 24);
+        return response()->json(null, 204);
     }
 }

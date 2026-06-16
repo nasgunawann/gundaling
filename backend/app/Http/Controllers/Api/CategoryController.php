@@ -22,7 +22,7 @@ class CategoryController extends Controller
 
         $category = Category::create($validated);
 
-        return response()->json($category, 21);
+        return response()->json($category, 201);
     }
 
     public function show(Category $category)
@@ -45,6 +45,6 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         $category->delete();
-        return response()->json(null, 24);
+        return response()->json(null, 204);
     }
 }

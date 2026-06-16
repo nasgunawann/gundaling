@@ -11,17 +11,16 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
   const [isSettling, setIsSettling] = useState(false)
   const [isSendingToKitchen, setIsSendingToKitchen] = useState(false)
   const [showReceiptModal, setShowReceiptModal] = useState(false)
+  const [activeNoteItemId, setActiveNoteItemId] = useState(null)
 
   const storeTables = useStore((state) => state.tables)
   const storeOrders = useStore((state) => state.orders)
+  const storeCategories = useStore((state) => state.categories || [])
   const submitOrderStore = useStore((state) => state.submitOrder)
   const updateOrderStatusStore = useStore((state) => state.updateOrderStatus)
 
-  const tablesList = [
-    'Table 01', 'Table 02', 'Table 03', 'Table 04', 'Table 05', 'Table 06', 'Table 07', 'Table 08', 'Table 12'
-  ]
-
-  const categories = ['All', 'Meals', 'Milk & Dairy', 'Coffee', 'Desserts']
+  const tablesList = storeTables && storeTables.length > 0 ? storeTables.map(t => t.name) : []
+  const categories = ['All', ...storeCategories.map(c => c.name)]
 
   // Load cart for active table
   const activeCart = tableCarts[selectedTable] || []
@@ -120,7 +119,8 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
       const itemsPayload = activeCart.map(item => ({
         product_id: item.id,
         qty: item.qty,
-        sent: true
+        sent: true,
+        note: item.note || ''
       }))
 
       await submitOrderStore(tableObj.id, itemsPayload)
@@ -177,7 +177,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
     const matchesCat = activeCategory === 'All' || 
                        (product.category && (product.category.name === activeCategory || product.category === activeCategory))
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.desc.toLowerCase().includes(searchQuery.toLowerCase())
+      (product.desc && product.desc.toLowerCase().includes(searchQuery.toLowerCase()))
     return matchesCat && matchesSearch
   })
 
@@ -352,12 +352,26 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
                         </span>
                       )}
                     </div>
-                    <textarea
-                      value={item.note || ''}
-                      onChange={(e) => handleUpdateItemNote(item.id, e.target.value)}
-                      placeholder="Catatan"
-                      className="min-h-[48px] w-full rounded-2xl border border-outline-variant/5 bg-surface-container-low px-3 py-2 text-[10px] leading-snug text-on-surface resize-none outline-none focus:border-primary/10 focus:ring-2 focus:ring-primary/10"
-                    />
+                    {item.note || activeNoteItemId === item.id ? (
+                      <textarea
+                        value={item.note || ''}
+                        onChange={(e) => handleUpdateItemNote(item.id, e.target.value)}
+                        placeholder="Tulis catatan..."
+                        className="min-h-[48px] w-full rounded-xl border border-outline-variant/10 bg-surface-container-low px-3 py-2 text-[10px] leading-snug text-on-surface resize-none outline-none focus:border-primary/15 focus:ring-1 focus:ring-primary/15 mt-1"
+                        autoFocus={activeNoteItemId === item.id}
+                        onBlur={() => {
+                          if (!item.note) setActiveNoteItemId(null);
+                        }}
+                      />
+                    ) : (
+                      <button
+                        onClick={() => setActiveNoteItemId(item.id)}
+                        className="text-[10px] font-bold text-primary hover:opacity-85 flex items-center gap-1 mt-1 text-left"
+                      >
+                        <span className="material-symbols-outlined text-[14px]">edit_note</span>
+                        Tambah Catatan
+                      </button>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-2">
@@ -428,7 +442,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
               disabled={activeCart.length === 0 || isPrinting || isSettling || isSendingToKitchen}
               className="h-14 border-2 border-primary/20 rounded-xl font-bold text-primary hover:bg-primary/5 active:scale-95 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:scale-100 text-xs uppercase tracking-wider"
             >
-              <span className="material-symbols-outlined text-base">
+              <span className={`material-symbols-outlined text-base ${isPrinting ? 'animate-spin' : ''}`}>
                 {isPrinting ? 'sync' : 'print'}
               </span>
               {isPrinting ? 'Queuing...' : 'Print Bill'}
@@ -438,9 +452,9 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
               <button
                 onClick={handleSendToKitchen}
                 disabled={activeCart.length === 0 || isPrinting || isSettling || isSendingToKitchen}
-                className="h-14 bg-tertiary text-on-tertiary rounded-xl font-bold shadow-md hover:shadow-lg active:scale-95 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:scale-100 text-xs uppercase tracking-wider animate-pulse"
+                className="h-14 bg-tertiary text-on-tertiary rounded-xl font-bold shadow-md hover:shadow-lg active:scale-95 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:scale-100 text-xs uppercase tracking-wider"
               >
-                <span className="material-symbols-outlined text-base">
+                <span className={`material-symbols-outlined text-base ${isSendingToKitchen ? 'animate-spin' : ''}`}>
                   {isSendingToKitchen ? 'sync' : 'soup_kitchen'}
                 </span>
                 {isSendingToKitchen ? 'Sending...' : 'Send to Kitchen'}
@@ -451,7 +465,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
                 disabled={activeCart.length === 0 || isPrinting || isSettling || isSendingToKitchen}
                 className="h-14 bg-primary text-on-primary rounded-xl font-bold shadow-md hover:shadow-lg active:scale-95 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:scale-100 text-xs uppercase tracking-wider"
               >
-                <span className="material-symbols-outlined text-base">
+                <span className={`material-symbols-outlined text-base ${isSettling ? 'animate-spin' : ''}`}>
                   {isSettling ? 'sync' : 'payments'}
                 </span>
                 {isSettling ? 'Settling...' : 'Settle Bill'}

@@ -26,6 +26,7 @@ const useStore = create((set, get) => ({
   tables: [],
   orders: [],
   reservations: [],
+  categories: [],
   echo: null,
   loading: false,
 
@@ -103,6 +104,7 @@ const useStore = create((set, get) => ({
         tables: res.data.tables,
         orders: res.data.orders,
         reservations: res.data.reservations,
+        categories: res.data.categories,
       });
     } catch (err) {
       console.error('Failed to fetch initial data', err);

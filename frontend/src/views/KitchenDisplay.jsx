@@ -7,8 +7,12 @@ export default function KitchenDisplay() {
   const orders = useStore((state) => state.orders);
   const updateOrderStatus = useStore((state) => state.updateOrderStatus);
 
-  // KDS local states
-  const [activeTab, setActiveTab] = useState('all');
+  // Auto-refresh elapsed times every 30 seconds
+  const [timeTick, setTimeTick] = useState(Date.now());
+  useEffect(() => {
+    const interval = setInterval(() => setTimeTick(Date.now()), 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const activeOrders = orders.filter((o) => 
     ['pending', 'preparing', 'ready'].includes(o.status)
@@ -73,7 +77,7 @@ export default function KitchenDisplay() {
       <div 
         key={order.id} 
         className={`bg-surface p-5 rounded-3xl border shadow-[0_4px_12px_rgba(0,0,0,0.01)] flex flex-col justify-between transition-all duration-200 ${
-          isLate ? 'border-error/30 bg-error-container/5 animate-pulse' : 'border-outline-variant/30 hover:shadow-md'
+          isLate ? 'border-error bg-error/5 ring-1 ring-error/30' : 'border-outline-variant/30 hover:shadow-md'
         }`}
       >
         <div>
@@ -98,7 +102,7 @@ export default function KitchenDisplay() {
                   </span>
                   <span>{item.product?.name}</span>
                 </div>
-                {item.note && (
+                {item.note && typeof item.note === 'string' && item.note.trim() !== '' && (
                   <p className="text-[9px] text-amber-800 italic mt-0.5 max-w-[120px] bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-100">
                     "{item.note}"
                   </p>

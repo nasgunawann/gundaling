@@ -55,7 +55,7 @@ export default function App() {
           price: Number(item.unit_price),
           qty: item.qty,
           sent: item.sent,
-          note: '',
+          note: item.note || '',
         }))
       }
     })

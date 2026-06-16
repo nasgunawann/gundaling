@@ -67,7 +67,7 @@ export default function WaiterLogin({ onLoginSuccess }) {
       <div className="relative md:w-[40%] w-full h-[40vh] md:h-full bg-primary flex flex-col justify-between p-container_margin text-on-primary overflow-hidden">
         <div
           className="absolute inset-0 opacity-10 pointer-events-none"
-          style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px;' }}
+          style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }}
         ></div>
 
         <div className="relative z-10 flex flex-col gap-unit">
@@ -145,7 +145,7 @@ export default function WaiterLogin({ onLoginSuccess }) {
             </div>
 
             {errorMsg && (
-              <div className="text-error text-xs font-bold text-center mt-1 flex items-center justify-center gap-1.5 bg-error/10 py-2.5 rounded-lg border border-error/20 animate-pulse">
+              <div className="text-error text-xs font-bold text-center mt-1 flex items-center justify-center gap-1.5 bg-error/10 py-2.5 rounded-lg border border-error/20 animate-in fade-in duration-200">
                 <span className="material-symbols-outlined text-sm">error</span>
                 {errorMsg}
               </div>
@@ -190,15 +190,15 @@ export default function WaiterLogin({ onLoginSuccess }) {
               className="mt-2 w-full h-16 bg-primary text-on-primary rounded-xl font-bold text-base shadow-lg active:scale-[0.98] hover:opacity-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:scale-100"
             >
               {isSubmitting ? 'Verifying Staff ID...' : 'Authorize Login'}
-              <span className="material-symbols-outlined">
+              <span className={`material-symbols-outlined ${isSubmitting ? 'animate-spin' : ''}`}>
                 {isSubmitting ? 'sync' : 'login'}
               </span>
             </button>
           </div>
 
           <div className="flex justify-between w-full text-xs font-semibold text-outline px-2">
-            <button className="hover:text-primary transition-colors">Forgot PIN?</button>
-            <button className="hover:text-primary transition-colors">System Support</button>
+            <button onClick={() => alert("Please contact your administrator or manager to reset your secure PIN.")} className="hover:text-primary transition-colors">Forgot PIN?</button>
+            <button onClick={() => alert("Gundaling POS v4.2.1 - System fully operational.")} className="hover:text-primary transition-colors">System Support</button>
           </div>
         </div>
       </div>

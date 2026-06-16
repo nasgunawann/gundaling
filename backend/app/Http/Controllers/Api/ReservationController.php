@@ -26,7 +26,7 @@ class ReservationController extends Controller
 
         $reservation = Reservation::create($validated);
 
-        return response()->json($reservation->load('table'), 21);
+        return response()->json($reservation->load('table'), 201);
     }
 
     public function show(Reservation $reservation)
@@ -53,6 +53,6 @@ class ReservationController extends Controller
     public function destroy(Reservation $reservation)
     {
         $reservation->delete();
-        return response()->json(null, 24);
+        return response()->json(null, 204);
     }
 }

@@ -20,20 +20,8 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
   const [newTableSeats, setNewTableSeats] = useState(4);
   const [newTableShape, setNewTableShape] = useState('square');
 
-  const defaultTables = [
-    { id: 1, name: 'Table 01', seats: 4, shape: 'circle', pos_x: 10, pos_y: 15, status: 'Available' },
-    { id: 2, name: 'Table 02', seats: 2, shape: 'square', pos_x: 30, pos_y: 15, status: 'Reserved' },
-    { id: 3, name: 'Table 03', seats: 4, shape: 'square', pos_x: 50, pos_y: 15, status: 'Occupied' },
-    { id: 4, name: 'Table 04', seats: 4, shape: 'square', pos_x: 70, pos_y: 15, status: 'Occupied' },
-    { id: 5, name: 'Table 05', seats: 6, shape: 'rectangle', pos_x: 10, pos_y: 45, status: 'Available' },
-    { id: 6, name: 'Table 06', seats: 2, shape: 'circle', pos_x: 30, pos_y: 45, status: 'Available' },
-    { id: 7, name: 'Table 07', seats: 8, shape: 'rectangle', pos_x: 50, pos_y: 45, status: 'Reserved' },
-    { id: 8, name: 'Table 08', seats: 6, shape: 'rectangle', pos_x: 70, pos_y: 45, status: 'Occupied' },
-    { id: 12, name: 'Table 12', seats: 4, shape: 'circle', pos_x: 90, pos_y: 45, status: 'Occupied' }
-  ];
-
   const isLoading = loading && (!backendTables || backendTables.length === 0);
-  const rawTables = backendTables && backendTables.length > 0 ? backendTables : (isLoading ? [] : defaultTables);
+  const rawTables = backendTables && backendTables.length > 0 ? backendTables : [];
 
   // Process live dynamic status
   const tables = rawTables.map(t => {
@@ -63,20 +51,27 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
     setLocalTables(tables);
   }, [backendTables, tableCarts]);
 
-  const handleMouseDown = (e, table) => {
+  const handleDragStart = (e, table) => {
     if (!isEditMode) return;
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
     
     const container = containerRef.current;
     if (!container) return;
     
     const rect = container.getBoundingClientRect();
+    const isTouch = e.type === 'touchstart';
 
-    const handleMouseMove = (moveEvent) => {
-      let x = ((moveEvent.clientX - rect.left) / rect.width) * 100;
-      let y = ((moveEvent.clientY - rect.top) / rect.height) * 100;
+    const getCoordinates = (evt) => {
+      const clientX = isTouch ? evt.touches[0].clientX : evt.clientX;
+      const clientY = isTouch ? evt.touches[0].clientY : evt.clientY;
+      return { clientX, clientY };
+    };
 
-      // Clamp values (e.g. w-32/h-32 is roughly 10% on standard screen width)
+    const handleDragMove = (moveEvent) => {
+      const { clientX, clientY } = getCoordinates(moveEvent);
+      let x = ((clientX - rect.left) / rect.width) * 100;
+      let y = ((clientY - rect.top) / rect.height) * 100;
+
       x = Math.max(1, Math.min(88, x));
       y = Math.max(1, Math.min(85, y));
 
@@ -85,9 +80,14 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
       );
     };
 
-    const handleMouseUp = async () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+    const handleDragEnd = async () => {
+      if (isTouch) {
+        document.removeEventListener('touchmove', handleDragMove);
+        document.removeEventListener('touchend', handleDragEnd);
+      } else {
+        document.removeEventListener('mousemove', handleDragMove);
+        document.removeEventListener('mouseup', handleDragEnd);
+      }
 
       const dragTarget = localTables.find(t => t.id === table.id);
       if (dragTarget) {
@@ -95,8 +95,13 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
       }
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    if (isTouch) {
+      document.addEventListener('touchmove', handleDragMove, { passive: false });
+      document.addEventListener('touchend', handleDragEnd);
+    } else {
+      document.addEventListener('mousemove', handleDragMove);
+      document.addEventListener('mouseup', handleDragEnd);
+    }
   };
 
   const handleAddTableSubmit = async (e) => {
@@ -258,7 +263,8 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
               return (
                 <div
                   key={table.id}
-                  onMouseDown={(e) => handleMouseDown(e, table)}
+                  onMouseDown={(e) => handleDragStart(e, table)}
+                  onTouchStart={(e) => handleDragStart(e, table)}
                   style={{
                     position: 'absolute',
                     left: `${table.pos_x}%`,
@@ -267,7 +273,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                     cursor: isEditMode ? 'move' : 'pointer',
                     zIndex: 20
                   }}
-                  className={`transition-shadow duration-200 ${isEditMode ? 'hover:scale-102 hover:shadow-lg' : ''}`}
+                  className={`transition-shadow duration-200 ${isEditMode ? 'hover:scale-[1.02] hover:shadow-lg' : ''}`}
                 >
                   <button
                     onClick={() => !isEditMode && onTableClick(table.name)}
@@ -275,27 +281,27 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                     className={`border p-4 flex flex-col justify-between text-left group shadow-sm select-none ${shapeClass} ${diameterClass} ${getStatusColor(table.status)}`}
                   >
                     <div className="flex justify-between items-center w-full">
-                      <h3 className="text-[11px] font-bold font-display leading-none text-current">
+                      <h3 className="text-sm font-bold font-display leading-none text-current">
                         {table.name}
                       </h3>
                       {!isEditMode && (
-                        <span className={`text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full border leading-none ${getBadgeStyle(table.status)}`}>
+                        <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border leading-none ${getBadgeStyle(table.status)}`}>
                           {table.status}
                         </span>
                       )}
                     </div>
 
-                    <div className="text-[9px] font-semibold opacity-85 text-current mt-1">
+                    <div className="text-xs font-semibold opacity-85 text-current mt-1">
                       {table.seats} Seats
                     </div>
 
                     <div className="border-t border-current/20 pt-2 flex justify-between items-center w-full mt-2">
                       {table.bill > 0 ? (
-                        <span className="text-[10px] font-bold font-display font-mono leading-none text-current">
+                        <span className="text-xs font-bold font-display font-mono leading-none text-current">
                           Rp {Math.floor(table.bill).toLocaleString('id-ID')}
                         </span>
                       ) : (
-                        <span className="text-[7px] font-bold opacity-80 uppercase tracking-widest text-current">
+                        <span className="text-[9px] font-bold opacity-80 uppercase tracking-widest text-current">
                           {table.status === 'Reserved' ? 'Reserved' : 'Ready'}
                         </span>
                       )}
@@ -371,7 +377,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
 
               <button 
                 type="submit"
-                className="w-full h-13 bg-primary text-on-primary rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-md mt-6 text-xs uppercase tracking-wider"
+                className="w-full h-12 bg-primary text-on-primary rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-md mt-6 text-xs uppercase tracking-wider"
               >
                 Register Table
               </button>

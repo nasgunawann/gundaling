@@ -18,6 +18,7 @@ export default function Reservations({ reservations }) {
   const [newGuests, setNewGuests] = useState('2');
   const [newTable, setNewTable] = useState('');
   const [newTime, setNewTime] = useState('19:00');
+  const [newDate, setNewDate] = useState(() => new Date().toISOString().split('T')[0]);
 
   const filterStatuses = ['All', 'Confirmed', 'Arrived', 'Seated'];
 
@@ -44,8 +45,7 @@ export default function Reservations({ reservations }) {
       return;
     }
 
-    const bookingDate = new Date().toISOString().split('T')[0];
-    const bookingTime = `${bookingDate} ${newTime}:00`;
+    const bookingTime = `${newDate} ${newTime}:00`;
 
     try {
       await addReservationStore({
@@ -134,8 +134,8 @@ export default function Reservations({ reservations }) {
 
       {/* Reservations Table list */}
       <div className="flex-1 p-container_margin overflow-y-auto custom-scrollbar bg-surface-container-lowest/30 pb-16">
-        <div className="bg-surface rounded-3xl border border-outline-variant/30 shadow-[0_4px_12px_rgba(0,0,0,0.02)] overflow-hidden">
-          <table className="w-full text-left border-collapse">
+        <div className="bg-surface rounded-3xl border border-outline-variant/30 shadow-[0_4px_12px_rgba(0,0,0,0.02)] overflow-x-auto">
+          <table className="w-full min-w-[700px] text-left border-collapse">
             <thead>
               <tr className="border-b border-outline-variant/30 bg-surface-container-low/20">
                 <th className="py-4 px-6 font-bold text-xs uppercase tracking-wider text-on-surface-variant">Guest Info</th>
@@ -299,14 +299,26 @@ export default function Reservations({ reservations }) {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Time Schedule</label>
-                <input 
-                  type="time" 
-                  value={newTime} 
-                  onChange={(e) => setNewTime(e.target.value)}
-                  className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold shadow-sm focus:ring-2 focus:ring-primary"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Booking Date</label>
+                  <input 
+                    type="date" 
+                    value={newDate} 
+                    onChange={(e) => setNewDate(e.target.value)}
+                    className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold shadow-sm focus:ring-2 focus:ring-primary"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Time Schedule</label>
+                  <input 
+                    type="time" 
+                    value={newTime} 
+                    onChange={(e) => setNewTime(e.target.value)}
+                    className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold shadow-sm focus:ring-2 focus:ring-primary"
+                  />
+                </div>
               </div>
 
               <button 

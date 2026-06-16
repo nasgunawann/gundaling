@@ -58,7 +58,7 @@ export default {
       },
       fontFamily: {
         display: ["Plus Jakarta Sans", "sans-serif"],
-        body: ["Inter", "sans-serif"],
+        body: ["Plus Jakarta Sans", "sans-serif"],
       },
     },
   },

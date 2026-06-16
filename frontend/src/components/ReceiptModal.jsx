@@ -11,10 +11,10 @@ export default function ReceiptModal({
   serviceCharge,
   grandTotal
 }) {
-  if (!open) return null
+  const now = React.useMemo(() => new Date(), [open])
+  const invoiceNumber = React.useMemo(() => `GND-${Math.floor(1000 + Math.random() * 9000)}`, [open])
 
-  const now = new Date()
-  const invoiceNumber = `GND-${Math.floor(1000 + Math.random() * 9000)}`
+  if (!open) return null
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">

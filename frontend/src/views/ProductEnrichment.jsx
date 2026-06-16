@@ -11,7 +11,7 @@ export default function ProductEnrichment({ products }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isAddingNew, setIsAddingNew] = useState(false);
 
-  const storeCategories = useStore((state) => state.categories);
+  const storeCategories = useStore((state) => state.categories || []);
   const fetchInitialData = useStore((state) => state.fetchInitialData);
 
   // Form states for Editing or Adding New
@@ -31,7 +31,7 @@ export default function ProductEnrichment({ products }) {
   const [formAllergen, setFormAllergen] = useState(false);
   const [formGarnish, setFormGarnish] = useState(false);
 
-  const categories = ['All', 'Meals', 'Milk & Dairy', 'Coffee', 'Desserts'];
+  const categories = ['All', ...storeCategories.map(c => c.name)];
 
   const handleSelectProduct = (product) => {
     setSelectedProduct(product);
@@ -62,7 +62,7 @@ export default function ProductEnrichment({ products }) {
     // Clear form for new item
     setFormName('');
     setFormPrice('10000');
-    setFormCategory('Meals');
+    setFormCategory(storeCategories[0]?.name || 'Meals');
     setFormDesc('');
     setFormBadge('New');
     setFormImage('/images/gundaling_milk.png');
@@ -218,7 +218,7 @@ export default function ProductEnrichment({ products }) {
                   <div className="aspect-[16/10] bg-surface-container-highest relative overflow-hidden">
                     <img 
                       alt={p.name} 
-                      className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-200"
+                      className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
                       src={p.image}
                     />
                     <span className="absolute top-2.5 left-2.5 bg-primary text-on-primary px-2.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest shadow-sm">
@@ -451,14 +451,14 @@ export default function ProductEnrichment({ products }) {
                   setIsAddingNew(false);
                   setSelectedProduct(null);
                 }}
-                className="flex-1 h-13 border border-outline-variant rounded-xl font-bold text-on-surface-variant hover:bg-surface-container hover:text-on-surface active:scale-95 transition-all text-xs"
+                className="flex-1 h-12 border border-outline-variant rounded-xl font-bold text-on-surface-variant hover:bg-surface-container hover:text-on-surface active:scale-95 transition-all text-xs"
               >
                 Cancel Form
               </button>
               
               <button 
                 type="submit"
-                className="flex-grow h-13 bg-primary text-on-primary rounded-xl font-bold shadow-md hover:shadow-lg active:scale-95 transition-all flex items-center justify-center gap-1 text-xs"
+                className="flex-grow h-12 bg-primary text-on-primary rounded-xl font-bold shadow-md hover:shadow-lg active:scale-95 transition-all flex items-center justify-center gap-1 text-xs"
               >
                 <span className="material-symbols-outlined text-base">save</span>
                 {isAddingNew ? 'Create Dish' : 'Apply Changes'}
@@ -472,7 +472,7 @@ export default function ProductEnrichment({ products }) {
             </span>
             <p className="text-xs font-bold font-display uppercase tracking-wider">Catalog Administrator</p>
             <p className="text-[11px] max-w-xs mt-1 leading-relaxed px-4">
-              Select any organic food dish or latte from the master menu on the left to edit its visual descriptions, price lists, or preparation standards. Or click **Add New Dish** to register a new recipe.
+              Select any organic food dish or latte from the master menu on the left to edit its visual descriptions, price lists, or preparation standards. Or click <strong>Add New Dish</strong> to register a new recipe.
             </p>
           </div>
         )}
