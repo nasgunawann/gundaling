@@ -63,7 +63,7 @@ export default function WaiterLogin({ onLoginSuccess }) {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col md:flex-row bg-background select-none font-body">
+    <div className="h-screen w-screen flex flex-col md:flex-row bg-background select-none font-body overflow-hidden">
       <div className="relative md:w-[40%] w-full h-[40vh] md:h-full bg-primary flex flex-col justify-between p-container_margin text-on-primary overflow-hidden">
         <div
           className="absolute inset-0 opacity-10 pointer-events-none"
@@ -94,14 +94,12 @@ export default function WaiterLogin({ onLoginSuccess }) {
           </p>
         </div>
 
-        <img
-          alt="Gundaling Farmstead Background"
-          className="absolute bottom-0 left-0 w-full h-1/2 object-cover opacity-20 mix-blend-overlay pointer-events-none"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBr-eMW1j8C8HdZu5T0VRgWoP8gwnmkD6fUj593svwohkF7SyqssEgUeX0I7hPeNs0Gu9xqn9g39yO12CsjDhMzy73J2t-2DCyBS5pGLOoG8iDJPaArT4xg_REJ-fWy1gVLv9HU-G0Aw0fXdw2OZ-pxkLzWKZGwr5ZX6Y6DUNxvcO65IQze7IcOL8KnXkjs2qjcDCS_E6gGh0nhZFYWJc1gqE4Fz6nc4aaKW77j6IxJC6WkfUtdHW4HAUhdzEm6jQObqm-YEGtekg5z"
+        <div 
+          className="absolute -bottom-10 -left-10 w-64 h-64 rounded-full bg-secondary/15 blur-3xl pointer-events-none"
         />
       </div>
 
-      <div className="flex-1 bg-surface flex flex-col items-center justify-center p-container_margin">
+      <div className="flex-1 bg-surface flex flex-col items-center justify-start md:justify-center p-6 overflow-y-auto custom-scrollbar">
         <div className="w-full max-w-md flex flex-col gap-8">
           <div className="text-center">
             <h2 className="font-display font-bold text-headline-md text-on-surface mb-2">Staff Login</h2>
@@ -156,7 +154,7 @@ export default function WaiterLogin({ onLoginSuccess }) {
                 <button
                   key={num}
                   onClick={() => handleNumClick(num.toString())}
-                  className="h-16 font-display font-bold text-xl bg-surface-container-high rounded-xl text-on-surface shadow-sm active:scale-95 active:bg-outline-variant/20 transition-all flex items-center justify-center"
+                  className="h-12 sm:h-14 md:h-16 font-display font-bold text-lg md:text-xl bg-surface-container-high rounded-xl text-on-surface shadow-sm active:scale-95 active:bg-outline-variant/20 transition-all flex items-center justify-center"
                 >
                   {num}
                 </button>
@@ -164,21 +162,21 @@ export default function WaiterLogin({ onLoginSuccess }) {
 
               <button
                 onClick={handleBackspace}
-                className="h-16 bg-surface-container-high rounded-xl text-error/80 shadow-sm active:scale-95 active:bg-error/10 transition-all flex items-center justify-center"
+                className="h-12 sm:h-14 md:h-16 bg-surface-container-high rounded-xl text-error/80 shadow-sm active:scale-95 active:bg-error/10 transition-all flex items-center justify-center"
               >
-                <span className="material-symbols-outlined text-2xl font-bold">backspace</span>
+                <span className="material-symbols-outlined text-xl md:text-2xl font-bold">backspace</span>
               </button>
 
               <button
                 onClick={() => handleNumClick('0')}
-                className="h-16 font-display font-bold text-xl bg-surface-container-high rounded-xl text-on-surface shadow-sm active:scale-95 active:bg-outline-variant/20 transition-all flex items-center justify-center"
+                className="h-12 sm:h-14 md:h-16 font-display font-bold text-lg md:text-xl bg-surface-container-high rounded-xl text-on-surface shadow-sm active:scale-95 active:bg-outline-variant/20 transition-all flex items-center justify-center"
               >
                 0
               </button>
 
               <button
                 onClick={handleClearPin}
-                className="h-16 rounded-xl bg-surface-container-high border border-outline-variant/20 text-on-surface-variant shadow-sm active:scale-95 active:bg-outline-variant/20 transition-all flex items-center justify-center text-xs font-bold uppercase tracking-[0.24em]"
+                className="h-12 sm:h-14 md:h-16 rounded-xl bg-surface-container-high border border-outline-variant/20 text-on-surface-variant shadow-sm active:scale-95 active:bg-outline-variant/20 transition-all flex items-center justify-center text-[10px] md:text-xs font-bold uppercase tracking-wider"
               >
                 Clear
               </button>
@@ -187,7 +185,7 @@ export default function WaiterLogin({ onLoginSuccess }) {
             <button
               onClick={handleLoginSubmit}
               disabled={isSubmitting}
-              className="mt-2 w-full h-16 bg-primary text-on-primary rounded-xl font-bold text-base shadow-lg active:scale-[0.98] hover:opacity-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:scale-100"
+              className="mt-2 w-full h-12 md:h-16 bg-primary text-on-primary rounded-xl font-bold text-sm md:text-base shadow-lg active:scale-[0.98] hover:opacity-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:scale-100"
             >
               {isSubmitting ? 'Verifying Staff ID...' : 'Authorize Login'}
               <span className={`material-symbols-outlined ${isSubmitting ? 'animate-spin' : ''}`}>

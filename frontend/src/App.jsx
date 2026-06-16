@@ -111,7 +111,7 @@ export default function App() {
             />
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center p-12 text-center bg-surface select-none">
-              <div className="w-20 h-20 bg-error/10 text-error rounded-3xl flex items-center justify-center mb-6 border border-error/20 shadow-sm animate-pulse">
+              <div className="w-20 h-20 bg-error/10 text-error rounded-3xl flex items-center justify-center mb-6 border border-error/20 shadow-sm">
                 <span className="material-symbols-outlined text-[40px]">gavel</span>
               </div>
               <h2 className="text-xl font-bold font-display text-on-surface mb-2">Access Restrained</h2>

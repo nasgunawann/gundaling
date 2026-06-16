@@ -343,12 +343,12 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
                     <div className="flex items-center gap-2">
                       <p className="text-[10px] font-bold text-primary font-display">Rp {Math.floor(item.price).toLocaleString('id-ID')}</p>
                       {item.sent ? (
-                        <span className="inline-flex items-center gap-1 text-[8px] font-bold text-primary uppercase bg-primary-container/20 border border-primary/20 px-1.5 py-0.5 rounded-full select-none">
-                          <span className="w-1 h-1 rounded-full bg-primary animate-pulse"></span>Cooking
+                        <span className="inline-flex items-center gap-1 text-[8px] font-bold text-status-success uppercase bg-status-success/10 border border-status-success/20 px-1.5 py-0.5 rounded-full select-none">
+                          <span className="w-1 h-1 rounded-full bg-status-success animate-pulse"></span>Cooking
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[8px] font-bold text-amber-700 uppercase bg-amber-50 border border-amber-200/50 px-1.5 py-0.5 rounded-full select-none">
-                          <span className="w-1 h-1 rounded-full bg-amber-500"></span>Pending
+                        <span className="inline-flex items-center gap-1 text-[8px] font-bold text-status-pending uppercase bg-status-pending/10 border border-status-pending/20 px-1.5 py-0.5 rounded-full select-none">
+                          <span className="w-1 h-1 rounded-full bg-status-pending"></span>Pending
                         </span>
                       )}
                     </div>

@@ -151,9 +151,9 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
   };
 
   const getStatusColor = (status) => {
-    if (status.startsWith('Occupied')) return 'bg-primary border-primary text-on-primary';
-    if (status === 'Pending Kitchen') return 'bg-tertiary border-tertiary text-on-tertiary';
-    if (status === 'Reserved') return 'bg-secondary border-secondary text-on-secondary';
+    if (status.startsWith('Occupied')) return 'bg-status-occupied border-status-occupied text-status-on-occupied';
+    if (status === 'Pending Kitchen') return 'bg-status-pending border-status-pending text-status-on-pending';
+    if (status === 'Reserved') return 'bg-status-reserved border-status-reserved text-status-on-reserved';
     return 'bg-surface border-outline-variant/35 text-on-surface';
   };
 
@@ -190,7 +190,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
               onClick={() => setIsEditMode(!isEditMode)}
               className={`h-12 px-5 rounded-xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-all text-xs uppercase tracking-wider shadow-sm ${
                 isEditMode 
-                  ? 'bg-amber-600 text-white hover:bg-amber-700' 
+                  ? 'bg-status-warning text-status-on-warning hover:opacity-90' 
                   : 'bg-primary/10 text-primary hover:bg-primary/20'
               }`}
             >
@@ -213,16 +213,16 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
             <span className="text-on-surface-variant">Available</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-tertiary"></div>
-            <span className="text-tertiary">Pending Kitchen</span>
+            <div className="w-3 h-3 rounded-full bg-status-pending"></div>
+            <span className="text-status-pending">Pending Kitchen</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-primary"></div>
-            <span className="text-primary">Occupied</span>
+            <div className="w-3 h-3 rounded-full bg-status-occupied"></div>
+            <span className="text-status-occupied">Occupied</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-secondary"></div>
-            <span className="text-secondary">Reserved</span>
+            <div className="w-3 h-3 rounded-full bg-status-reserved"></div>
+            <span className="text-status-reserved">Reserved</span>
           </div>
         </div>
 
@@ -252,13 +252,12 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
             </div>
           ) : (
             localTables.map((table) => {
+              // Standardized responsive layout sizes
               const shapeClass = table.shape === 'circle' 
-                ? 'rounded-full aspect-square' 
+                ? 'rounded-full aspect-square w-28 h-28 flex flex-col items-center justify-center text-center p-3' 
                 : table.shape === 'rectangle' 
-                ? 'rounded-2xl w-40 h-28' 
-                : 'rounded-2xl w-32 h-32';
-
-              const diameterClass = table.shape === 'circle' ? 'w-32 h-32' : '';
+                ? 'rounded-2xl w-36 h-24 flex flex-col justify-between text-left p-3' 
+                : 'rounded-2xl w-28 h-28 flex flex-col justify-between text-left p-3';
 
               return (
                 <div
@@ -278,34 +277,70 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                   <button
                     onClick={() => !isEditMode && onTableClick(table.name)}
                     disabled={isEditMode}
-                    className={`border p-4 flex flex-col justify-between text-left group shadow-sm select-none ${shapeClass} ${diameterClass} ${getStatusColor(table.status)}`}
+                    className={`border group shadow-sm select-none ${shapeClass} ${getStatusColor(table.status)}`}
                   >
-                    <div className="flex justify-between items-center w-full">
-                      <h3 className="text-sm font-bold font-display leading-none text-current">
-                        {table.name}
-                      </h3>
-                      {!isEditMode && (
-                        <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border leading-none ${getBadgeStyle(table.status)}`}>
-                          {table.status}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="text-xs font-semibold opacity-85 text-current mt-1">
-                      {table.seats} Seats
-                    </div>
-
-                    <div className="border-t border-current/20 pt-2 flex justify-between items-center w-full mt-2">
-                      {table.bill > 0 ? (
-                        <span className="text-xs font-bold font-display font-mono leading-none text-current">
-                          Rp {Math.floor(table.bill).toLocaleString('id-ID')}
-                        </span>
-                      ) : (
-                        <span className="text-[9px] font-bold opacity-80 uppercase tracking-widest text-current">
-                          {table.status === 'Reserved' ? 'Reserved' : 'Ready'}
-                        </span>
-                      )}
-                    </div>
+                    {table.shape === 'circle' ? (
+                      // Circle Centered Content
+                      <div className="flex flex-col items-center justify-center w-full h-full gap-0.5">
+                        <h3 className="text-xs font-bold font-display leading-tight text-current truncate max-w-full">
+                          {table.name}
+                        </h3>
+                        <div className="text-[10px] font-medium opacity-80 text-current leading-none">
+                          {table.seats} seats
+                        </div>
+                        {table.bill > 0 ? (
+                          <div className="border-t border-current/20 pt-1 mt-1 text-[10px] font-bold font-mono leading-none text-current w-full text-center">
+                            Rp {Math.floor(table.bill).toLocaleString('id-ID')}
+                          </div>
+                        ) : (
+                          <div className="text-[8px] font-bold opacity-60 uppercase tracking-wider mt-1">
+                            {table.status === 'Reserved' ? 'Reserved' : 'Ready'}
+                          </div>
+                        )}
+                      </div>
+                    ) : table.shape === 'rectangle' ? (
+                      // Rectangle Compact Left-Right Content
+                      <div className="flex flex-col justify-between w-full h-full">
+                        <div className="flex justify-between items-start w-full">
+                          <h3 className="text-sm font-bold font-display leading-none text-current">
+                            {table.name}
+                          </h3>
+                          <span className="text-[10px] font-medium opacity-80 text-current">
+                            {table.seats} seats
+                          </span>
+                        </div>
+                        {table.bill > 0 ? (
+                          <div className="border-t border-current/20 pt-1.5 text-xs font-bold font-display font-mono leading-none text-current w-full">
+                            Rp {Math.floor(table.bill).toLocaleString('id-ID')}
+                          </div>
+                        ) : (
+                          <div className="text-[8px] font-bold opacity-60 uppercase tracking-widest">
+                            {table.status === 'Reserved' ? 'Reserved' : 'Ready'}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      // Square Content
+                      <div className="flex flex-col justify-between w-full h-full">
+                        <div>
+                          <h3 className="text-xs font-bold font-display leading-tight text-current">
+                            {table.name}
+                          </h3>
+                          <div className="text-[10px] font-medium opacity-80 text-current mt-0.5">
+                            {table.seats} seats
+                          </div>
+                        </div>
+                        {table.bill > 0 ? (
+                          <div className="border-t border-current/20 pt-1.5 text-xs font-bold font-display font-mono leading-none text-current w-full">
+                            Rp {Math.floor(table.bill).toLocaleString('id-ID')}
+                          </div>
+                        ) : (
+                          <div className="text-[8px] font-bold opacity-60 uppercase tracking-widest">
+                            {table.status === 'Reserved' ? 'Reserved' : 'Ready'}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </button>
 
                   {isEditMode && (

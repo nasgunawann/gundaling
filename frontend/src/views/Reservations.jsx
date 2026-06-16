@@ -122,7 +122,7 @@ export default function Reservations({ reservations }) {
               onClick={() => setStatusFilter(status)}
               className={`px-4 py-2 rounded-full text-xs font-bold transition-all border ${
                 statusFilter === status 
-                  ? 'bg-primary/10 text-primary border-primary/20 font-bold shadow-sm' 
+                  ? 'bg-status-reserved/10 text-status-reserved border-status-reserved/20 font-bold shadow-sm' 
                   : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border-outline-variant/10'
               }`}
             >
@@ -148,7 +148,9 @@ export default function Reservations({ reservations }) {
             <tbody className="divide-y divide-surface-container/40">
               {filteredReservations.length > 0 ? (
                 filteredReservations.map((res) => {
-                  const bookingTimeStr = new Date(res.time).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                  const bookingTime = new Date(res.time);
+                  const bookingDateStr = bookingTime.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+                  const bookingTimeStr = bookingTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
                   return (
                     <tr key={res.id} className="hover:bg-surface-container-low/10 transition-colors">
                       {/* Guest Info */}
@@ -169,7 +171,7 @@ export default function Reservations({ reservations }) {
                         <div className="flex flex-col gap-0.5">
                           <div className="flex items-center gap-1.5 text-sm font-bold text-on-surface font-mono">
                             <span className="material-symbols-outlined text-sm text-primary">schedule</span>
-                            {bookingTimeStr}
+                            {bookingDateStr}, {bookingTimeStr}
                           </div>
                           <p className="text-xs text-on-surface-variant/80 font-semibold">{res.guests} Guests booked</p>
                         </div>
@@ -186,10 +188,10 @@ export default function Reservations({ reservations }) {
                       <td className="py-5 px-6 text-center">
                         <span className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm border ${
                           res.status === 'Seated' 
-                            ? 'bg-primary/10 border-primary/20 text-primary' 
+                            ? 'bg-status-success/10 border-status-success/20 text-status-success' 
                             : res.status === 'Arrived' 
-                            ? 'bg-blue-100 border-blue-200 text-blue-700' 
-                            : 'bg-secondary/15 border-secondary/20 text-secondary'
+                            ? 'bg-status-warning/10 border-status-warning/20 text-status-warning' 
+                            : 'bg-status-reserved/10 border-status-reserved/20 text-status-reserved'
                         }`}>
                           {res.status}
                         </span>
@@ -201,7 +203,7 @@ export default function Reservations({ reservations }) {
                           {res.status === 'Confirmed' && (
                             <button 
                               onClick={() => handleStatusChange(res.id, 'Arrived')}
-                              className="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-xl text-xs transition-colors shadow-sm"
+                              className="px-3.5 py-2 bg-status-warning text-status-on-warning font-bold rounded-xl text-xs transition-colors shadow-sm hover:opacity-90 active:scale-95"
                             >
                               Mark Arrived
                             </button>
@@ -209,14 +211,14 @@ export default function Reservations({ reservations }) {
                           {res.status === 'Arrived' && (
                             <button 
                               onClick={() => handleStatusChange(res.id, 'Seated')}
-                              className="px-3.5 py-2 bg-primary/10 hover:bg-primary/20 text-primary font-bold rounded-xl text-xs transition-colors shadow-sm"
+                              className="px-3.5 py-2 bg-status-success text-status-on-success font-bold rounded-xl text-xs transition-colors shadow-sm hover:opacity-90 active:scale-95"
                             >
                               Seat Guest
                             </button>
                           )}
                           {res.status === 'Seated' && (
                             <span className="text-xs font-bold text-outline uppercase tracking-wider pr-3 py-2 leading-none flex items-center gap-1.5 justify-end">
-                              <span className="material-symbols-outlined text-sm text-green-500">check_circle</span>
+                              <span className="material-symbols-outlined text-sm text-status-success">check_circle</span>
                               Seated
                             </span>
                           )}

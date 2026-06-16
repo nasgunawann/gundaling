@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -40,6 +40,22 @@
     --color-inverse-surface: #3E2F28;
     --color-inverse-on-surface: #FDFBF7;
     --color-inverse-primary: #b1ceb1;
+
+    /* Semantic Status Colors */
+    --color-status-available: #5C8A3C;
+    --color-status-on-available: #ffffff;
+    --color-status-pending: #B38F2D;
+    --color-status-on-pending: #ffffff;
+    --color-status-occupied: #C87A53;
+    --color-status-on-occupied: #ffffff;
+    --color-status-reserved: #6B7A8D;
+    --color-status-on-reserved: #ffffff;
+    --color-status-success: #2D6A4F;
+    --color-status-on-success: #ffffff;
+    --color-status-warning: #B38F2D;
+    --color-status-on-warning: #ffffff;
+    --color-status-danger: #ba1a1a;
+    --color-status-on-danger: #ffffff;
   }
 
   body {

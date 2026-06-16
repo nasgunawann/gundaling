@@ -63,14 +63,14 @@ export default function KitchenDisplay() {
     }
   };
 
-  const getElapsedTime = (createdAt) => {
-    const elapsed = Math.floor((new Date() - new Date(createdAt)) / 60000);
+  const getElapsedTime = (createdAt, tick) => {
+    const elapsed = Math.floor((tick - new Date(createdAt)) / 60000);
     if (elapsed < 1) return 'Just now';
     return `${elapsed} min ago`;
   };
 
   const renderOrderCard = (order) => {
-    const elapsed = getElapsedTime(order.created_at);
+    const elapsed = getElapsedTime(order.created_at, timeTick);
     const isLate = Math.floor((new Date() - new Date(order.created_at)) / 60000) > 15;
 
     return (
@@ -116,7 +116,7 @@ export default function KitchenDisplay() {
           {order.status === 'pending' && (
             <button
               onClick={() => handleStatusTransition(order.id, 'preparing')}
-              className="w-full py-2.5 bg-amber-600 text-white rounded-xl font-bold hover:opacity-90 active:scale-95 transition-all text-[11px] uppercase tracking-wider shadow-sm"
+              className="w-full py-2.5 bg-status-warning text-status-on-warning rounded-xl font-bold hover:opacity-95 active:scale-95 transition-all text-[11px] uppercase tracking-wider shadow-sm"
             >
               Start Cooking
             </button>
@@ -125,7 +125,7 @@ export default function KitchenDisplay() {
           {order.status === 'preparing' && (
             <button
               onClick={() => handleStatusTransition(order.id, 'ready')}
-              className="w-full py-2.5 bg-tertiary text-on-tertiary rounded-xl font-bold hover:opacity-90 active:scale-95 transition-all text-[11px] uppercase tracking-wider shadow-sm"
+              className="w-full py-2.5 bg-status-success text-status-on-success rounded-xl font-bold hover:opacity-95 active:scale-95 transition-all text-[11px] uppercase tracking-wider shadow-sm"
             >
               Mark Ready
             </button>
@@ -162,13 +162,13 @@ export default function KitchenDisplay() {
       <div className="flex-grow p-container_margin grid grid-cols-1 md:grid-cols-3 gap-gutter overflow-hidden items-stretch pb-8 bg-surface-container-lowest/10">
         
         {/* COLUMN 1: PENDING / NEW */}
-        <div className="flex flex-col bg-surface-container-low/40 rounded-3xl border border-outline-variant/20 overflow-hidden">
+        <div className="flex flex-col bg-surface-container-low/40 rounded-3xl border border-outline-variant/20 overflow-hidden max-h-[calc(100vh-200px)]">
           <div className="p-5 border-b border-outline-variant/10 bg-surface flex justify-between items-center">
             <h3 className="text-xs font-bold font-display uppercase tracking-widest text-on-surface flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-error animate-pulse"></span>
+              <span className="w-2 h-2 rounded-full bg-status-danger animate-pulse"></span>
               New Incoming
             </h3>
-            <span className="px-2 py-0.5 bg-error/15 text-error text-[10px] font-bold font-mono rounded-full">
+            <span className="px-2 py-0.5 bg-status-danger/10 text-status-danger text-[10px] font-bold font-mono rounded-full">
               {pendingOrders.length}
             </span>
           </div>
@@ -185,13 +185,13 @@ export default function KitchenDisplay() {
         </div>
 
         {/* COLUMN 2: COOKING / PREPARING */}
-        <div className="flex flex-col bg-surface-container-low/40 rounded-3xl border border-outline-variant/20 overflow-hidden">
+        <div className="flex flex-col bg-surface-container-low/40 rounded-3xl border border-outline-variant/20 overflow-hidden max-h-[calc(100vh-200px)]">
           <div className="p-5 border-b border-outline-variant/10 bg-surface flex justify-between items-center">
             <h3 className="text-xs font-bold font-display uppercase tracking-widest text-on-surface flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+              <span className="w-2 h-2 rounded-full bg-status-warning"></span>
               Preparing / Cooking
             </h3>
-            <span className="px-2 py-0.5 bg-amber-500/15 text-amber-700 text-[10px] font-bold font-mono rounded-full">
+            <span className="px-2 py-0.5 bg-status-warning/10 text-status-warning text-[10px] font-bold font-mono rounded-full">
               {preparingOrders.length}
             </span>
           </div>
@@ -208,13 +208,13 @@ export default function KitchenDisplay() {
         </div>
 
         {/* COLUMN 3: READY FOR PICKUP */}
-        <div className="flex flex-col bg-surface-container-low/40 rounded-3xl border border-outline-variant/20 overflow-hidden">
+        <div className="flex flex-col bg-surface-container-low/40 rounded-3xl border border-outline-variant/20 overflow-hidden max-h-[calc(100vh-200px)]">
           <div className="p-5 border-b border-outline-variant/10 bg-surface flex justify-between items-center">
             <h3 className="text-xs font-bold font-display uppercase tracking-widest text-on-surface flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-green-500"></span>
+              <span className="w-2 h-2 rounded-full bg-status-success"></span>
               Ready / Pickup
             </h3>
-            <span className="px-2 py-0.5 bg-green-500/15 text-green-700 text-[10px] font-bold font-mono rounded-full">
+            <span className="px-2 py-0.5 bg-status-success/10 text-status-success text-[10px] font-bold font-mono rounded-full">
               {readyOrders.length}
             </span>
           </div>
