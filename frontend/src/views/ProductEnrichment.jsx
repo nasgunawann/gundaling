@@ -1,158 +1,158 @@
-import React, { useState } from 'react'
-import { useNotification } from '../components/NotificationProvider'
+import React, { useState } from 'react';
+import { useNotification } from '../components/NotificationProvider';
+import useStore from '../store';
+import api from '../api';
 
-export default function ProductEnrichment({ products, setProducts }) {
-  const { showToast, showConfirm } = useNotification()
-  const [selectedProduct, setSelectedProduct] = useState(products[0] || null)
-  const [activeCategory, setActiveCategory] = useState('All')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [isEditing, setIsEditing] = useState(false)
-  const [isAddingNew, setIsAddingNew] = useState(false)
+export default function ProductEnrichment({ products }) {
+  const { showToast, showConfirm } = useNotification();
+  const [selectedProduct, setSelectedProduct] = useState(products[0] || null);
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [isAddingNew, setIsAddingNew] = useState(false);
+
+  const storeCategories = useStore((state) => state.categories);
+  const fetchInitialData = useStore((state) => state.fetchInitialData);
 
   // Form states for Editing or Adding New
-  const [formName, setFormName] = useState('')
-  const [formPrice, setFormPrice] = useState('')
-  const [formCategory, setFormCategory] = useState('Meals')
-  const [formDesc, setFormDesc] = useState('')
-  const [formBadge, setFormBadge] = useState('New')
-  const [formImage, setFormImage] = useState('')
-  const [formTemp, setFormTemp] = useState('HOT')
-  const [formTime, setFormTime] = useState('10 min')
-  const [formCalories, setFormCalories] = useState('450 kcal')
+  const [formName, setFormName] = useState('');
+  const [formPrice, setFormPrice] = useState('');
+  const [formCategory, setFormCategory] = useState('Meals');
+  const [formDesc, setFormDesc] = useState('');
+  const [formBadge, setFormBadge] = useState('New');
+  const [formImage, setFormImage] = useState('');
+  const [formTemp, setFormTemp] = useState('HOT');
+  const [formTime, setFormTime] = useState('10 min');
+  const [formCalories, setFormCalories] = useState('450 kcal');
   
   // Kitchen Quality Checklist states
-  const [formOrganic, setFormOrganic] = useState(false)
-  const [formTempControlled, setFormTempControlled] = useState(false)
-  const [formAllergen, setFormAllergen] = useState(false)
-  const [formGarnish, setFormGarnish] = useState(false)
+  const [formOrganic, setFormOrganic] = useState(false);
+  const [formTempControlled, setFormTempControlled] = useState(false);
+  const [formAllergen, setFormAllergen] = useState(false);
+  const [formGarnish, setFormGarnish] = useState(false);
 
-  const categories = ['All', 'Meals', 'Milk & Dairy', 'Coffee', 'Desserts']
+  const categories = ['All', 'Meals', 'Milk & Dairy', 'Coffee', 'Desserts'];
 
   const handleSelectProduct = (product) => {
-    setSelectedProduct(product)
-    setIsEditing(true)
-    setIsAddingNew(false)
+    setSelectedProduct(product);
+    setIsEditing(true);
+    setIsAddingNew(false);
     
     // Populate form values
-    setFormName(product.name)
-    setFormPrice(product.price.toString())
-    setFormCategory(product.category)
-    setFormDesc(product.desc)
-    setFormBadge(product.badge)
-    setFormImage(product.image)
-    setFormTemp(product.details?.temp || 'HOT')
-    setFormTime(product.details?.time || '10 min')
-    setFormCalories(product.details?.calories || '450 kcal')
-    setFormOrganic(product.standards?.organicCert || false)
-    setFormTempControlled(product.standards?.tempControlled || false)
-    setFormAllergen(product.standards?.allergenWarning || false)
-    setFormGarnish(product.standards?.garnishAdded || false)
-  }
+    setFormName(product.name);
+    setFormPrice(product.price.toString());
+    setFormCategory(product.category?.name || product.category || 'Meals');
+    setFormDesc(product.desc || '');
+    setFormBadge(product.badge || '');
+    setFormImage(product.image || '');
+    setFormTemp(product.details?.temp || 'HOT');
+    setFormTime(product.details?.time || '10 min');
+    setFormCalories(product.details?.calories || '450 kcal');
+    setFormOrganic(product.standards?.organicCert || false);
+    setFormTempControlled(product.standards?.tempControlled || false);
+    setFormAllergen(product.standards?.allergenWarning || false);
+    setFormGarnish(product.standards?.garnishAdded || false);
+  };
 
   const handleAddNewTrigger = () => {
-    setIsAddingNew(true)
-    setIsEditing(false)
-    setSelectedProduct(null)
+    setIsAddingNew(true);
+    setIsEditing(false);
+    setSelectedProduct(null);
 
     // Clear form for new item
-    setFormName('')
-    setFormPrice('10.00')
-    setFormCategory('Meals')
-    setFormDesc('')
-    setFormBadge('New')
-    setFormImage('https://lh3.googleusercontent.com/aida-public/AB6AXuChz42JHxpzh7G6fImUmLBjNvOlOChq_r__rLiSkqAeIP1mSOQbwt6JhO6Qg7DI-sXYt0CO8AmD-pIY1DUXcGss-OWhzNo2HnCADCUPqEjtgBg2D40f-M-oOTUMQOUBWrW_nwirQzMXiWfDcCkW7VDgRvCV6HC0C9A9CP3HVHT4NdlYIQvxH81o_nOvEskHppYExS42IJaclt7J1U3RCTgzifMXgWWrwUx6sOzEIM6mJ7w140l7XbnK2qnaqzy-zHPNc3-jl9JzRIRl')
-    setFormTemp('HOT')
-    setFormTime('10 min')
-    setFormCalories('400 kcal')
-    setFormOrganic(true)
-    setFormTempControlled(true)
-    setFormAllergen(false)
-    setFormGarnish(false)
-  }
+    setFormName('');
+    setFormPrice('10000');
+    setFormCategory('Meals');
+    setFormDesc('');
+    setFormBadge('New');
+    setFormImage('/images/gundaling_milk.png');
+    setFormTemp('HOT');
+    setFormTime('10 min');
+    setFormCalories('400 kcal');
+    setFormOrganic(true);
+    setFormTempControlled(true);
+    setFormAllergen(false);
+    setFormGarnish(false);
+  };
 
-  const handleSaveProduct = (e) => {
-    e.preventDefault()
+  const handleSaveProduct = async (e) => {
+    e.preventDefault();
     if (!formName.trim() || !formPrice.trim()) {
-      showToast('Please complete the product details.', 'error')
-      return
+      showToast('Please complete the product details.', 'error');
+      return;
     }
 
-    const priceNum = parseFloat(formPrice)
+    const priceNum = parseFloat(formPrice);
     if (isNaN(priceNum)) {
-      showToast('Price must be a valid number.', 'error')
-      return
+      showToast('Price must be a valid number.', 'error');
+      return;
     }
 
-    if (isAddingNew) {
-      const newProduct = {
-        id: 'item_new_' + Date.now(),
-        name: formName,
-        price: priceNum,
-        category: formCategory,
-        image: formImage || 'https://lh3.googleusercontent.com/aida-public/AB6AXuChz42JHxpzh7G6fImUmLBjNvOlOChq_r__rLiSkqAeIP1mSOQbwt6JhO6Qg7DI-sXYt0CO8AmD-pIY1DUXcGss-OWhzNo2HnCADCUPqEjtgBg2D40f-M-oOTUMQOUBWrW_nwirQzMXiWfDcCkW7VDgRvCV6HC0C9A9CP3HVHT4NdlYIQvxH81o_nOvEskHppYExS42IJaclt7J1U3RCTgzifMXgWWrwUx6sOzEIM6mJ7w140l7XbnK2qnaqzy-zHPNc3-jl9JzRIRl',
-        desc: formDesc,
-        badge: formBadge,
-        details: { temp: formTemp, time: formTime, calories: formCalories },
-        standards: {
-          organicCert: formOrganic,
-          tempControlled: formTempControlled,
-          allergenWarning: formAllergen,
-          garnishAdded: formGarnish
-        }
+    const targetCategory = storeCategories.find(c => c.name === formCategory);
+    const categoryId = targetCategory ? targetCategory.id : 1;
+
+    const payload = {
+      name: formName,
+      price: priceNum,
+      category_id: categoryId,
+      image: formImage,
+      desc: formDesc,
+      badge: formBadge,
+      details: { temp: formTemp, time: formTime, calories: formCalories },
+      standards: {
+        organicCert: formOrganic,
+        tempControlled: formTempControlled,
+        allergenWarning: formAllergen,
+        garnishAdded: formGarnish
       }
+    };
 
-      setProducts(prev => [newProduct, ...prev])
-      setSelectedProduct(newProduct)
-      setIsAddingNew(false)
-      setIsEditing(true)
-      showToast(`Master dish "${formName}" created and added to POS Menu!`, 'success')
-    } else if (selectedProduct) {
-      // Modify existing
-      setProducts(prev => prev.map(p => {
-        if (p.id === selectedProduct.id) {
-          return {
-            ...p,
-            name: formName,
-            price: priceNum,
-            category: formCategory,
-            desc: formDesc,
-            badge: formBadge,
-            image: formImage,
-            details: { temp: formTemp, time: formTime, calories: formCalories },
-            standards: {
-              organicCert: formOrganic,
-              tempControlled: formTempControlled,
-              allergenWarning: formAllergen,
-              garnishAdded: formGarnish
-            }
-          }
-        }
-        return p
-      }))
-      showToast(`Dish "${formName}" updated successfully!`, 'success')
+    try {
+      if (isAddingNew) {
+        const res = await api.post('/api/products', payload);
+        showToast(`Master dish "${formName}" created and added to POS Menu!`, 'success');
+        setIsAddingNew(false);
+        setIsEditing(false);
+      } else if (selectedProduct) {
+        await api.put(`/api/products/${selectedProduct.id}`, payload);
+        showToast(`Dish "${formName}" updated successfully!`, 'success');
+        setIsEditing(false);
+      }
+      await fetchInitialData();
+      setSelectedProduct(null);
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to save product details.', 'error');
     }
-  }
+  };
 
   const handleDeleteProduct = async () => {
-    if (!selectedProduct) return
+    if (!selectedProduct) return;
     const confirmed = await showConfirm(
       'Delete Master Dish',
       `Are you absolutely sure you want to delete "${selectedProduct.name}" from the POS master database?`
-    )
+    );
     if (confirmed) {
-      setProducts(prev => prev.filter(p => p.id !== selectedProduct.id))
-      showToast(`Product deleted successfully.`, 'success')
-      setSelectedProduct(null)
-      setIsEditing(false)
+      try {
+        await api.delete(`/api/products/${selectedProduct.id}`);
+        showToast(`Product deleted successfully.`, 'success');
+        await fetchInitialData();
+        setSelectedProduct(null);
+        setIsEditing(false);
+      } catch (err) {
+        console.error(err);
+        showToast('Failed to delete product.', 'error');
+      }
     }
-  }
+  };
 
   const filteredProducts = products.filter(product => {
-    const matchesCat = activeCategory === 'All' || product.category === activeCategory
+    const matchesCat = activeCategory === 'All' || 
+                       (product.category && (product.category.name === activeCategory || product.category === activeCategory));
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          product.desc.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesCat && matchesSearch
-  })
+                          (product.desc && product.desc.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesCat && matchesSearch;
+  });
 
   return (
     <div className="flex-1 flex bg-background h-full w-full overflow-hidden">
@@ -238,7 +238,7 @@ export default function ProductEnrichment({ products, setProducts }) {
                 <div className="p-3 pt-0 border-t border-outline-variant/10 flex justify-between items-center mt-1">
                   <span className="text-xs font-bold text-primary font-display">Rp {Math.floor(p.price).toLocaleString('id-ID')}</span>
                   <span className="text-[9px] font-bold text-outline-variant uppercase tracking-widest">
-                    {p.category}
+                    {p.category?.name || p.category || ''}
                   </span>
                 </div>
               </div>
@@ -383,7 +383,7 @@ export default function ProductEnrichment({ products, setProducts }) {
                 </div>
               </div>
 
-              {/* Image URL Hidden / Extended support */}
+              {/* Photo Link */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Photo Link (Optional)</label>
                 <input 
@@ -447,9 +447,9 @@ export default function ProductEnrichment({ products, setProducts }) {
               <button 
                 type="button"
                 onClick={() => {
-                  setIsEditing(false)
-                  setIsAddingNew(false)
-                  setSelectedProduct(null)
+                  setIsEditing(false);
+                  setIsAddingNew(false);
+                  setSelectedProduct(null);
                 }}
                 className="flex-1 h-13 border border-outline-variant rounded-xl font-bold text-on-surface-variant hover:bg-surface-container hover:text-on-surface active:scale-95 transition-all text-xs"
               >
@@ -478,5 +478,5 @@ export default function ProductEnrichment({ products, setProducts }) {
         )}
       </div>
     </div>
-  )
+  );
 }

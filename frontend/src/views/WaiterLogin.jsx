@@ -1,66 +1,70 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
+import useStore from '../store';
+import api from '../api';
 
 export default function WaiterLogin({ onLoginSuccess }) {
-  const [selectedStaff, setSelectedStaff] = useState('')
-  const [pin, setPin] = useState('')
-  const [errorMsg, setErrorMsg] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [selectedStaff, setSelectedStaff] = useState('');
+  const [pin, setPin] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [staffMembers, setStaffMembers] = useState([]);
 
-  const staffMembers = [
-    { id: 'waiter_1', name: 'Andi Pratama', role: 'Server' },
-    { id: 'waiter_2', name: 'Siti Aminah', role: 'Server' },
-    { id: 'waiter_3', name: 'Budi Santoso', role: 'Server' },
-    { id: 'manager_1', name: 'David Lee', role: 'Manager' }
-  ]
+  const loginStore = useStore((state) => state.login);
+
+  useEffect(() => {
+    api.get('/api/staff-members')
+      .then((res) => {
+        setStaffMembers(res.data);
+      })
+      .catch((err) => {
+        console.error(err);
+        setErrorMsg('Failed to load staff list. Is backend running?');
+      });
+  }, []);
 
   const handleNumClick = (num) => {
     if (pin.length < 4) {
-      setPin(prev => prev + num)
-      setErrorMsg('')
+      setPin(prev => prev + num);
+      setErrorMsg('');
     }
-  }
+  };
 
   const handleBackspace = () => {
-    setPin(prev => prev.slice(0, -1))
-  }
+    setPin(prev => prev.slice(0, -1));
+  };
 
   const handleClearPin = () => {
-    setPin('')
-    setErrorMsg('')
-  }
+    setPin('');
+    setErrorMsg('');
+  };
 
-  const handleLoginSubmit = () => {
+  const handleLoginSubmit = async () => {
     if (!selectedStaff) {
-      setErrorMsg('Please select a staff member first.')
-      return
+      setErrorMsg('Please select a staff member first.');
+      return;
     }
     if (pin.length !== 4) {
-      setErrorMsg('PIN must be exactly 4 digits.')
-      return
+      setErrorMsg('PIN must be exactly 4 digits.');
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
+    setErrorMsg('');
 
-    // Simulate validation and optimistic loader
-    setTimeout(() => {
-      setIsSubmitting(false)
-      const matched = staffMembers.find(s => s.id === selectedStaff)
-
-      // Allow any 4-digit PIN for demonstration, but let's say '1234' is manager and others can login with anything or '1234' too
-      if (pin === '1234' || pin === '0000' || pin === '4321' || pin.length === 4) {
-        onLoginSuccess(matched)
-      } else {
-        setErrorMsg('Invalid Secure PIN. Try again.')
-        setPin('')
-      }
-    }, 800)
-  }
+    try {
+      const loggedInUser = await loginStore(selectedStaff, pin);
+      setIsSubmitting(false);
+      onLoginSuccess(loggedInUser);
+    } catch (err) {
+      setIsSubmitting(false);
+      setErrorMsg(err.response?.data?.message || 'Invalid Secure PIN. Try again.');
+      setPin('');
+    }
+  };
 
   return (
     <div className="h-screen w-screen flex flex-col md:flex-row bg-background select-none font-body">
-      {/* Left Side: Branding */}
       <div className="relative md:w-[40%] w-full h-[40vh] md:h-full bg-primary flex flex-col justify-between p-container_margin text-on-primary overflow-hidden">
-        {/* Background Texture Simulation */}
         <div
           className="absolute inset-0 opacity-10 pointer-events-none"
           style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px;' }}
@@ -90,7 +94,6 @@ export default function WaiterLogin({ onLoginSuccess }) {
           </p>
         </div>
 
-        {/* Farm Background Image Overlay */}
         <img
           alt="Gundaling Farmstead Background"
           className="absolute bottom-0 left-0 w-full h-1/2 object-cover opacity-20 mix-blend-overlay pointer-events-none"
@@ -98,26 +101,22 @@ export default function WaiterLogin({ onLoginSuccess }) {
         />
       </div>
 
-      {/* Right Side: Login Interaction */}
       <div className="flex-1 bg-surface flex flex-col items-center justify-center p-container_margin">
         <div className="w-full max-w-md flex flex-col gap-8">
-          {/* Header */}
           <div className="text-center">
             <h2 className="font-display font-bold text-headline-md text-on-surface mb-2">Staff Login</h2>
             <p className="text-sm font-medium text-on-surface-variant/80">Select your name and enter your secure PIN</p>
           </div>
 
-          {/* Form */}
           <div className="flex flex-col gap-6">
-            {/* Employee Selector */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider ml-1">Employee Name</label>
               <div className="relative">
                 <select
                   value={selectedStaff}
                   onChange={(e) => {
-                    setSelectedStaff(e.target.value)
-                    setErrorMsg('')
+                    setSelectedStaff(e.target.value);
+                    setErrorMsg('');
                   }}
                   className="w-full h-14 bg-surface-container-low border-none rounded-xl px-4 text-sm font-semibold text-on-surface focus:ring-2 focus:ring-primary appearance-none shadow-sm cursor-pointer"
                 >
@@ -129,12 +128,10 @@ export default function WaiterLogin({ onLoginSuccess }) {
               </div>
             </div>
 
-            {/* PIN Display */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider ml-1">Secure PIN</label>
               <div className="flex justify-between items-center bg-surface-container-low h-16 rounded-xl px-8 border-2 border-transparent focus-within:border-primary transition-all shadow-sm">
                 <div className="flex gap-4">
-                  {/* Password dots */}
                   {[0, 1, 2, 3].map((index) => (
                     <div
                       key={index}
@@ -147,7 +144,6 @@ export default function WaiterLogin({ onLoginSuccess }) {
               </div>
             </div>
 
-            {/* Error Message */}
             {errorMsg && (
               <div className="text-error text-xs font-bold text-center mt-1 flex items-center justify-center gap-1.5 bg-error/10 py-2.5 rounded-lg border border-error/20 animate-pulse">
                 <span className="material-symbols-outlined text-sm">error</span>
@@ -155,7 +151,6 @@ export default function WaiterLogin({ onLoginSuccess }) {
               </div>
             )}
 
-            {/* Numpad */}
             <div className="grid grid-cols-3 gap-3 mt-2">
               {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
                 <button
@@ -167,7 +162,6 @@ export default function WaiterLogin({ onLoginSuccess }) {
                 </button>
               ))}
 
-              {/* Backspace */}
               <button
                 onClick={handleBackspace}
                 className="h-16 bg-surface-container-high rounded-xl text-error/80 shadow-sm active:scale-95 active:bg-error/10 transition-all flex items-center justify-center"
@@ -175,7 +169,6 @@ export default function WaiterLogin({ onLoginSuccess }) {
                 <span className="material-symbols-outlined text-2xl font-bold">backspace</span>
               </button>
 
-              {/* Zero */}
               <button
                 onClick={() => handleNumClick('0')}
                 className="h-16 font-display font-bold text-xl bg-surface-container-high rounded-xl text-on-surface shadow-sm active:scale-95 active:bg-outline-variant/20 transition-all flex items-center justify-center"
@@ -183,7 +176,6 @@ export default function WaiterLogin({ onLoginSuccess }) {
                 0
               </button>
 
-              {/* Clear */}
               <button
                 onClick={handleClearPin}
                 className="h-16 rounded-xl bg-surface-container-high border border-outline-variant/20 text-on-surface-variant shadow-sm active:scale-95 active:bg-outline-variant/20 transition-all flex items-center justify-center text-xs font-bold uppercase tracking-[0.24em]"
@@ -192,7 +184,6 @@ export default function WaiterLogin({ onLoginSuccess }) {
               </button>
             </div>
 
-            {/* Login Trigger Button */}
             <button
               onClick={handleLoginSubmit}
               disabled={isSubmitting}
@@ -205,7 +196,6 @@ export default function WaiterLogin({ onLoginSuccess }) {
             </button>
           </div>
 
-          {/* Footer Links */}
           <div className="flex justify-between w-full text-xs font-semibold text-outline px-2">
             <button className="hover:text-primary transition-colors">Forgot PIN?</button>
             <button className="hover:text-primary transition-colors">System Support</button>
@@ -213,5 +203,5 @@ export default function WaiterLogin({ onLoginSuccess }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,57 +1,87 @@
-import React, { useState } from 'react'
-import { useNotification } from '../components/NotificationProvider'
+import React, { useState } from 'react';
+import { useNotification } from '../components/NotificationProvider';
+import useStore from '../store';
 
-export default function Reservations({ reservations, setReservations }) {
-  const { showToast } = useNotification()
-  const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState('All')
-  const [showAddModal, setShowAddModal] = useState(false)
+export default function Reservations({ reservations }) {
+  const { showToast } = useNotification();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [showAddModal, setShowAddModal] = useState(false);
   
+  const storeTables = useStore((state) => state.tables);
+  const addReservationStore = useStore((state) => state.addReservation);
+  const updateReservationStore = useStore((state) => state.updateReservation);
+
   // Form states for booking table
-  const [newName, setNewName] = useState('')
-  const [newPhone, setNewPhone] = useState('')
-  const [newGuests, setNewGuests] = useState('2')
-  const [newTable, setNewTable] = useState('T-01')
-  const [newTime, setNewTime] = useState('19:00')
+  const [newName, setNewName] = useState('');
+  const [newPhone, setNewPhone] = useState('');
+  const [newGuests, setNewGuests] = useState('2');
+  const [newTable, setNewTable] = useState('');
+  const [newTime, setNewTime] = useState('19:00');
 
-  const filterStatuses = ['All', 'Confirmed', 'Arrived', 'Seated']
+  const filterStatuses = ['All', 'Confirmed', 'Arrived', 'Seated'];
 
-  const handleStatusChange = (id, newStatus) => {
-    setReservations(prev => prev.map(res => 
-      res.id === id ? { ...res, status: newStatus } : res
-    ))
-  }
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      await updateReservationStore(id, newStatus);
+      showToast(`Reservation status updated to ${newStatus}`, 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to update reservation status.', 'error');
+    }
+  };
 
-  const handleAddReservation = (e) => {
-    e.preventDefault()
+  const handleAddReservation = async (e) => {
+    e.preventDefault();
     if (!newName.trim() || !newPhone.trim()) {
-      showToast('Please fill in the guest details.', 'error')
-      return
+      showToast('Please fill in the guest details.', 'error');
+      return;
     }
 
-    const newRes = {
-      id: 'res_' + Date.now(),
-      name: newName,
-      phone: newPhone,
-      guests: parseInt(newGuests),
-      table: newTable,
-      time: newTime,
-      status: 'Confirmed'
+    const selectedTableId = newTable || (storeTables[0] ? storeTables[0].id : '');
+    if (!selectedTableId) {
+      showToast('No tables available to book.', 'error');
+      return;
     }
 
-    setReservations(prev => [newRes, ...prev])
-    setShowAddModal(false)
-    setNewName('')
-    setNewPhone('')
-    showToast(`Reservation booked successfully for ${newName} at ${newTable}!`, 'success')
-  }
+    const bookingDate = new Date().toISOString().split('T')[0];
+    const bookingTime = `${bookingDate} ${newTime}:00`;
+
+    try {
+      await addReservationStore({
+        name: newName,
+        phone: newPhone,
+        guests: parseInt(newGuests),
+        table_id: parseInt(selectedTableId),
+        time: bookingTime,
+        status: 'Confirmed'
+      });
+
+      const tableObj = storeTables.find(t => t.id === parseInt(selectedTableId));
+
+      setShowAddModal(false);
+      setNewName('');
+      setNewPhone('');
+      showToast(`Reservation booked successfully for ${newName} at ${tableObj?.name || 'Table'}!`, 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to book reservation.', 'error');
+    }
+  };
+
+  const openAddModal = () => {
+    if (storeTables.length > 0 && !newTable) {
+      setNewTable(storeTables[0].id.toString());
+    }
+    setShowAddModal(true);
+  };
 
   const filteredReservations = reservations.filter(res => {
     const matchesSearch = res.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          res.phone.includes(searchQuery)
-    const matchesFilter = statusFilter === 'All' || res.status === statusFilter
-    return matchesSearch && matchesFilter
-  })
+                          res.phone.includes(searchQuery);
+    const matchesFilter = statusFilter === 'All' || res.status === statusFilter;
+    return matchesSearch && matchesFilter;
+  });
 
   return (
     <div className="flex-1 flex flex-col bg-background h-full w-full overflow-hidden">
@@ -63,7 +93,7 @@ export default function Reservations({ reservations, setReservations }) {
         </div>
         
         <button 
-          onClick={() => setShowAddModal(true)}
+          onClick={openAddModal}
           className="h-12 px-6 bg-primary text-on-primary rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-md text-sm font-display"
         >
           <span className="material-symbols-outlined text-lg">add</span>
@@ -76,7 +106,7 @@ export default function Reservations({ reservations, setReservations }) {
         <div className="relative w-full max-w-xs">
           <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
           <input 
-            type="text"
+            type="text" 
             placeholder="Search by name or phone..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -117,82 +147,84 @@ export default function Reservations({ reservations, setReservations }) {
             </thead>
             <tbody className="divide-y divide-surface-container/40">
               {filteredReservations.length > 0 ? (
-                filteredReservations.map((res) => (
-                  <tr key={res.id} className="hover:bg-surface-container-low/10 transition-colors">
-                    
-                    {/* Guest Info */}
-                    <td className="py-5 px-6">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
-                          {res.name.charAt(0)}
+                filteredReservations.map((res) => {
+                  const bookingTimeStr = new Date(res.time).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                  return (
+                    <tr key={res.id} className="hover:bg-surface-container-low/10 transition-colors">
+                      {/* Guest Info */}
+                      <td className="py-5 px-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+                            {res.name.charAt(0)}
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-on-surface leading-tight">{res.name}</p>
+                            <p className="text-[11px] font-semibold text-on-surface-variant font-mono mt-0.5">{res.phone}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-sm font-bold text-on-surface leading-tight">{res.name}</p>
-                          <p className="text-[11px] font-semibold text-on-surface-variant font-mono mt-0.5">{res.phone}</p>
+                      </td>
+
+                      {/* Time & Seats */}
+                      <td className="py-5 px-6">
+                        <div className="flex flex-col gap-0.5">
+                          <div className="flex items-center gap-1.5 text-sm font-bold text-on-surface font-mono">
+                            <span className="material-symbols-outlined text-sm text-primary">schedule</span>
+                            {bookingTimeStr}
+                          </div>
+                          <p className="text-xs text-on-surface-variant/80 font-semibold">{res.guests} Guests booked</p>
                         </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    {/* Time & Seats */}
-                    <td className="py-5 px-6">
-                      <div className="flex flex-col gap-0.5">
-                        <div className="flex items-center gap-1.5 text-sm font-bold text-on-surface font-mono">
-                          <span className="material-symbols-outlined text-sm text-primary">schedule</span>
-                          {res.time}
+                      {/* Table Details */}
+                      <td className="py-5 px-6">
+                        <span className="bg-surface-container px-3.5 py-1.5 rounded-xl text-xs font-bold text-on-surface-variant border border-outline-variant/10 shadow-sm font-mono">
+                          {res.table?.name || 'Table'}
+                        </span>
+                      </td>
+
+                      {/* Status badge */}
+                      <td className="py-5 px-6 text-center">
+                        <span className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm border ${
+                          res.status === 'Seated' 
+                            ? 'bg-primary/10 border-primary/20 text-primary' 
+                            : res.status === 'Arrived' 
+                            ? 'bg-blue-100 border-blue-200 text-blue-700' 
+                            : 'bg-secondary/15 border-secondary/20 text-secondary'
+                        }`}>
+                          {res.status}
+                        </span>
+                      </td>
+
+                      {/* Actions */}
+                      <td className="py-5 px-6 text-right">
+                        <div className="flex gap-2 justify-end">
+                          {res.status === 'Confirmed' && (
+                            <button 
+                              onClick={() => handleStatusChange(res.id, 'Arrived')}
+                              className="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-xl text-xs transition-colors shadow-sm"
+                            >
+                              Mark Arrived
+                            </button>
+                          )}
+                          {res.status === 'Arrived' && (
+                            <button 
+                              onClick={() => handleStatusChange(res.id, 'Seated')}
+                              className="px-3.5 py-2 bg-primary/10 hover:bg-primary/20 text-primary font-bold rounded-xl text-xs transition-colors shadow-sm"
+                            >
+                              Seat Guest
+                            </button>
+                          )}
+                          {res.status === 'Seated' && (
+                            <span className="text-xs font-bold text-outline uppercase tracking-wider pr-3 py-2 leading-none flex items-center gap-1.5 justify-end">
+                              <span className="material-symbols-outlined text-sm text-green-500">check_circle</span>
+                              Seated
+                            </span>
+                          )}
                         </div>
-                        <p className="text-xs text-on-surface-variant/80 font-semibold">{res.guests} Guests booked</p>
-                      </div>
-                    </td>
-
-                    {/* Table Details */}
-                    <td className="py-5 px-6">
-                      <span className="bg-surface-container px-3.5 py-1.5 rounded-xl text-xs font-bold text-on-surface-variant border border-outline-variant/10 shadow-sm font-mono">
-                        {res.table}
-                      </span>
-                    </td>
-
-                    {/* Status badge */}
-                    <td className="py-5 px-6 text-center">
-                      <span className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm border ${
-                        res.status === 'Seated' 
-                          ? 'bg-primary/10 border-primary/20 text-primary' 
-                          : res.status === 'Arrived' 
-                          ? 'bg-blue-100 border-blue-200 text-blue-700' 
-                          : 'bg-secondary/15 border-secondary/20 text-secondary'
-                      }`}>
-                        {res.status}
-                      </span>
-                    </td>
-
-                    {/* Actions */}
-                    <td className="py-5 px-6 text-right">
-                      <div className="flex gap-2 justify-end">
-                        {res.status === 'Confirmed' && (
-                          <button 
-                            onClick={() => handleStatusChange(res.id, 'Arrived')}
-                            className="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-xl text-xs transition-colors shadow-sm"
-                          >
-                            Mark Arrived
-                          </button>
-                        )}
-                        {res.status === 'Arrived' && (
-                          <button 
-                            onClick={() => handleStatusChange(res.id, 'Seated')}
-                            className="px-3.5 py-2 bg-primary/10 hover:bg-primary/20 text-primary font-bold rounded-xl text-xs transition-colors shadow-sm"
-                          >
-                            Seat Guest
-                          </button>
-                        )}
-                        {res.status === 'Seated' && (
-                          <span className="text-xs font-bold text-outline uppercase tracking-wider pr-3 py-2 leading-none flex items-center gap-1.5 justify-end">
-                            <span className="material-symbols-outlined text-sm text-green-500">check_circle</span>
-                            Seated
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
                   <td colSpan="5" className="py-12 text-center text-on-surface-variant/80">
@@ -262,7 +294,7 @@ export default function Reservations({ reservations, setReservations }) {
                     onChange={(e) => setNewTable(e.target.value)}
                     className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold shadow-sm focus:ring-2 focus:ring-primary"
                   >
-                    {['T-01','T-02','T-03','T-04','T-05','T-06','T-07','T-08','T-12'].map(t => <option key={t} value={t}>{t}</option>)}
+                    {storeTables.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                   </select>
                 </div>
               </div>
@@ -288,5 +320,5 @@ export default function Reservations({ reservations, setReservations }) {
         </div>
       )}
     </div>
-  )
+  );
 }

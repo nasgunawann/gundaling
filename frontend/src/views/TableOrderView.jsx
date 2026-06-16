@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNotification } from '../components/NotificationProvider'
 import ReceiptModal from '../components/ReceiptModal'
+import useStore from '../store'
 
 export default function TableOrderView({ selectedTable, setSelectedTable, products, tableCarts, setTableCarts }) {
   const { showToast, showConfirm } = useNotification()
@@ -10,6 +11,11 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
   const [isSettling, setIsSettling] = useState(false)
   const [isSendingToKitchen, setIsSendingToKitchen] = useState(false)
   const [showReceiptModal, setShowReceiptModal] = useState(false)
+
+  const storeTables = useStore((state) => state.tables)
+  const storeOrders = useStore((state) => state.orders)
+  const submitOrderStore = useStore((state) => state.submitOrder)
+  const updateOrderStatusStore = useStore((state) => state.updateOrderStatus)
 
   const tablesList = [
     'Table 01', 'Table 02', 'Table 03', 'Table 04', 'Table 05', 'Table 06', 'Table 07', 'Table 08', 'Table 12'
@@ -101,29 +107,62 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
   }
 
   // Send pending items to kitchen
-  const handleSendToKitchen = () => {
+  const handleSendToKitchen = async () => {
     if (activeCart.length === 0) return
     setIsSendingToKitchen(true)
-    setTimeout(() => {
-      setIsSendingToKitchen(false)
+
+    try {
+      const tableObj = storeTables.find((t) => t.name === selectedTable)
+      if (!tableObj) {
+        throw new Error(`Table ${selectedTable} not found in database.`)
+      }
+
+      const itemsPayload = activeCart.map(item => ({
+        product_id: item.id,
+        qty: item.qty,
+        sent: true
+      }))
+
+      await submitOrderStore(tableObj.id, itemsPayload)
+      
       setTableCarts(prev => {
         const currentCart = prev[selectedTable] || []
         const updatedCart = currentCart.map(item => ({ ...item, sent: true }))
         return { ...prev, [selectedTable]: updatedCart }
       })
+
       showToast(`Order for ${selectedTable} successfully transmitted to kitchen displays!`, 'success')
-    }, 1000)
+    } catch (err) {
+      console.error(err)
+      showToast(err.message || 'Failed to send order to kitchen.', 'error')
+    } finally {
+      setIsSendingToKitchen(false)
+    }
   }
 
-  // Settle Bill Simulation
-  const handleSettleBill = () => {
+  // Settle Bill
+  const handleSettleBill = async () => {
     if (activeCart.length === 0) return
     setIsSettling(true)
-    setTimeout(() => {
-      setIsSettling(false)
+
+    try {
+      const tableObj = storeTables.find((t) => t.name === selectedTable)
+      const activeOrder = storeOrders.find((o) => o.table_id === tableObj?.id && o.status !== 'paid')
+      
+      if (!activeOrder) {
+        throw new Error('No active order found for this table.')
+      }
+
+      await updateOrderStatusStore(activeOrder.id, 'paid')
+      
       showToast(`Bill for ${selectedTable} settled! Total of Rp ${Math.floor(grandTotal).toLocaleString('id-ID')} received.`, 'success')
-      setTableCarts(prev => ({ ...prev, [selectedTable]: [] })) // Clear active table's cart
-    }, 1200)
+      setTableCarts(prev => ({ ...prev, [selectedTable]: [] }))
+    } catch (err) {
+      console.error(err)
+      showToast(err.message || 'Failed to settle bill.', 'error')
+    } finally {
+      setIsSettling(false)
+    }
   }
 
   // Calculations
@@ -135,7 +174,8 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
 
   // Filter products catalog
   const filteredProducts = products.filter(product => {
-    const matchesCat = activeCategory === 'All' || product.category === activeCategory
+    const matchesCat = activeCategory === 'All' || 
+                       (product.category && (product.category.name === activeCategory || product.category === activeCategory))
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.desc.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesCat && matchesSearch
@@ -433,5 +473,5 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
         grandTotal={grandTotal}
       />
     </div>
-  )
+  );
 }

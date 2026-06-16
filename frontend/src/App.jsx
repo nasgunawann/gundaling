@@ -1,130 +1,69 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Sidebar from './components/Sidebar'
 import WaiterLogin from './views/WaiterLogin'
 import FloorPlan from './views/FloorPlan'
 import TableOrderView from './views/TableOrderView'
 import ProductEnrichment from './views/ProductEnrichment'
 import Reservations from './views/Reservations'
+import useStore from './store'
+import { useNotification } from './components/NotificationProvider'
 
 export default function App() {
-  const [user, setUser] = useState(null) // { name: 'Andi Pratama', role: 'Server' }
-  const [currentView, setCurrentView] = useState('floor-plan') // 'floor-plan', 'table-menu', 'product-enrichment', 'reservations'
-  const [selectedTable, setSelectedTable] = useState('Table 12') // Default active table
-  
-  // Master Products Catalog State (Shared across Ordering and Management)
-  const [products, setProducts] = useState([
-    {
-      id: 'item_1',
-      name: 'Truffle Tagliatelle',
-      price: 260000,
-      category: 'Meals',
-      image: '/images/truffle_tagliatelle.png',
-      desc: 'Handmade pasta tossed in premium shaved black truffle butter, finished with freshly grated dry-aged Parmigiano.',
-      badge: 'Best Seller',
-      details: { temp: 'HOT', time: '12 min', calories: '640 kcal' },
-      standards: { organicCert: true, tempControlled: true, allergenWarning: false, garnishAdded: true }
-    },
-    {
-      id: 'item_2',
-      name: 'Crispy Skin Salmon',
-      price: 285000,
-      category: 'Meals',
-      image: '/images/crispy_skin_salmon.png',
-      desc: 'Pan-seared Atlantic salmon on a bed of fresh garlic butter asparagus and creamy mashed mountain potatoes.',
-      badge: 'Signature',
-      details: { temp: 'HOT', time: '15 min', calories: '580 kcal' },
-      standards: { organicCert: true, tempControlled: true, allergenWarning: false, garnishAdded: false }
-    },
-    {
-      id: 'item_3',
-      name: 'Heirloom Tomato Salad',
-      price: 160000,
-      category: 'Meals',
-      image: '/images/heirloom_tomato_salad.png',
-      desc: 'Fresh heirloom garden tomatoes, artisan buffalo mozzarella, farm basil, drizzled in premium aged balsamic vinegar.',
-      badge: 'Vegan',
-      details: { temp: 'COLD', time: '5 min', calories: '220 kcal' },
-      standards: { organicCert: true, tempControlled: false, allergenWarning: false, garnishAdded: true }
-    },
-    {
-      id: 'item_milk_1',
-      name: 'Fresh Gundaling Cow Milk',
-      price: 65000,
-      category: 'Milk & Dairy',
-      image: '/images/gundaling_milk.png',
-      desc: 'Organic raw milk harvested daily from our high-altitude Berastagi dairy farm, pasteurized and flash chilled.',
-      badge: 'Farmstead Fresh',
-      details: { temp: 'COLD', time: '1 min', calories: '150 kcal' },
-      standards: { organicCert: true, tempControlled: true, allergenWarning: false, garnishAdded: false }
-    },
-    {
-      id: 'item_coffee_1',
-      name: 'Single Origin Latte',
-      price: 55000,
-      category: 'Coffee',
-      image: '/images/single_origin_latte.png',
-      desc: 'Premium espresso pulled from organic Sumatra Mandheling beans, combined with steamed Gundaling farm milk.',
-      badge: 'Artisan',
-      details: { temp: 'HOT', time: '3 min', calories: '120 kcal' },
-      standards: { organicCert: false, tempControlled: true, allergenWarning: false, garnishAdded: true }
-    },
-    {
-      id: 'item_dessert_1',
-      name: 'Organic Strawberry Gelato',
-      price: 85000,
-      category: 'Desserts',
-      image: '/images/strawberry_gelato.png',
-      desc: 'High-altitude organic strawberries churned with fresh Gundaling farm pasteurized cow milk cream.',
-      badge: 'Sold Out',
-      outOfStock: true,
-      details: { temp: 'COLD', time: '2 min', calories: '180 kcal' },
-      standards: { organicCert: true, tempControlled: true, allergenWarning: false, garnishAdded: true }
+  const { showToast } = useNotification()
+  const [currentView, setCurrentView] = useState('floor-plan')
+  const [selectedTable, setSelectedTable] = useState('Table 12')
+  const [tableCarts, setTableCarts] = useState({})
+
+  const user = useStore((state) => state.user)
+  const products = useStore((state) => state.products)
+  const tables = useStore((state) => state.tables)
+  const orders = useStore((state) => state.orders)
+  const reservations = useStore((state) => state.reservations)
+  const logoutStore = useStore((state) => state.logout)
+  const tryAutoLogin = useStore((state) => state.tryAutoLogin)
+
+  // Attach showToast to window for Zustand websocket access
+  useEffect(() => {
+    window.showToast = showToast
+    return () => {
+      window.showToast = null
     }
-  ])
+  }, [showToast])
 
-  // Table-Specific Carts State to decouple billing
-  const [tableCarts, setTableCarts] = useState({
-    'Table 12': [
-      { id: 'item_1', name: 'Truffle Tagliatelle', price: 260000, qty: 2, sent: true },
-      { id: 'item_2', name: 'Crispy Skin Salmon', price: 285000, qty: 1, sent: true },
-      { id: 'item_3', name: 'Heirloom Tomato Salad', price: 160000, qty: 1, sent: true }
-    ],
-    'Table 04': [
-      { id: 'item_3', name: 'Heirloom Tomato Salad', price: 160000, qty: 1, sent: true },
-      { id: 'item_coffee_1', name: 'Single Origin Latte', price: 55000, qty: 2, sent: true }
-    ],
-    'Table 03': [
-      { id: 'item_2', name: 'Crispy Skin Salmon', price: 285000, qty: 2, sent: true },
-      { id: 'item_1', name: 'Truffle Tagliatelle', price: 260000, qty: 1, sent: true }
-    ],
-    'Table 08': [
-      { id: 'item_1', name: 'Truffle Tagliatelle', price: 260000, qty: 4, sent: true },
-      { id: 'item_coffee_1', name: 'Single Origin Latte', price: 55000, qty: 4, sent: true }
-    ]
-  })
+  // Try auto-login on mount
+  useEffect(() => {
+    tryAutoLogin()
+  }, [])
 
-  // Shared Reservations State
-  const [reservations, setReservations] = useState([
-    { id: 'res_1', name: 'Eleanor Vance', time: '18:30', guests: 4, table: 'T-12', status: 'Seated', phone: '+62 811-2345-6789' },
-    { id: 'res_2', name: 'Albert Cole', time: '19:00', guests: 2, table: 'T-05', status: 'Confirmed', phone: '+62 812-9876-5432' },
-    { id: 'res_3', name: 'Miriam Sterling', time: '19:30', guests: 6, table: 'T-08', status: 'Confirmed', phone: '+62 813-4567-8901' },
-    { id: 'res_4', name: 'Dr. Gregory House', time: '20:00', guests: 1, table: 'Bar-03', status: 'Arrived', phone: '+62 814-1111-2222' }
-  ])
+  // Sync database orders into local table carts
+  useEffect(() => {
+    const newCarts = {}
+    orders.forEach((order) => {
+      if (order.status !== 'paid' && order.table) {
+        newCarts[order.table.name] = order.items.map((item) => ({
+          id: item.product_id,
+          name: item.product?.name,
+          price: Number(item.unit_price),
+          qty: item.qty,
+          sent: item.sent,
+          note: '',
+        }))
+      }
+    })
+    setTableCarts(newCarts)
+  }, [orders])
 
-  const handleLogout = () => {
-    setUser(null)
+  const handleLogout = async () => {
+    await logoutStore()
     setCurrentView('floor-plan')
-    setIsOrderDrawerOpen(false)
   }
 
-  // Render Authentication View
   if (!user) {
-    return <WaiterLogin onLoginSuccess={(loggedInUser) => setUser(loggedInUser)} />
+    return <WaiterLogin onLoginSuccess={() => setCurrentView('floor-plan')} />
   }
 
   return (
     <div className="flex min-h-screen bg-background text-on-surface select-none font-body">
-      {/* Sidebar Navigation */}
       <Sidebar 
         currentView={currentView} 
         onViewChange={(view) => setCurrentView(view)} 
@@ -132,17 +71,16 @@ export default function App() {
         onLogout={handleLogout}
       />
 
-      {/* Main Panel */}
       <div className="flex-1 md:ml-[280px] ml-0 h-screen overflow-hidden flex flex-col">
-        {/* Render Active View */}
         {currentView === 'floor-plan' && (
           <FloorPlan 
             onTableClick={(tableName) => {
               setSelectedTable(tableName)
-              setCurrentView('table-menu') // Switch directly to table ordering & menu view!
+              setCurrentView('table-menu')
             }} 
             user={user}
             tableCarts={tableCarts}
+            tables={tables}
           />
         )}
         {currentView === 'table-menu' && (
@@ -158,7 +96,7 @@ export default function App() {
           user?.role === 'Manager' ? (
             <ProductEnrichment 
               products={products}
-              setProducts={setProducts}
+              setProducts={() => {}}
             />
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center p-12 text-center bg-surface select-none">
@@ -181,7 +119,7 @@ export default function App() {
         {currentView === 'reservations' && (
           <Reservations 
             reservations={reservations} 
-            setReservations={setReservations}
+            setReservations={() => {}}
           />
         )}
       </div>

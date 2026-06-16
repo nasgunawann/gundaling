@@ -1,8 +1,8 @@
 import React from 'react'
 
-export default function FloorPlan({ onTableClick, user, tableCarts }) {
-  // Master base configuration for tables
-  const baseTables = [
+export default function FloorPlan({ onTableClick, user, tableCarts, tables: backendTables }) {
+  // Master base configuration for tables (fallback)
+  const defaultTables = [
     { id: 'T-01', name: 'Table 01', seats: 4, type: 'circle', defaultStatus: 'Available' },
     { id: 'T-02', name: 'Table 02', seats: 2, type: 'square', defaultStatus: 'Reserved' },
     { id: 'T-03', name: 'Table 03', seats: 4, type: 'square', defaultStatus: 'Occupied' },
@@ -14,12 +14,14 @@ export default function FloorPlan({ onTableClick, user, tableCarts }) {
     { id: 'T-12', name: 'Table 12', seats: 4, type: 'circle', defaultStatus: 'Occupied', highlight: true }
   ]
 
+  const baseTables = backendTables && backendTables.length > 0 ? backendTables : defaultTables
+
   // Calculate live dynamic statuses and bill totals from master tableCarts!
   const tables = baseTables.map(t => {
     const cart = tableCarts[t.name] || []
     const hasItems = cart.length > 0
 
-    let status = t.defaultStatus
+    let status = t.status || t.defaultStatus || 'Available'
     let billTotal = 0
 
     if (hasItems) {
@@ -27,12 +29,12 @@ export default function FloorPlan({ onTableClick, user, tableCarts }) {
       status = hasUnsent ? 'Pending Kitchen' : 'Occupied'
       billTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0) * 1.1 // Including 10% service charge
     } else if (status.startsWith('Occupied') || status === 'Pending' || status === 'Pending Kitchen') {
-      // If default was occupied but cart is empty, make it available
       status = 'Available'
     }
 
     return {
       ...t,
+      type: t.shape || t.type,
       status,
       bill: billTotal
     }
