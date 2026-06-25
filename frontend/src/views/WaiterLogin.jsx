@@ -12,7 +12,7 @@ export default function WaiterLogin({ onLoginSuccess }) {
   const loginStore = useStore((state) => state.login);
 
   useEffect(() => {
-    api.get('/api/staff-members')
+    api.get('/users')
       .then((res) => {
         setStaffMembers(res.data);
       })
