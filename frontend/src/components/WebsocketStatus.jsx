@@ -1,33 +1,33 @@
 import React, { useState, useEffect } from 'react';
+import useStore from '../store';
 
 export default function WebsocketStatus() {
   const [status, setStatus] = useState('disconnected');
+  const socket = useStore((state) => state.socket);
 
   useEffect(() => {
-    const checkStatus = () => {
-      if (window.Echo && window.Echo.connector && window.Echo.connector.pusher) {
-        const pusher = window.Echo.connector.pusher;
-        setStatus(pusher.connection.state);
+    if (!socket) {
+      setStatus('disconnected');
+      return;
+    }
 
-        const handleStateChange = (states) => {
-          setStatus(states.current);
-        };
+    const onConnect = () => setStatus('connected');
+    const onDisconnect = () => setStatus('disconnected');
 
-        pusher.connection.bind('state_change', handleStateChange);
-        return () => {
-          pusher.connection.unbind('state_change', handleStateChange);
-        };
-      } else {
-        setStatus('disconnected');
-      }
+    if (socket.connected) {
+      setStatus('connected');
+    } else {
+      setStatus('connecting');
+    }
+
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+
+    return () => {
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
     };
-
-    // Retry checking if window.Echo isn't ready immediately
-    const timer = setInterval(checkStatus, 1000);
-    checkStatus();
-
-    return () => clearInterval(timer);
-  }, []);
+  }, [socket]);
 
   const getStatusDetails = () => {
     switch (status) {

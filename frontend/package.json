@@ -7,7 +7,7 @@
     "dev": "vite --host --port 5173",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "concurrently -n \"VITE,LARAVEL,REVERB\" -c \"cyan,green,yellow\" \"vite --host --port 5173\" \"php ../backend/artisan serve --host=127.0.0.1 --port=8000\" \"php ../backend/artisan reverb:start --host=127.0.0.1 --port=8080 --debug\""
+    "start": "concurrently -n \"VITE,NEST\" -c \"cyan,green\" \"vite --host --port 5173\" \"pnpm --dir ../backend-new start:dev\""
   },
   "dependencies": {
     "axios": "^1.18.0",
@@ -15,6 +15,7 @@
     "pusher-js": "^8.5.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "socket.io-client": "^4.8.3",
     "zustand": "^5.0.14"
   },
   "devDependencies": {

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import api, { initEcho } from './api';
+import api, { initSocket } from './api';
 
 const getInitialState = () => {
   const token = localStorage.getItem('gundaling_token');
@@ -27,7 +27,7 @@ const useStore = create((set, get) => ({
   orders: [],
   reservations: [],
   categories: [],
-  echo: null,
+  socket: null,
   loading: false,
 
   setTables: (tables) => set({ tables }),
@@ -42,13 +42,12 @@ const useStore = create((set, get) => ({
       localStorage.setItem('gundaling_token', token);
       localStorage.setItem('gundaling_user', JSON.stringify(user));
       
-      const echo = initEcho(token);
-      window.Echo = echo;
+      const socket = initSocket(token);
       
-      set({ user, token, echo, loading: false });
+      set({ user, token, socket, loading: false });
       
       await get().fetchInitialData();
-      get().subscribeToChannels(echo);
+      get().subscribeToSocket(socket);
       
       return user;
     } catch (err) {
@@ -63,12 +62,11 @@ const useStore = create((set, get) => ({
     } catch (e) {}
     localStorage.removeItem('gundaling_token');
     localStorage.removeItem('gundaling_user');
-    const { echo } = get();
-    if (echo) {
-      echo.disconnect();
+    const { socket } = get();
+    if (socket) {
+      socket.disconnect();
     }
-    window.Echo = null;
-    set({ user: null, token: null, echo: null, products: [], tables: [], orders: [], reservations: [] });
+    set({ user: null, token: null, socket: null, products: [], tables: [], orders: [], reservations: [] });
   },
 
   tryAutoLogin: async () => {
@@ -81,13 +79,12 @@ const useStore = create((set, get) => ({
       const user = res.data;
       localStorage.setItem('gundaling_user', JSON.stringify(user));
       
-      const echo = initEcho(token);
-      window.Echo = echo;
+      const socket = initSocket(token);
       
-      set({ user, echo });
+      set({ user, socket });
       
       await get().fetchInitialData();
-      get().subscribeToChannels(echo);
+      get().subscribeToSocket(socket);
       
       set({ loading: false });
       return true;
@@ -214,7 +211,7 @@ const useStore = create((set, get) => ({
     }
   },
 
-  subscribeToChannels: (echo) => {
+  subscribeToSocket: (socket) => {
     const { user } = get();
     if (!user) return;
 
@@ -234,31 +231,110 @@ const useStore = create((set, get) => ({
       });
     };
 
-    if (user.role === 'Chef' || user.role === 'Manager') {
-      echo.private('kitchen-orders')
-        .listen('.OrderSent', (e) => {
-          handleOrderUpdate(e.order);
-        })
-        .listen('.OrderServed', (e) => {
-          handleOrderUpdate(e.order);
-        });
-    }
+    socket.on('OrderSent', (order) => {
+      if (user.role === 'Chef' || user.role === 'Manager') {
+        handleOrderUpdate(order);
+      }
+    });
 
-    if (user.role === 'Server' || user.role === 'Manager') {
-      echo.private('waiter-floor')
-        .listen('.OrderPreparing', (e) => {
-          handleOrderUpdate(e.order);
-        })
-        .listen('.OrderReady', (e) => {
-          handleOrderUpdate(e.order);
-          if (window.showToast) {
-            window.showToast(`Order for ${e.order.table?.name || 'Table'} is ready for pickup!`, 'success');
-          }
-        })
-        .listen('.OrderPaid', (e) => {
-          handleOrderUpdate(e.order);
-        });
-    }
+    socket.on('OrderServed', (order) => {
+      if (user.role === 'Chef' || user.role === 'Manager') {
+        handleOrderUpdate(order);
+      }
+    });
+
+    socket.on('OrderPreparing', (order) => {
+      if (user.role === 'Server' || user.role === 'Manager') {
+        handleOrderUpdate(order);
+      }
+    });
+
+    socket.on('OrderReady', (order) => {
+      if (user.role === 'Server' || user.role === 'Manager') {
+        handleOrderUpdate(order);
+        if (window.showToast) {
+          window.showToast(`Order for ${order.table?.name || 'Table'} is ready for pickup!`, 'success');
+        }
+      }
+    });
+
+    socket.on('OrderPaid', (order) => {
+      if (user.role === 'Server' || user.role === 'Manager') {
+        handleOrderUpdate(order);
+      }
+    });
+
+    socket.on('table.updated', (table) => {
+      set((state) => ({
+        tables: state.tables.map((t) => t.id === table.id ? table : t)
+      }));
+    });
+
+    socket.on('table.created', (table) => {
+      set((state) => ({
+        tables: [...state.tables, table]
+      }));
+    });
+
+    socket.on('table.deleted', (tableId) => {
+      set((state) => ({
+        tables: state.tables.filter((t) => t.id !== tableId)
+      }));
+    });
+
+    socket.on('product.created', (product) => {
+      set((state) => ({
+        products: [...state.products, product]
+      }));
+    });
+
+    socket.on('product.updated', (product) => {
+      set((state) => ({
+        products: state.products.map((p) => p.id === product.id ? product : p)
+      }));
+    });
+
+    socket.on('product.deleted', (productId) => {
+      set((state) => ({
+        products: state.products.filter((p) => p.id !== productId)
+      }));
+    });
+
+    socket.on('category.created', (category) => {
+      set((state) => ({
+        categories: [...state.categories, category]
+      }));
+    });
+
+    socket.on('category.updated', (category) => {
+      set((state) => ({
+        categories: state.categories.map((c) => c.id === category.id ? category : c)
+      }));
+    });
+
+    socket.on('category.deleted', (categoryId) => {
+      set((state) => ({
+        categories: state.categories.filter((c) => c.id !== categoryId)
+      }));
+    });
+
+    socket.on('reservation.created', (res) => {
+      set((state) => ({
+        reservations: [...state.reservations, res]
+      }));
+    });
+
+    socket.on('reservation.updated', (res) => {
+      set((state) => ({
+        reservations: state.reservations.map((r) => r.id === res.id ? res : r)
+      }));
+    });
+
+    socket.on('reservation.deleted', (resId) => {
+      set((state) => ({
+        reservations: state.reservations.filter((r) => r.id !== resId)
+      }));
+    });
   },
 }));
 
