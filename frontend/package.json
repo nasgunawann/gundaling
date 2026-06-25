@@ -7,7 +7,7 @@
     "dev": "vite --host --port 5173",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "concurrently -n \"VITE,NEST\" -c \"cyan,green\" \"vite --host --port 5173\" \"pnpm --dir ../backend-new start:dev\""
+    "start": "concurrently -n \"VITE,NEST\" -c \"cyan,green\" \"vite --host --port 5173\" \"pnpm --dir ../backend start:dev\""
   },
   "dependencies": {
     "axios": "^1.18.0",
