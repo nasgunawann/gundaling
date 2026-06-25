@@ -37,7 +37,7 @@ const useStore = create((set, get) => ({
   login: async (id, pin) => {
     set({ loading: true });
     try {
-      const res = await api.post('/api/login', { id, pin });
+      const res = await api.post('/auth/login', { id, pin });
       const { user, token } = res.data;
       localStorage.setItem('gundaling_token', token);
       localStorage.setItem('gundaling_user', JSON.stringify(user));
@@ -57,9 +57,6 @@ const useStore = create((set, get) => ({
   },
 
   logout: async () => {
-    try {
-      await api.post('/api/logout');
-    } catch (e) {}
     localStorage.removeItem('gundaling_token');
     localStorage.removeItem('gundaling_user');
     const { socket } = get();
@@ -75,7 +72,7 @@ const useStore = create((set, get) => ({
 
     set({ token, loading: true });
     try {
-      const res = await api.get('/api/me');
+      const res = await api.get('/auth/me');
       const user = res.data;
       localStorage.setItem('gundaling_user', JSON.stringify(user));
       
@@ -98,13 +95,19 @@ const useStore = create((set, get) => ({
 
   fetchInitialData: async () => {
     try {
-      const res = await api.get('/api/bootstrap');
+      const [productsRes, categoriesRes, tablesRes, ordersRes, reservationsRes] = await Promise.all([
+        api.get('/products'),
+        api.get('/categories'),
+        api.get('/tables'),
+        api.get('/orders'),
+        api.get('/reservations'),
+      ]);
       set({
-        products: res.data.products,
-        tables: res.data.tables,
-        orders: res.data.orders,
-        reservations: res.data.reservations,
-        categories: res.data.categories,
+        products: productsRes.data,
+        categories: categoriesRes.data,
+        tables: tablesRes.data,
+        orders: ordersRes.data,
+        reservations: reservationsRes.data,
       });
     } catch (err) {
       console.error('Failed to fetch initial data', err);
@@ -113,7 +116,7 @@ const useStore = create((set, get) => ({
 
   submitOrder: async (tableId, items) => {
     try {
-      const res = await api.post('/api/orders', { table_id: tableId, items });
+      const res = await api.post('/orders', { table_id: tableId, items });
       const updatedOrder = res.data;
       
       set((state) => {
@@ -139,7 +142,7 @@ const useStore = create((set, get) => ({
 
   transmitOrder: async (orderId) => {
     try {
-      const res = await api.post(`/api/orders/${orderId}/transmit`);
+      const res = await api.post(`/orders/${orderId}/transmit`);
       const updatedOrder = res.data;
       set((state) => {
         const newOrders = state.orders.map((o) => o.id === orderId ? updatedOrder : o);
@@ -157,7 +160,7 @@ const useStore = create((set, get) => ({
 
   updateOrderStatus: async (orderId, status) => {
     try {
-      const res = await api.put(`/api/orders/${orderId}/status`, { status });
+      const res = await api.put(`/orders/${orderId}/status`, { status });
       const updatedOrder = res.data;
       set((state) => {
         const newOrders = state.orders.map((o) => o.id === orderId ? updatedOrder : o);
@@ -175,7 +178,7 @@ const useStore = create((set, get) => ({
 
   addReservation: async (data) => {
     try {
-      const res = await api.post('/api/reservations', data);
+      const res = await api.post('/reservations', data);
       const newRes = res.data;
       set((state) => ({ reservations: [...state.reservations, newRes] }));
       return newRes;
@@ -187,7 +190,7 @@ const useStore = create((set, get) => ({
 
   updateReservation: async (id, status) => {
     try {
-      const res = await api.put(`/api/reservations/${id}`, { status });
+      const res = await api.put(`/reservations/${id}`, { status });
       const updated = res.data;
       set((state) => ({
         reservations: state.reservations.map((r) => r.id === id ? updated : r),
@@ -201,7 +204,7 @@ const useStore = create((set, get) => ({
 
   updateTablePosition: async (tableId, posX, posY) => {
     try {
-      const res = await api.put(`/api/tables/${tableId}`, { pos_x: posX, pos_y: posY });
+      const res = await api.put(`/tables/${tableId}`, { pos_x: posX, pos_y: posY });
       const updatedTable = res.data;
       set((state) => ({
         tables: state.tables.map((t) => t.id === tableId ? updatedTable : t),

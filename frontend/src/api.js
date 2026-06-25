@@ -2,7 +2,7 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: 'http://localhost:8000/api',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
