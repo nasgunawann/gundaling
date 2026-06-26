@@ -44,8 +44,6 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
 
       return { ...prev, [selectedTable]: updatedCart }
     })
-    // Auto-open cart summary drawer on mobile when adding items so the waiter gets immediate feedback
-    setIsCartOpen(true)
   }
 
   const handleUpdateItemNote = (itemId, note) => {
@@ -191,7 +189,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
       <div className="flex-1 flex flex-col h-full overflow-hidden lg:border-r border-outline-variant/20">
 
         {/* Header with Table Selection Selector */}
-        <header className="h-20 bg-surface/80 backdrop-blur-md flex justify-between items-center px-container_margin border-b border-outline-variant/10 z-10 font-display">
+        <header className="h-20 bg-surface/80 backdrop-blur-md flex justify-between items-center px-container_margin border-b border-outline-variant/10 z-10 font-display shrink-0">
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-4">
               <div className="flex flex-col">
@@ -200,7 +198,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
                   <select
                     value={selectedTable}
                     onChange={(e) => setSelectedTable(e.target.value)}
-                    className="bg-primary/10 border-none font-bold text-primary px-4 py-2 rounded-xl text-base focus:ring-2 focus:ring-primary appearance-none pr-8 cursor-pointer shadow-sm"
+                    className="bg-primary/10 border-none font-bold text-primary px-4 py-2.5 rounded-xl text-base focus:ring-2 focus:ring-primary appearance-none pr-8 cursor-pointer shadow-sm"
                   >
                     {tablesList.map(t => (
                       <option key={t} value={t} className="text-on-surface bg-surface font-semibold">{t}</option>
@@ -210,17 +208,6 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
                     <span className="material-symbols-outlined text-sm">expand_more</span>
                   </div>
                 </div>
-              </div>
-
-              <div className="relative w-full max-w-[320px] ml-0 lg:ml-4">
-                <span className="material-symbols-outlined absolute left-4.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-base">search</span>
-                <input
-                  type="text"
-                  placeholder="Search menu..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-surface-container-low border-none rounded-full py-2 pl-11 pr-4 text-xs font-semibold focus:ring-2 focus:ring-primary/20 shadow-sm"
-                />
               </div>
             </div>
 
@@ -241,36 +228,51 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
           </div>
         </header>
 
-        {/* Category horizontal filters */}
-        <div className="px-container_margin py-5 flex items-center gap-2 overflow-x-auto custom-scrollbar bg-surface-container-lowest/15">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border shrink-0 ${activeCategory === cat
-                  ? 'bg-primary text-on-primary border-primary shadow-sm'
-                  : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border-outline-variant/15'
-                }`}
-            >
-              {cat}
-            </button>
-          ))}
+        {/* Filters Wrapper: Merged Categories and Search Bar into one block */}
+        <div className="px-container_margin py-4 border-b border-outline-variant/10 bg-surface-container-lowest/15 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+          {/* Category Horizontal Filters (scrollbar hidden) */}
+          <div className="flex gap-2 overflow-x-auto custom-scrollbar shrink-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border shrink-0 ${activeCategory === cat
+                    ? 'bg-primary text-on-primary border-primary shadow-sm'
+                    : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border-outline-variant/15'
+                  }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Search bar positioned next to categories for consistency */}
+          <div className="relative w-full md:max-w-[280px]">
+            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-base">search</span>
+            <input
+              type="text"
+              placeholder="Search menu..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-surface-container-low border-none rounded-full py-2.5 pl-11 pr-4 text-xs font-semibold focus:ring-2 focus:ring-primary/20 shadow-sm"
+            />
+          </div>
         </div>
 
         {/* Product Cards Grid */}
         <div className="flex-grow p-container_margin overflow-y-auto custom-scrollbar pb-16 bg-surface-container-lowest/30">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredProducts.length > 0 ? filteredProducts.map((p) => (
               <div
                 key={p.id}
                 onClick={() => handleAddToCart(p)}
-                className={`bg-surface rounded-3xl overflow-hidden border border-outline-variant/35 shadow-[0_4px_12px_rgba(0,0,0,0.02)] transition-all duration-200 flex flex-col justify-between group ${p.outOfStock
+                className={`bg-surface rounded-2xl overflow-hidden border border-outline-variant/35 shadow-[0_4px_12px_rgba(0,0,0,0.02)] transition-all duration-200 flex flex-col justify-between group ${p.outOfStock
                     ? 'opacity-50 cursor-not-allowed select-none'
                     : 'hover:shadow-[0_8px_24px_rgba(0,0,0,0.05)] cursor-pointer active:scale-[0.98]'
                   }`}
               >
                 <div>
-                  <div className="aspect-[16/10] bg-surface-container-highest relative overflow-hidden">
+                  <div className="aspect-[4/3] bg-surface-container-highest relative overflow-hidden">
                     <img
                       alt={p.name}
                       className={`w-full h-full object-cover transition-transform duration-300 ${p.outOfStock ? 'grayscale' : 'group-hover:scale-105'
