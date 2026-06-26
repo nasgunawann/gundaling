@@ -185,7 +185,7 @@ export default function ProductEnrichment({ products }) {
         </header>
 
         {/* Category Horizontal Filters */}
-        <div className="px-container_margin py-4 flex gap-2 overflow-x-auto custom-scrollbar bg-surface-container-lowest/15">
+        <div className="px-container_margin py-5 flex items-center gap-2 overflow-x-auto custom-scrollbar bg-surface-container-lowest/15">
           {categories.map((cat) => (
             <button
               key={cat}

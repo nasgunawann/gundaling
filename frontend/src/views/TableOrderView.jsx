@@ -185,7 +185,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
   })
 
   return (
-    <div className="flex-1 flex flex-col lg:flex-row bg-background h-full w-full overflow-hidden relative">
+    <div className="flex-1 flex flex-col lg:flex-row bg-background h-full w-full overflow-hidden">
 
       {/* LEFT: Menu Products Catalog Grid */}
       <div className="flex-1 flex flex-col h-full overflow-hidden lg:border-r border-outline-variant/20">
@@ -242,7 +242,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
         </header>
 
         {/* Category horizontal filters */}
-        <div className="px-container_margin py-4 flex gap-2 overflow-x-auto custom-scrollbar bg-surface-container-lowest/15">
+        <div className="px-container_margin py-5 flex items-center gap-2 overflow-x-auto custom-scrollbar bg-surface-container-lowest/15">
           {categories.map((cat) => (
             <button
               key={cat}
