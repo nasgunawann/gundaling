@@ -16,8 +16,8 @@
 C:\laragon\www\gundaling\
 ├── frontend/              ← React + Vite
 │   ├── src/
-│   │   ├── components/
-│   │   ├── views/
+│   │   ├── components/    ← Common components (Sidebar, CartDrawer, WebsocketStatus, etc.)
+│   │   ├── views/         ← WaiterLogin, FloorPlan, TableOrderView, KitchenDisplay, ProductEnrichment, Reservations
 │   │   ├── App.jsx
 │   │   ├── api.js
 │   │   ├── store.js
@@ -25,12 +25,13 @@ C:\laragon\www\gundaling\
 │
 ├── backend/               ← NestJS
 │   ├── src/
-│   │   ├── auth/          ← JWT login, logout, me
+│   │   ├── auth/          ← JWT login, logout, me (JWT Login uses TypeCast integer matching via class-transformer)
 │   │   ├── categories/    ← Categories CRUD
 │   │   ├── products/      ← Products CRUD
-│   │   ├── tables/        ← Tables CRUD and update position
+│   │   ├── tables/        ← Tables CRUD and position updates
 │   │   ├── reservations/  ← Reservations CRUD
 │   │   ├── orders/        ← Orders creation, transmit, status updates
+│   │   ├── users/         ← Users/Staff query endpoint
 │   │   ├── prisma/        ← PrismaService
 │   │   ├── events/        ← Socket.io POS Gateway
 │   │   ├── app.module.ts
@@ -118,8 +119,11 @@ C:\laragon\www\gundaling\
 All REST endpoints are prefixed with `/api`.
 
 ### Auth Module
-- `POST /api/auth/login` → Login with `{ id, pin }` → Returns `{ user, token }`
+- `POST /api/auth/login` → Login with `{ id, pin }` (validated with `@Type(() => Number)` / `parseInt`) → Returns `{ user, token }`
 - `GET /api/auth/me` → Returns current logged-in user
+
+### Users Module
+- `GET /api/users` → Returns list of registered employee staff members
 
 ### Categories Module
 - `GET /api/categories` → List all categories sorted by `sortOrder`
@@ -146,9 +150,32 @@ All REST endpoints are prefixed with `/api`.
 
 ### Orders Module
 - `GET /api/orders` → List active orders (status !== paid)
-- `POST /api/orders` → Create or update current active table order
+- `POST /api/orders` → Send new items to kitchen (Split-Ticket: Always creates a new Order ID for transaction tracking)
 - `POST /api/orders/:id/transmit` → Transmit unsent items to kitchen (sets status to `pending`, fires socket)
 - `PUT /api/orders/:id/status` → Update status (`preparing`, `ready`, `served`, `paid`)
+
+---
+
+## UI/UX & Architectural Redesign Specifications
+
+### 1. Split-Ticket & Unified Billing
+- **Chef Clarity**: Sending newly selected items to the kitchen always creates a new, independent Order ID in the backend. Chefs receive a fresh, unmutated cooking ticket instead of appending to in-progress food lists.
+- **Waiter Billing Consolidation**: The Table Menu interface aggregates the subtotal and grandTotal calculations across **all** active orders associated with the table. Settling the bill closes all active table tickets simultaneously.
+
+### 2. Standardized Layout Systems & Affordance
+- **Collapsible Mini-Drawer Sidebar**: The main navigation menu dynamically collapses down to 80px (icons only) with a high-affordance hover states chevron toggler.
+- **Centralized Websocket Tracker**: Real-time Socket connection state (`WebsocketStatus`) is unified at the bottom of the navigation sidebar.
+- **Category Filter Wrap-Around**: Horizontal categories list hides its desktop browser scrollbar natively (`[&::-webkit-scrollbar]:hidden`) and holds `shrink-0` layout parameters to prevent padding squash on state change.
+- **High-Density Menu Grid**: Products catalog rendered as `grid-cols-2 md:grid-cols-3 xl:grid-cols-4` with unified `aspect-[4/3]` aspect ratio layouts.
+- **Waiters FAB Trigger**: Cart trigger refactored into a floating action button on the bottom right corner with a white cart icon, "View Bill" descriptor text, and a glowing count badge indicator.
+- **Confirm Settle Dialog**: The bill settlement button is backed by a fully padded `showConfirm` window modal prompt.
+
+### 3. KDS Masonry Grid & Expeditor
+- **Scroll-Free Grid**: Replaced the Kanban layout with a responsive Masonry ticket grid for chefs.
+- **SLA Warnings**: Ticket headers turn Yellow at 10 minutes and Red at 15 minutes to highlight delay times.
+- **Item Plating Strikes**: Line items are checkable and struck out (`line-through`) individually by cooks.
+- **Expeditor Screen Mode**: Fullscreen API (`document.documentElement.requestFullscreen()`) integrated on the KDS view to dedicate full screen real-estate to the kitchen.
+- **Waiter Ready Pickup**: When orders enter `ready` status, tables on the floor plan flash/pulse Green and display a "Food Ready!" badge directly.
 
 ---
 
