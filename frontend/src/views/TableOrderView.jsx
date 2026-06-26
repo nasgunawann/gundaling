@@ -13,6 +13,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
   const [isSendingToKitchen, setIsSendingToKitchen] = useState(false)
   const [showReceiptModal, setShowReceiptModal] = useState(false)
   const [activeNoteItemId, setActiveNoteItemId] = useState(null)
+  const [isCartOpen, setIsCartOpen] = useState(false)
 
   const storeTables = useStore((state) => state.tables)
   const storeOrders = useStore((state) => state.orders)
@@ -148,7 +149,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
 
     try {
       const tableObj = storeTables.find((t) => t.name === selectedTable)
-      const activeOrder = storeOrders.find((o) => o.table_id === tableObj?.id && o.status !== 'paid')
+      const activeOrder = storeOrders.find((o) => (o.tableId === tableObj?.id || o.table_id === tableObj?.id) && o.status !== 'paid')
       
       if (!activeOrder) {
         throw new Error('No active order found for this table.')
@@ -222,7 +223,20 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
               </div>
             </div>
 
-            <WebsocketStatus />
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsCartOpen(!isCartOpen)}
+                className="relative h-12 px-5 bg-primary/10 text-primary hover:bg-primary/20 rounded-xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-all text-xs uppercase tracking-wider"
+              >
+                <span className="material-symbols-outlined text-base">shopping_cart</span>
+                <span>Cart Summary</span>
+                {activeCart.length > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-error text-on-error rounded-full flex items-center justify-center text-[9px] font-bold border border-surface">
+                    {activeCart.reduce((totalQty, item) => totalQty + item.qty, 0)}
+                  </span>
+                )}
+              </button>
+            </div>
           </div>
         </header>
 
@@ -307,8 +321,12 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
         </div>
       </div>
 
-      {/* RIGHT: High-density Billing & Cart Summary Side Panel */}
-      <div className="w-full lg:w-[420px] bg-surface flex flex-col h-full overflow-hidden shadow-[-4px_0_24px_rgba(0,0,0,0.02)] z-10 mt-6 lg:mt-0">
+      {/* RIGHT: High-density Collapsible Billing & Cart Summary Side Panel */}
+      <div 
+        className={`fixed lg:relative inset-y-0 right-0 z-40 w-[380px] sm:w-[420px] bg-surface flex flex-col h-full overflow-hidden shadow-[-4px_0_24px_rgba(0,0,0,0.06)] lg:shadow-[-4px_0_24px_rgba(0,0,0,0.02)] transition-transform duration-300 transform ${
+          isCartOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
+        }`}
+      >
 
         {/* Panel Header */}
         <header className="px-6 py-6 border-b border-surface-container flex justify-between items-center bg-surface-container-low/20">
@@ -319,15 +337,24 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
             </p>
           </div>
 
-          {activeCart.length > 0 && (
+          <div className="flex items-center gap-2">
+            {activeCart.length > 0 && (
+              <button
+                onClick={handleClearCart}
+                className="p-2 text-outline hover:text-error hover:bg-error/10 rounded-xl transition-all"
+                title="Clear Active Cart"
+              >
+                <span className="material-symbols-outlined text-lg">delete_sweep</span>
+              </button>
+            )}
             <button
-              onClick={handleClearCart}
-              className="p-2 text-outline hover:text-error hover:bg-error/10 rounded-xl transition-all"
-              title="Clear Active Cart"
+              onClick={() => setIsCartOpen(false)}
+              className="lg:hidden p-2 text-outline hover:bg-surface-container rounded-xl transition-all"
+              title="Close Drawer"
             >
-              <span className="material-symbols-outlined text-lg">delete_sweep</span>
+              <span className="material-symbols-outlined text-lg">close</span>
             </button>
-          )}
+          </div>
         </header>
 
         {/* Panel Receipt Content */}
@@ -479,6 +506,14 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
           </div>
         </footer>
       </div>
+
+      {/* Backdrop for mobile drawer */}
+      {isCartOpen && (
+        <div 
+          onClick={() => setIsCartOpen(false)}
+          className="fixed inset-0 bg-black/25 backdrop-blur-xs z-35 lg:hidden"
+        />
+      )}
 
       <ReceiptModal
         open={showReceiptModal}

@@ -154,7 +154,6 @@ export default function KitchenDisplay() {
           <h2 className="text-xl font-bold text-on-surface leading-tight">Kitchen Displays</h2>
           <p className="text-xs text-on-surface-variant/80 uppercase tracking-widest mt-0.5">Kitchen Production System (KDS) • Real-time</p>
         </div>
-        <WebsocketStatus />
       </header>
 
       {/* Kanban Layout */}

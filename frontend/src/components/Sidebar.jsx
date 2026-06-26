@@ -1,6 +1,7 @@
 import React from 'react'
+import WebsocketStatus from './WebsocketStatus'
 
-export default function Sidebar({ currentView, onViewChange, user, onLogout }) {
+export default function Sidebar({ currentView, onViewChange, user, onLogout, isCollapsed, onToggleCollapse }) {
   const isManager = user?.role === 'Manager'
   const isChefOrManager = user?.role === 'Chef' || user?.role === 'Manager'
 
@@ -13,12 +14,30 @@ export default function Sidebar({ currentView, onViewChange, user, onLogout }) {
   ]
 
   return (
-    <aside className="relative md:fixed md:left-0 md:top-0 h-auto md:h-full w-full md:w-[280px] bg-surface-container-low md:border-r border-outline-variant/30 flex flex-col z-50 font-display">
+    <aside className={`relative md:fixed md:left-0 md:top-0 h-auto md:h-full bg-surface-container-low md:border-r border-outline-variant/30 flex flex-col z-50 font-display transition-all duration-300 ${
+      isCollapsed ? 'w-full md:w-[80px]' : 'w-full md:w-[280px]'
+    }`}>
       {/* Branding */}
-      <div className="px-8 py-8">
-        <h1 className="font-display text-primary leading-tight font-bold text-[32px] tracking-tight">
-          Gundaling
-        </h1>
+      <div className={`px-6 py-6 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+        {!isCollapsed && (
+          <h1 className="font-display text-primary leading-tight font-bold text-[28px] tracking-tight">
+            Gundaling
+          </h1>
+        )}
+        {isCollapsed && (
+          <h1 className="font-display text-primary leading-tight font-bold text-[22px] tracking-tight">
+            G
+          </h1>
+        )}
+        <button 
+          onClick={onToggleCollapse}
+          className="hidden md:flex p-1.5 hover:bg-surface-container-high rounded-full text-on-surface-variant transition-colors"
+          title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+        >
+          <span className="material-symbols-outlined text-sm">
+            {isCollapsed ? 'chevron_right' : 'chevron_left'}
+          </span>
+        </button>
       </div>
 
       {/* Navigation */}
@@ -29,10 +48,13 @@ export default function Sidebar({ currentView, onViewChange, user, onLogout }) {
             <button
               key={item.id}
               onClick={() => onViewChange(item.id)}
-              className={`flex items-center gap-3 w-full text-left transition-all rounded-full px-4 py-3 font-semibold ${isActive
+              className={`flex items-center gap-3 transition-all rounded-full font-semibold ${
+                isCollapsed ? 'justify-center w-12 h-12 mx-auto' : 'w-full px-4 py-3 text-left'
+              } ${isActive
                   ? 'bg-primary/10 text-primary'
                   : 'text-on-surface-variant hover:bg-surface-container-high'
                 }`}
+              title={isCollapsed ? item.label : undefined}
             >
               <span
                 className="material-symbols-outlined"
@@ -40,7 +62,7 @@ export default function Sidebar({ currentView, onViewChange, user, onLogout }) {
               >
                 {item.icon}
               </span>
-              <span className="text-sm font-semibold">{item.label}</span>
+              {!isCollapsed && <span className="text-sm font-semibold">{item.label}</span>}
             </button>
           )
         })}
@@ -48,26 +70,44 @@ export default function Sidebar({ currentView, onViewChange, user, onLogout }) {
 
       {/* Footer / User Profile */}
       <div className="mt-auto pb-8 flex flex-col gap-1">
+        <div className={`px-6 mb-4 flex ${isCollapsed ? 'justify-center' : 'justify-start'}`}>
+          <WebsocketStatus showLabel={!isCollapsed} />
+        </div>
 
         {/* User Card */}
-        <div className="px-4 py-3 mx-2 bg-surface-container rounded-2xl flex items-center justify-between border border-outline-variant/20">
-          <div className="flex items-center gap-3">
+        {isCollapsed ? (
+          <div className="flex flex-col items-center gap-2 mx-2">
             <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-sm shadow-sm border border-outline-variant/10">
               {user.name.charAt(0)}
             </div>
-            <div>
-              <p className="text-xs font-bold text-on-surface leading-snug">{user.name}</p>
-              <p className="text-[10px] font-semibold text-on-surface-variant/80 uppercase tracking-wider">{user.role}</p>
-            </div>
+            <button
+              onClick={onLogout}
+              title="Log Out Staff"
+              className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-full transition-all"
+            >
+              <span className="material-symbols-outlined text-lg">logout</span>
+            </button>
           </div>
-          <button
-            onClick={onLogout}
-            title="Log Out Staff"
-            className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-full transition-all"
-          >
-            <span className="material-symbols-outlined text-lg">logout</span>
-          </button>
-        </div>
+        ) : (
+          <div className="px-4 py-3 mx-2 bg-surface-container rounded-2xl flex items-center justify-between border border-outline-variant/20">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-sm shadow-sm border border-outline-variant/10">
+                {user.name.charAt(0)}
+              </div>
+              <div>
+                <p className="text-xs font-bold text-on-surface leading-snug">{user.name}</p>
+                <p className="text-[10px] font-semibold text-on-surface-variant/80 uppercase tracking-wider">{user.role}</p>
+              </div>
+            </div>
+            <button
+              onClick={onLogout}
+              title="Log Out Staff"
+              className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-full transition-all"
+            >
+              <span className="material-symbols-outlined text-lg">logout</span>
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   )

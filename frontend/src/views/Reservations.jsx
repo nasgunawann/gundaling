@@ -93,7 +93,6 @@ export default function Reservations({ reservations }) {
             <h2 className="text-xl font-bold text-on-surface font-display leading-tight">Reservation & Guest Management</h2>
             <p className="text-xs text-on-surface-variant/80 uppercase tracking-widest mt-0.5">Live Guest Bookings • Gundaling Farmstead</p>
           </div>
-          <WebsocketStatus />
         </div>
         
         <button 

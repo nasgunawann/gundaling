@@ -14,6 +14,7 @@ export default function App() {
   const [currentView, setCurrentView] = useState(() => localStorage.getItem('gundaling_current_view') || 'floor-plan')
   const [selectedTable, setSelectedTable] = useState(() => localStorage.getItem('gundaling_selected_table') || 'Table 12')
   const [tableCarts, setTableCarts] = useState({})
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => localStorage.getItem('gundaling_sidebar_collapsed') === 'true')
 
   const user = useStore((state) => state.user)
   const products = useStore((state) => state.products)
@@ -30,6 +31,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('gundaling_selected_table', selectedTable)
   }, [selectedTable])
+
+  useEffect(() => {
+    localStorage.setItem('gundaling_sidebar_collapsed', isSidebarCollapsed)
+  }, [isSidebarCollapsed])
 
   // Attach showToast to window for Zustand websocket access
   useEffect(() => {
@@ -50,7 +55,7 @@ export default function App() {
     orders.forEach((order) => {
       if (order.status !== 'paid' && order.table) {
         newCarts[order.table.name] = order.items.map((item) => ({
-          id: item.product_id,
+          id: item.product_id || item.productId,
           name: item.product?.name,
           price: Number(item.unitPrice || item.unit_price),
           qty: item.qty,
@@ -80,9 +85,11 @@ export default function App() {
         onViewChange={(view) => setCurrentView(view)} 
         user={user}
         onLogout={handleLogout}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
-      <div className="flex-1 md:ml-[280px] ml-0 h-screen overflow-hidden flex flex-col">
+      <div className={`flex-1 ${isSidebarCollapsed ? 'md:ml-[80px]' : 'md:ml-[280px]'} ml-0 h-screen overflow-hidden flex flex-col transition-all duration-300`}>
         {currentView === 'floor-plan' && (
           <FloorPlan 
             onTableClick={(tableName) => {

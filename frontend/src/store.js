@@ -127,8 +127,9 @@ const useStore = create((set, get) => ({
         } else {
           newOrders.push(updatedOrder);
         }
+        const updatedTableId = updatedOrder.tableId || updatedOrder.table_id;
         const newTables = state.tables.map((t) => 
-          t.id === updatedOrder.table_id ? updatedOrder.table : t
+          t.id === updatedTableId ? updatedOrder.table : t
         );
         return { orders: newOrders, tables: newTables };
       });
@@ -146,8 +147,9 @@ const useStore = create((set, get) => ({
       const updatedOrder = res.data;
       set((state) => {
         const newOrders = state.orders.map((o) => o.id === orderId ? updatedOrder : o);
+        const updatedTableId = updatedOrder.tableId || updatedOrder.table_id;
         const newTables = state.tables.map((t) => 
-          t.id === updatedOrder.table_id ? updatedOrder.table : t
+          t.id === updatedTableId ? updatedOrder.table : t
         );
         return { orders: newOrders, tables: newTables };
       });
@@ -164,8 +166,9 @@ const useStore = create((set, get) => ({
       const updatedOrder = res.data;
       set((state) => {
         const newOrders = state.orders.map((o) => o.id === orderId ? updatedOrder : o);
+        const updatedTableId = updatedOrder.tableId || updatedOrder.table_id;
         const newTables = state.tables.map((t) => 
-          t.id === updatedOrder.table_id ? updatedOrder.table : t
+          t.id === updatedTableId ? updatedOrder.table : t
         );
         return { orders: newOrders, tables: newTables };
       });
@@ -227,8 +230,9 @@ const useStore = create((set, get) => ({
         } else {
           newOrders.push(order);
         }
+        const orderTableId = order.tableId || order.table_id;
         const newTables = state.tables.map((t) => 
-          t.id === order.table_id ? order.table : t
+          t.id === orderTableId ? order.table : t
         );
         return { orders: newOrders, tables: newTables };
       });

@@ -4,6 +4,14 @@ import * as bcrypt from "bcrypt";
 const prisma = new PrismaClient();
 
 async function main() {
+  // Clear existing orders, tables, products, categories
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
+  await prisma.reservation.deleteMany();
+  await prisma.table.deleteMany();
+  await prisma.product.deleteMany();
+  await prisma.category.deleteMany();
+
   const pinHash = await bcrypt.hash("1234", 10);
   const passwordHash = await bcrypt.hash("password123", 10);
 
@@ -172,13 +180,13 @@ async function main() {
     data: { id: 1, name: "Table 01", seats: 4, shape: "circle", posX: 10, posY: 15, status: "Available" },
   });
   const t2 = await prisma.table.create({
-    data: { id: 2, name: "Table 02", seats: 2, shape: "square", posX: 30, posY: 15, status: "Reserved" },
+    data: { id: 2, name: "Table 02", seats: 2, shape: "square", posX: 30, posY: 15, status: "Available" },
   });
   const t3 = await prisma.table.create({
-    data: { id: 3, name: "Table 03", seats: 4, shape: "square", posX: 50, posY: 15, status: "Occupied" },
+    data: { id: 3, name: "Table 03", seats: 4, shape: "square", posX: 50, posY: 15, status: "Available" },
   });
   const t4 = await prisma.table.create({
-    data: { id: 4, name: "Table 04", seats: 4, shape: "square", posX: 70, posY: 15, status: "Occupied" },
+    data: { id: 4, name: "Table 04", seats: 4, shape: "square", posX: 70, posY: 15, status: "Available" },
   });
   const t5 = await prisma.table.create({
     data: { id: 5, name: "Table 05", seats: 6, shape: "rectangle", posX: 10, posY: 45, status: "Available" },
@@ -187,109 +195,14 @@ async function main() {
     data: { id: 6, name: "Table 06", seats: 2, shape: "circle", posX: 30, posY: 45, status: "Available" },
   });
   const t7 = await prisma.table.create({
-    data: { id: 7, name: "Table 07", seats: 8, shape: "rectangle", posX: 50, posY: 45, status: "Reserved" },
+    data: { id: 7, name: "Table 07", seats: 8, shape: "rectangle", posX: 50, posY: 45, status: "Available" },
   });
   const t8 = await prisma.table.create({
-    data: { id: 8, name: "Table 08", seats: 6, shape: "rectangle", posX: 70, posY: 45, status: "Occupied" },
+    data: { id: 8, name: "Table 08", seats: 6, shape: "rectangle", posX: 70, posY: 45, status: "Available" },
   });
   const t12 = await prisma.table.create({
-    data: { id: 12, name: "Table 12", seats: 4, shape: "circle", posX: 90, posY: 45, status: "Occupied" },
+    data: { id: 12, name: "Table 12", seats: 4, shape: "circle", posX: 90, posY: 45, status: "Available" },
   });
-
-  await prisma.reservation.createMany({
-    data: [
-      {
-        name: "Eleanor Vance",
-        phone: "+62 811-2345-6789",
-        guests: 4,
-        tableId: t12.id,
-        time: new Date(new Date().setHours(18, 30, 0, 0)),
-        status: "Seated",
-      },
-      {
-        name: "Albert Cole",
-        phone: "+62 812-9876-5432",
-        guests: 2,
-        tableId: t5.id,
-        time: new Date(new Date().setHours(19, 0, 0, 0)),
-        status: "Confirmed",
-      },
-      {
-        name: "Miriam Sterling",
-        phone: "+62 813-4567-8901",
-        guests: 6,
-        tableId: t8.id,
-        time: new Date(new Date().setHours(19, 30, 0, 0)),
-        status: "Confirmed",
-      },
-      {
-        name: "Dr. Gregory House",
-        phone: "+62 814-1111-2222",
-        guests: 1,
-        tableId: t3.id,
-        time: new Date(new Date().setHours(20, 0, 0, 0)),
-        status: "Arrived",
-      },
-    ],
-  });
-
-  const cartList = [
-    {
-      table: t12,
-      items: [
-        { product: p1, qty: 2 },
-        { product: p2, qty: 1 },
-        { product: p3, qty: 1 },
-      ],
-    },
-    {
-      table: t4,
-      items: [
-        { product: p3, qty: 1 },
-        { product: p5, qty: 2 },
-      ],
-    },
-    {
-      table: t3,
-      items: [
-        { product: p2, qty: 2 },
-        { product: p1, qty: 1 },
-      ],
-    },
-    {
-      table: t8,
-      items: [
-        { product: p1, qty: 4 },
-        { product: p5, qty: 4 },
-      ],
-    },
-  ];
-
-  for (const cart of cartList) {
-    const subtotal = cart.items.reduce((acc, item) => acc + Number(item.product.price) * item.qty, 0);
-    const total = subtotal * 1.1;
-
-    const order = await prisma.order.create({
-      data: {
-        tableId: cart.table.id,
-        userId: user1.id,
-        status: "pending",
-        total,
-      },
-    });
-
-    for (const item of cart.items) {
-      await prisma.orderItem.create({
-        data: {
-          orderId: order.id,
-          productId: item.product.id,
-          qty: item.qty,
-          unitPrice: item.product.price,
-          sent: true,
-        },
-      });
-    }
-  }
 }
 
 main()

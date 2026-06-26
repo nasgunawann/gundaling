@@ -27,7 +27,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
 
   // Process live dynamic status based on orders
   const tables = rawTables.map(t => {
-    const activeOrder = orders.find(o => o.table_id === t.id && o.status !== 'paid');
+    const activeOrder = orders.find(o => (o.tableId === t.id || o.table_id === t.id) && o.status !== 'paid');
     
     let status = 'Available';
     let billTotal = 0;
@@ -179,7 +179,6 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
             <h2 className="text-xl font-bold text-on-surface leading-tight">Table Management</h2>
             <p className="text-xs text-on-surface-variant/80 uppercase tracking-widest mt-0.5">Floor Plan • Main Dining Room</p>
           </div>
-          <WebsocketStatus />
         </div>
         
         {isManager && (

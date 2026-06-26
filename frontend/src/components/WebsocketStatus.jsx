@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import useStore from '../store';
 
-export default function WebsocketStatus() {
+export default function WebsocketStatus({ showLabel = true }) {
   const [status, setStatus] = useState('disconnected');
   const socket = useStore((state) => state.socket);
 
@@ -43,11 +43,15 @@ export default function WebsocketStatus() {
   const details = getStatusDetails();
 
   return (
-    <div className="flex items-center gap-2 bg-surface-container-low px-3 py-1.5 rounded-full border border-outline-variant/10 shadow-sm">
+    <div className={`flex items-center gap-2 bg-surface-container-low rounded-full border border-outline-variant/10 shadow-sm ${
+      showLabel ? 'px-3 py-1.5' : 'w-10 h-10 items-center justify-center'
+    }`} title={!showLabel ? details.label : undefined}>
       <span className={`w-2 h-2 rounded-full ${details.color}`} />
-      <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider leading-none">
-        {details.label}
-      </span>
+      {showLabel && (
+        <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider leading-none">
+          {details.label}
+        </span>
+      )}
     </div>
   );
 }
