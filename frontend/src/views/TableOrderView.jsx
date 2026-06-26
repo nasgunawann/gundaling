@@ -45,6 +45,8 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
 
       return { ...prev, [selectedTable]: updatedCart }
     })
+    // Auto-open cart summary drawer on mobile when adding items so the waiter gets immediate feedback
+    setIsCartOpen(true)
   }
 
   const handleUpdateItemNote = (itemId, note) => {
@@ -184,7 +186,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
   })
 
   return (
-    <div className="flex-1 flex flex-col lg:flex-row bg-background h-full w-full overflow-hidden">
+    <div className="flex-1 flex flex-col lg:flex-row bg-background h-full w-full overflow-hidden relative">
 
       {/* LEFT: Menu Products Catalog Grid */}
       <div className="flex-1 flex flex-col h-full overflow-hidden lg:border-r border-outline-variant/20">
@@ -226,7 +228,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsCartOpen(!isCartOpen)}
-                className="relative h-12 px-5 bg-primary/10 text-primary hover:bg-primary/20 rounded-xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-all text-xs uppercase tracking-wider"
+                className="relative h-12 px-5 bg-primary/10 text-primary hover:bg-primary/20 rounded-xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-all text-xs uppercase tracking-wider lg:hidden"
               >
                 <span className="material-symbols-outlined text-base">shopping_cart</span>
                 <span>Cart Summary</span>
@@ -323,8 +325,8 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
 
       {/* RIGHT: High-density Collapsible Billing & Cart Summary Side Panel */}
       <div 
-        className={`fixed lg:relative inset-y-0 right-0 z-40 w-[380px] sm:w-[420px] bg-surface flex flex-col h-full overflow-hidden shadow-[-4px_0_24px_rgba(0,0,0,0.06)] lg:shadow-[-4px_0_24px_rgba(0,0,0,0.02)] transition-transform duration-300 transform ${
-          isCartOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
+        className={`absolute lg:relative inset-y-0 right-0 z-40 w-[380px] sm:w-[420px] bg-surface flex flex-col h-full overflow-hidden shadow-[-4px_0_24px_rgba(0,0,0,0.06)] lg:shadow-[-4px_0_24px_rgba(0,0,0,0.02)] transition-transform duration-300 transform lg:translate-x-0 ${
+          isCartOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
 
@@ -507,11 +509,11 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
         </footer>
       </div>
 
-      {/* Backdrop for mobile drawer */}
+      {/* Backdrop for drawer */}
       {isCartOpen && (
         <div 
           onClick={() => setIsCartOpen(false)}
-          className="fixed inset-0 bg-black/25 backdrop-blur-xs z-35 lg:hidden"
+          className="absolute inset-0 bg-black/25 backdrop-blur-xs z-35 lg:hidden"
         />
       )}
 

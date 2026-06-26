@@ -18,7 +18,7 @@ export default function Sidebar({ currentView, onViewChange, user, onLogout, isC
       isCollapsed ? 'w-full md:w-[80px]' : 'w-full md:w-[280px]'
     }`}>
       {/* Branding */}
-      <div className={`px-6 py-6 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+      <div className={`px-6 py-6 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} border-b border-outline-variant/10 mb-2`}>
         {!isCollapsed && (
           <h1 className="font-display text-primary leading-tight font-bold text-[28px] tracking-tight">
             Gundaling
@@ -31,10 +31,10 @@ export default function Sidebar({ currentView, onViewChange, user, onLogout, isC
         )}
         <button 
           onClick={onToggleCollapse}
-          className="hidden md:flex p-1.5 hover:bg-surface-container-high rounded-full text-on-surface-variant transition-colors"
+          className="hidden md:flex items-center justify-center w-8 h-8 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-on-primary transition-all duration-200 border border-primary/20 shadow-sm active:scale-95"
           title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
         >
-          <span className="material-symbols-outlined text-sm">
+          <span className="material-symbols-outlined text-base font-bold">
             {isCollapsed ? 'chevron_right' : 'chevron_left'}
           </span>
         </button>
