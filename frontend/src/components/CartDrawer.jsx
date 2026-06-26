@@ -70,74 +70,104 @@ export default function CartDrawer({
             <div className="flex flex-col gap-2">
               {activeCart.map((item) => (
                 <div
-                  key={item.id}
-                  className="bg-surface p-2.5 rounded-xl border border-outline-variant/20 shadow-[0_2px_8px_rgba(0,0,0,0.01)] flex justify-between items-center group hover:border-primary/10 transition-all"
+                  key={item.cartItemId || item.id}
+                  className={`bg-surface p-2.5 rounded-xl border transition-all ${
+                    item.sent
+                      ? 'border-outline-variant/10 opacity-85'
+                      : 'border-outline-variant/20 group hover:border-primary/10'
+                  } shadow-[0_2px_8px_rgba(0,0,0,0.01)] flex justify-between items-center`}
                 >
                   <div className="flex flex-col gap-1 max-w-[160px]">
-                    <h4 className="text-xs font-bold text-on-surface leading-tight truncate group-hover:text-primary transition-colors">
+                    <h4 className={`text-xs font-bold leading-tight truncate ${item.sent ? 'text-on-surface-variant' : 'text-on-surface group-hover:text-primary transition-colors'}`}>
                       {item.name}
                     </h4>
                     <div className="flex items-center gap-2">
                       <p className="text-[10px] font-bold text-primary font-display">Rp {Math.floor(item.price).toLocaleString('id-ID')}</p>
-                      {item.sent ? (
+                      {!item.sent ? (
+                        <span className="inline-flex items-center gap-1 text-[8px] font-bold text-status-pending uppercase bg-status-pending/10 border border-status-pending/20 px-1.5 py-0.5 rounded-full select-none">
+                          <span className="w-1 h-1 rounded-full bg-status-pending"></span>Draft
+                        </span>
+                      ) : item.status === 'preparing' ? (
+                        <span className="inline-flex items-center gap-1 text-[8px] font-bold text-status-occupied uppercase bg-status-occupied/10 border border-status-occupied/20 px-1.5 py-0.5 rounded-full select-none">
+                          <span className="w-1 h-1 rounded-full bg-status-occupied animate-pulse"></span>Cooking
+                        </span>
+                      ) : item.status === 'ready' ? (
                         <span className="inline-flex items-center gap-1 text-[8px] font-bold text-status-success uppercase bg-status-success/10 border border-status-success/20 px-1.5 py-0.5 rounded-full select-none">
-                          <span className="w-1 h-1 rounded-full bg-status-success animate-pulse"></span>Cooking
+                          <span className="w-1 h-1 rounded-full bg-status-success animate-bounce"></span>Ready for Pickup
+                        </span>
+                      ) : item.status === 'served' ? (
+                        <span className="inline-flex items-center gap-1 text-[8px] font-bold text-status-reserved uppercase bg-status-reserved/10 border border-status-reserved/20 px-1.5 py-0.5 rounded-full select-none">
+                          <span className="w-1 h-1 rounded-full bg-status-reserved"></span>Served
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[8px] font-bold text-status-pending uppercase bg-status-pending/10 border border-status-pending/20 px-1.5 py-0.5 rounded-full select-none">
-                          <span className="w-1 h-1 rounded-full bg-status-pending"></span>Pending
+                        <span className="inline-flex items-center gap-1 text-[8px] font-bold text-status-warning uppercase bg-status-warning/10 border border-status-warning/20 px-1.5 py-0.5 rounded-full select-none">
+                          <span className="w-1 h-1 rounded-full bg-status-warning animate-pulse"></span>In Queue
                         </span>
                       )}
                     </div>
-                    {item.note || activeNoteItemId === item.id ? (
-                      <textarea
-                        value={item.note || ''}
-                        onChange={(e) => handleUpdateItemNote(item.id, e.target.value)}
-                        placeholder="Tulis catatan..."
-                        className="min-h-[48px] w-full rounded-xl border border-outline-variant/10 bg-surface-container-low px-3 py-2 text-[10px] leading-snug text-on-surface resize-none outline-none focus:border-primary/15 focus:ring-1 focus:ring-primary/15 mt-1"
-                        autoFocus={activeNoteItemId === item.id}
-                        onBlur={() => {
-                          if (!item.note) setActiveNoteItemId(null);
-                        }}
-                      />
+                    {item.sent ? (
+                      item.note && (
+                        <p className="text-[10px] italic text-amber-800 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-lg mt-1 leading-tight">
+                          "{item.note}"
+                        </p>
+                      )
                     ) : (
-                      <button
-                        onClick={() => setActiveNoteItemId(item.id)}
-                        className="text-[10px] font-bold text-primary hover:opacity-85 flex items-center gap-1 mt-1 text-left"
-                      >
-                        <span className="material-symbols-outlined text-[14px]">edit_note</span>
-                        Tambah Catatan
-                      </button>
+                      <>
+                        {item.note || activeNoteItemId === item.cartItemId ? (
+                          <textarea
+                            value={item.note || ''}
+                            onChange={(e) => handleUpdateItemNote(item.cartItemId, e.target.value)}
+                            placeholder="Tulis catatan..."
+                            className="min-h-[48px] w-full rounded-xl border border-outline-variant/10 bg-surface-container-low px-3 py-2 text-[10px] leading-snug text-on-surface resize-none outline-none focus:border-primary/15 focus:ring-1 focus:ring-primary/15 mt-1"
+                            autoFocus={activeNoteItemId === item.cartItemId}
+                            onBlur={() => {
+                              if (!item.note) setActiveNoteItemId(null);
+                            }}
+                          />
+                        ) : (
+                          <button
+                            onClick={() => setActiveNoteItemId(item.cartItemId)}
+                            className="text-[10px] font-bold text-primary hover:opacity-85 flex items-center gap-1 mt-1 text-left"
+                          >
+                            <span className="material-symbols-outlined text-[14px]">edit_note</span>
+                            Tambah Catatan
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    {/* Qty selectors */}
-                    <div className="flex items-center bg-surface-container rounded-xl border border-outline-variant/25 p-0.5">
+                  {item.sent ? (
+                    <span className="text-xs font-bold font-mono text-on-surface-variant bg-surface-container-low rounded-lg px-2.5 py-1">
+                      x{item.qty}
+                    </span>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center bg-surface-container rounded-xl border border-outline-variant/25 p-0.5">
+                        <button
+                          onClick={() => handleQtyChange(item.cartItemId, -1)}
+                          className="w-11 h-11 rounded-lg hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant font-bold active:scale-90 transition-all"
+                        >
+                          <span className="material-symbols-outlined text-sm font-bold">remove</span>
+                        </button>
+                        <span className="w-8 text-center text-xs font-bold font-mono text-on-surface">{item.qty}</span>
+                        <button
+                          onClick={() => handleQtyChange(item.cartItemId, 1)}
+                          className="w-11 h-11 rounded-lg hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant font-bold active:scale-90 transition-all"
+                        >
+                          <span className="material-symbols-outlined text-sm font-bold">add</span>
+                        </button>
+                      </div>
+
                       <button
-                        onClick={() => handleQtyChange(item.id, -1)}
-                        className="w-11 h-11 rounded-lg hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant font-bold active:scale-90 transition-all"
+                        onClick={() => handleRemoveItem(item.cartItemId)}
+                        className="w-11 h-11 hover:bg-error/10 text-outline-variant hover:text-error rounded-xl transition-all flex items-center justify-center"
+                        title="Remove Item"
                       >
-                        <span className="material-symbols-outlined text-sm font-bold">remove</span>
-                      </button>
-                      <span className="w-8 text-center text-xs font-bold font-mono text-on-surface">{item.qty}</span>
-                      <button
-                        onClick={() => handleQtyChange(item.id, 1)}
-                        className="w-11 h-11 rounded-lg hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant font-bold active:scale-90 transition-all"
-                      >
-                        <span className="material-symbols-outlined text-sm font-bold">add</span>
+                        <span className="material-symbols-outlined text-lg">delete</span>
                       </button>
                     </div>
-
-                    {/* Trash */}
-                    <button
-                      onClick={() => handleRemoveItem(item.id)}
-                      className="w-11 h-11 hover:bg-error/10 text-outline-variant hover:text-error rounded-xl transition-all flex items-center justify-center"
-                      title="Remove Item"
-                    >
-                      <span className="material-symbols-outlined text-lg">delete</span>
-                    </button>
-                  </div>
+                  )}
                 </div>
               ))}
             </div>

@@ -40,72 +40,42 @@ export class OrdersService {
       throw new NotFoundException(`Table with ID ${dto.table_id} not found`);
     }
 
-    let order = await this.prisma.order.findFirst({
-      where: {
+    // Always create a new Order for split-ticket tracking
+    const order = await this.prisma.order.create({
+      data: {
         tableId: table.id,
-        status: { not: 'paid' },
+        userId,
+        status: 'pending',
+        total: 0,
       },
     });
 
-    if (!order) {
-      order = await this.prisma.order.create({
-        data: {
-          tableId: table.id,
-          userId,
-          status: 'pending',
-          total: 0,
-        },
-      });
-      await this.prisma.table.update({
-        where: { id: table.id },
-        data: { status: 'Occupied' },
-      });
-    }
+    await this.prisma.table.update({
+      where: { id: table.id },
+      data: { status: 'Occupied' },
+    });
 
-    let incomingSentCount = 0;
     const productIds = dto.items.map((i) => i.product_id);
     const products = await this.prisma.product.findMany({
       where: { id: { in: productIds } },
     });
     const productsMap = new Map(products.map((p) => [p.id, p]));
 
-    const existingItems = await this.prisma.orderItem.findMany({
-      where: { orderId: order.id },
-    });
-
     for (const item of dto.items) {
       const product = productsMap.get(item.product_id);
       if (!product) continue;
       const sent = item.sent ?? false;
 
-      if (sent) {
-        incomingSentCount++;
-      }
-
-      const existingItem = existingItems.find(
-        (ei) => ei.productId === item.product_id && ei.sent === sent,
-      );
-
-      if (existingItem) {
-        await this.prisma.orderItem.update({
-          where: { id: existingItem.id },
-          data: {
-            qty: item.qty,
-            note: item.note ?? null,
-          },
-        });
-      } else {
-        await this.prisma.orderItem.create({
-          data: {
-            orderId: order.id,
-            productId: item.product_id,
-            qty: item.qty,
-            unitPrice: product.price,
-            sent,
-            note: item.note ?? null,
-          },
-        });
-      }
+      await this.prisma.orderItem.create({
+        data: {
+          orderId: order.id,
+          productId: item.product_id,
+          qty: item.qty,
+          unitPrice: product.price,
+          sent,
+          note: item.note ?? null,
+        },
+      });
     }
 
     await this.recalculateOrderTotal(order.id);
@@ -123,9 +93,7 @@ export class OrdersService {
       },
     });
 
-    if (incomingSentCount > 0) {
-      this.posGateway.emitEvent('OrderSent', updatedOrder);
-    }
+    this.posGateway.emitEvent('OrderSent', updatedOrder);
 
     return updatedOrder;
   }

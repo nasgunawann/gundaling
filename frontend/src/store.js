@@ -239,36 +239,26 @@ const useStore = create((set, get) => ({
     };
 
     socket.on('OrderSent', (order) => {
-      if (user.role === 'Chef' || user.role === 'Manager') {
-        handleOrderUpdate(order);
-      }
+      handleOrderUpdate(order);
     });
 
     socket.on('OrderServed', (order) => {
-      if (user.role === 'Chef' || user.role === 'Manager') {
-        handleOrderUpdate(order);
-      }
+      handleOrderUpdate(order);
     });
 
     socket.on('OrderPreparing', (order) => {
-      if (user.role === 'Server' || user.role === 'Manager') {
-        handleOrderUpdate(order);
-      }
+      handleOrderUpdate(order);
     });
 
     socket.on('OrderReady', (order) => {
-      if (user.role === 'Server' || user.role === 'Manager') {
-        handleOrderUpdate(order);
-        if (window.showToast) {
-          window.showToast(`Order for ${order.table?.name || 'Table'} is ready for pickup!`, 'success');
-        }
+      handleOrderUpdate(order);
+      if (window.showToast && (user.role === 'Server' || user.role === 'Manager')) {
+        window.showToast(`Order for ${order.table?.name || 'Table'} is ready for pickup!`, 'success');
       }
     });
 
     socket.on('OrderPaid', (order) => {
-      if (user.role === 'Server' || user.role === 'Manager') {
-        handleOrderUpdate(order);
-      }
+      handleOrderUpdate(order);
     });
 
     socket.on('table.updated', (table) => {

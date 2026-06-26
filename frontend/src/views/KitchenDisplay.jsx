@@ -1,29 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import useStore from '../store';
 import { useNotification } from '../components/NotificationProvider';
-import WebsocketStatus from '../components/WebsocketStatus';
 
 export default function KitchenDisplay() {
   const { showToast } = useNotification();
   const orders = useStore((state) => state.orders);
   const updateOrderStatus = useStore((state) => state.updateOrderStatus);
 
-  // Auto-refresh elapsed times every 30 seconds
+  // Auto-refresh elapsed times every 15 seconds for precise SLA warning timing
   const [timeTick, setTimeTick] = useState(Date.now());
   useEffect(() => {
-    const interval = setInterval(() => setTimeTick(Date.now()), 30000);
+    const interval = setInterval(() => setTimeTick(Date.now()), 15000);
     return () => clearInterval(interval);
   }, []);
 
-  const activeOrders = orders.filter((o) => 
-    ['pending', 'preparing', 'ready'].includes(o.status)
-  );
+  // Fullscreen state tracking
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
 
-  const pendingOrders = activeOrders.filter((o) => o.status === 'pending');
-  const preparingOrders = activeOrders.filter((o) => o.status === 'preparing');
-  const readyOrders = activeOrders.filter((o) => o.status === 'ready');
+  // Item plating strike states (local visual checklist for cooks)
+  const [checkedItems, setCheckedItems] = useState({});
 
-  // Audio synthezier alert for new orders
+  const toggleItemChecked = (itemId) => {
+    setCheckedItems((prev) => ({
+      ...prev,
+      [itemId]: !prev[itemId],
+    }));
+  };
+
+  const activeOrders = orders
+    .filter((o) => ['pending', 'preparing', 'ready'].includes(o.status))
+    .sort((a, b) => new Date(a.createdAt || a.created_at) - new Date(b.createdAt || b.created_at));
+
+  // Audio synthesizer alert for new orders
   const playNewOrderSound = () => {
     try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -43,6 +58,7 @@ export default function KitchenDisplay() {
     }
   };
 
+  const pendingOrders = activeOrders.filter((o) => o.status === 'pending');
   const pendingCount = pendingOrders.length;
   const [prevCount, setPrevCount] = useState(pendingCount);
 
@@ -58,176 +74,205 @@ export default function KitchenDisplay() {
     try {
       await updateOrderStatus(orderId, targetStatus);
       showToast(`Order status updated successfully.`, 'success');
+      
+      // Auto-check all items when order is marked as ready
+      if (targetStatus === 'ready') {
+        const order = activeOrders.find(o => o.id === orderId);
+        if (order && order.items) {
+          setCheckedItems(prev => {
+            const next = { ...prev };
+            order.items.forEach(item => {
+              next[item.id] = true;
+            });
+            return next;
+          });
+        }
+      }
     } catch (err) {
       console.error(err);
       showToast('Failed to update order status.', 'error');
     }
   };
 
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
   const getElapsedTime = (createdAt, tick) => {
     const elapsed = Math.floor((tick - new Date(createdAt)) / 60000);
     if (elapsed < 1) return 'Just now';
-    return `${elapsed} min ago`;
+    return `${elapsed}m ago`;
   };
 
-  const renderOrderCard = (order) => {
-    const createdTime = order.createdAt || order.created_at;
-    const elapsed = getElapsedTime(createdTime, timeTick);
-    const isLate = Math.floor((new Date() - new Date(createdTime)) / 60000) > 15;
-
-    return (
-      <div 
-        key={order.id} 
-        className={`bg-surface p-5 rounded-3xl border shadow-[0_4px_12px_rgba(0,0,0,0.01)] flex flex-col justify-between transition-all duration-200 ${
-          isLate ? 'border-error bg-error/5 ring-1 ring-error/30' : 'border-outline-variant/30 hover:shadow-md'
-        }`}
-      >
-        <div>
-          <div className="flex justify-between items-center pb-3 border-b border-outline-variant/10 mb-3 font-display">
-            <div>
-              <h4 className="text-sm font-bold text-on-surface">{order.table?.name || 'Table'}</h4>
-              <p className="text-[10px] font-semibold text-primary uppercase tracking-widest mt-0.5 font-mono">
-                Order #{order.id}
-              </p>
-            </div>
-            <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-full ${isLate ? 'text-error bg-error/15' : 'text-on-surface-variant bg-surface-container'}`}>
-              {elapsed}
-            </span>
-          </div>
-
-          <div className="space-y-2.5 pb-4">
-            {order.items.map((item) => (
-              <div key={item.id} className="flex justify-between items-start text-xs font-semibold text-on-surface-variant">
-                <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 bg-primary/10 text-primary font-bold rounded-lg flex items-center justify-center text-xs">
-                    {item.qty}
-                  </span>
-                  <span>{item.product?.name}</span>
-                </div>
-                {item.note && typeof item.note === 'string' && item.note.trim() !== '' && (
-                  <p className="text-[9px] text-amber-800 italic mt-0.5 max-w-[120px] bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-100">
-                    "{item.note}"
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="pt-3 border-t border-outline-variant/10 mt-2 flex gap-2">
-          {order.status === 'pending' && (
-            <button
-              onClick={() => handleStatusTransition(order.id, 'preparing')}
-              className="w-full py-2.5 bg-status-warning text-status-on-warning rounded-xl font-bold hover:opacity-95 active:scale-95 transition-all text-[11px] uppercase tracking-wider shadow-sm"
-            >
-              Start Cooking
-            </button>
-          )}
-
-          {order.status === 'preparing' && (
-            <button
-              onClick={() => handleStatusTransition(order.id, 'ready')}
-              className="w-full py-2.5 bg-status-success text-status-on-success rounded-xl font-bold hover:opacity-95 active:scale-95 transition-all text-[11px] uppercase tracking-wider shadow-sm"
-            >
-              Mark Ready
-            </button>
-          )}
-
-          {order.status === 'ready' && (
-            <button
-              onClick={() => handleStatusTransition(order.id, 'served')}
-              className="w-full py-2.5 bg-surface-container border border-outline-variant/30 text-on-surface-variant rounded-xl font-bold hover:bg-surface-container-high active:scale-95 transition-all text-[11px] uppercase tracking-wider"
-            >
-              Dismiss (Served)
-            </button>
-          )}
-        </div>
-      </div>
-    );
+  const getSlaTimerStyles = (elapsedMins) => {
+    if (elapsedMins >= 15) {
+      return {
+        cardBorder: 'bg-surface shadow-lg ring-1 ring-status-danger/15',
+        headerBg: 'bg-status-danger text-status-on-danger',
+        timerBadge: 'bg-white/20 text-white border border-white/20 font-mono font-bold',
+      };
+    }
+    if (elapsedMins >= 10) {
+      return {
+        cardBorder: 'bg-surface shadow-md ring-1 ring-status-warning/15',
+        headerBg: 'bg-status-warning text-status-on-warning',
+        timerBadge: 'bg-white/20 text-white border border-white/20 font-mono font-bold',
+      };
+    }
+    return {
+      cardBorder: 'bg-surface shadow-sm hover:shadow-md ring-1 ring-outline-variant/5',
+      headerBg: 'bg-surface-container text-on-surface border-b border-outline-variant/10',
+      timerBadge: 'bg-surface border border-outline-variant/30 text-on-surface-variant font-mono font-semibold',
+    };
   };
 
   return (
     <div className="flex-1 flex flex-col bg-background h-full w-full overflow-hidden">
       {/* Top Header */}
-      <header className="h-20 bg-surface/80 backdrop-blur-md flex justify-between items-center px-container_margin border-b border-outline-variant/10 z-10 font-display">
+      <header className="h-20 bg-surface/80 backdrop-blur-md flex justify-between items-center px-container_margin border-b border-outline-variant/10 z-10 font-display shrink-0">
         <div>
           <h2 className="text-xl font-bold text-on-surface leading-tight">Kitchen Displays</h2>
-          <p className="text-xs text-on-surface-variant/80 uppercase tracking-widest mt-0.5">Kitchen Production System (KDS) • Real-time</p>
+          <p className="text-xs text-on-surface-variant/80 uppercase tracking-widest mt-0.5">
+            Kitchen Production System (KDS) • {activeOrders.length} Active Tickets
+          </p>
+        </div>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={toggleFullscreen}
+            className="flex items-center gap-2 px-4 py-2 border-2 border-primary/20 text-primary font-bold hover:bg-primary/5 active:scale-95 transition-all text-xs uppercase tracking-wider rounded-xl shadow-sm"
+          >
+            <span className="material-symbols-outlined text-base">
+              {isFullscreen ? 'fullscreen_exit' : 'fullscreen'}
+            </span>
+            {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen Mode'}
+          </button>
         </div>
       </header>
 
-      {/* Kanban Layout */}
-      <div className="flex-grow p-container_margin grid grid-cols-1 md:grid-cols-3 gap-gutter overflow-hidden items-stretch pb-8 bg-surface-container-lowest/10">
-        
-        {/* COLUMN 1: PENDING / NEW */}
-        <div className="flex flex-col bg-surface-container-low/40 rounded-3xl border border-outline-variant/20 overflow-hidden max-h-[calc(100vh-200px)]">
-          <div className="p-5 border-b border-outline-variant/10 bg-surface flex justify-between items-center">
-            <h3 className="text-xs font-bold font-display uppercase tracking-widest text-on-surface flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-status-danger animate-pulse"></span>
-              New Incoming
-            </h3>
-            <span className="px-2 py-0.5 bg-status-danger/10 text-status-danger text-[10px] font-bold font-mono rounded-full">
-              {pendingOrders.length}
-            </span>
-          </div>
-          <div className="flex-grow p-4 overflow-y-auto custom-scrollbar flex flex-col gap-4">
-            {pendingOrders.length > 0 ? (
-              pendingOrders.map(renderOrderCard)
-            ) : (
-              <div className="my-auto text-center p-6 text-on-surface-variant/50">
-                <span className="material-symbols-outlined text-4xl mb-2 opacity-30">check_circle</span>
-                <p className="text-[10px] font-bold uppercase tracking-wider">Queue Cleared</p>
-              </div>
-            )}
-          </div>
-        </div>
+      {/* Masonry Tickets Grid */}
+      <div className="flex-grow overflow-y-auto custom-scrollbar p-container_margin bg-surface-container-lowest/10">
+        {activeOrders.length > 0 ? (
+          <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6 pb-20">
+            {activeOrders.map((order) => {
+              const createdTime = order.createdAt || order.created_at;
+              const elapsedMins = Math.floor((timeTick - new Date(createdTime)) / 60000);
+              const elapsed = getElapsedTime(createdTime, timeTick);
+              const styles = getSlaTimerStyles(elapsedMins);
 
-        {/* COLUMN 2: COOKING / PREPARING */}
-        <div className="flex flex-col bg-surface-container-low/40 rounded-3xl border border-outline-variant/20 overflow-hidden max-h-[calc(100vh-200px)]">
-          <div className="p-5 border-b border-outline-variant/10 bg-surface flex justify-between items-center">
-            <h3 className="text-xs font-bold font-display uppercase tracking-widest text-on-surface flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-status-warning"></span>
-              Preparing / Cooking
-            </h3>
-            <span className="px-2 py-0.5 bg-status-warning/10 text-status-warning text-[10px] font-bold font-mono rounded-full">
-              {preparingOrders.length}
-            </span>
-          </div>
-          <div className="flex-grow p-4 overflow-y-auto custom-scrollbar flex flex-col gap-4">
-            {preparingOrders.length > 0 ? (
-              preparingOrders.map(renderOrderCard)
-            ) : (
-              <div className="my-auto text-center p-6 text-on-surface-variant/50">
-                <span className="material-symbols-outlined text-4xl mb-2 opacity-30">outdoor_grill</span>
-                <p className="text-[10px] font-bold uppercase tracking-wider">No Active Cooking</p>
-              </div>
-            )}
-          </div>
-        </div>
+              return (
+                <div
+                  key={order.id}
+                  className={`break-inside-avoid mb-6 rounded-3xl border shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all duration-200 flex flex-col justify-between overflow-hidden ${styles.cardBorder}`}
+                >
+                  <div>
+                    {/* SLA styled Header */}
+                    <div className={`p-4 flex justify-between items-center font-display ${styles.headerBg}`}>
+                      <div>
+                        <h4 className="text-sm font-extrabold">{order.table?.name || 'Table'}</h4>
+                        <p className="text-[9px] font-bold opacity-80 uppercase tracking-wider mt-0.5 font-mono">
+                          Order #{order.id}
+                        </p>
+                      </div>
+                      <span className={`text-[10px] font-mono rounded-full px-2.5 py-0.5 select-none ${styles.timerBadge}`}>
+                        {elapsed}
+                      </span>
+                    </div>
 
-        {/* COLUMN 3: READY FOR PICKUP */}
-        <div className="flex flex-col bg-surface-container-low/40 rounded-3xl border border-outline-variant/20 overflow-hidden max-h-[calc(100vh-200px)]">
-          <div className="p-5 border-b border-outline-variant/10 bg-surface flex justify-between items-center">
-            <h3 className="text-xs font-bold font-display uppercase tracking-widest text-on-surface flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-status-success"></span>
-              Ready / Pickup
-            </h3>
-            <span className="px-2 py-0.5 bg-status-success/10 text-status-success text-[10px] font-bold font-mono rounded-full">
-              {readyOrders.length}
-            </span>
-          </div>
-          <div className="flex-grow p-4 overflow-y-auto custom-scrollbar flex flex-col gap-4">
-            {readyOrders.length > 0 ? (
-              readyOrders.map(renderOrderCard)
-            ) : (
-              <div className="my-auto text-center p-6 text-on-surface-variant/50">
-                <span className="material-symbols-outlined text-4xl mb-2 opacity-30">hail</span>
-                <p className="text-[10px] font-bold uppercase tracking-wider">No food waiting</p>
-              </div>
-            )}
-          </div>
-        </div>
+                    {/* Plating Checklist Items */}
+                    <div className="p-4 space-y-2">
+                      {order.items.map((item) => {
+                        const isChecked = !!checkedItems[item.id];
+                        return (
+                          <div
+                            key={item.id}
+                            onClick={() => toggleItemChecked(item.id)}
+                            className="group flex flex-col gap-1.5 text-xs font-semibold text-on-surface-variant cursor-pointer hover:bg-surface-container-low/50 p-2 rounded-xl select-none transition-colors border border-transparent hover:border-outline-variant/10"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all shrink-0 ${
+                                isChecked
+                                  ? 'bg-primary border-primary text-on-primary'
+                                  : 'border-outline-variant/60 bg-surface group-hover:border-primary/50'
+                              }`}>
+                                {isChecked ? (
+                                  <span className="material-symbols-outlined text-[14px] font-bold">check</span>
+                                ) : (
+                                  <span className="material-symbols-outlined text-[14px] font-bold opacity-0 group-hover:opacity-30">check</span>
+                                )}
+                              </div>
+                              <span className="w-6 h-6 bg-primary/10 text-primary font-extrabold rounded-lg flex items-center justify-center text-xs shrink-0">
+                                {item.qty}
+                              </span>
+                              <span className={`transition-all ${isChecked ? 'line-through opacity-40' : 'text-on-surface'}`}>
+                                {item.product?.name}
+                              </span>
+                            </div>
+                            {item.note && typeof item.note === 'string' && item.note.trim() !== '' && (
+                              <div className="pl-9 pr-2">
+                                <p className="text-[10px] text-status-warning italic bg-status-warning/10 px-2.5 py-1 rounded-lg border border-status-warning/20 inline-block font-bold">
+                                  💡 "{item.note}"
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
 
+                  {/* KDS Status controls */}
+                  <div className="p-4 pt-0 mt-1 flex gap-2">
+                    {order.status === 'pending' && (
+                      <button
+                        onClick={() => handleStatusTransition(order.id, 'preparing')}
+                        className="w-full py-3 bg-status-warning text-status-on-warning rounded-xl font-bold hover:opacity-95 active:scale-[0.98] transition-all text-[11px] uppercase tracking-wider shadow-sm flex items-center justify-center gap-1.5"
+                      >
+                        <span className="material-symbols-outlined text-sm">outdoor_grill</span>
+                        Start Cooking
+                      </button>
+                    )}
+
+                    {order.status === 'preparing' && (
+                      <button
+                        onClick={() => handleStatusTransition(order.id, 'ready')}
+                        className="w-full py-3 bg-status-success text-status-on-success rounded-xl font-bold hover:opacity-95 active:scale-[0.98] transition-all text-[11px] uppercase tracking-wider shadow-sm flex items-center justify-center gap-1.5"
+                      >
+                        <span className="material-symbols-outlined text-sm">notifications_active</span>
+                        Mark Ready
+                      </button>
+                    )}
+
+                    {order.status === 'ready' && (
+                      <button
+                        onClick={() => handleStatusTransition(order.id, 'served')}
+                        className="w-full py-3 bg-surface-container border border-outline-variant/30 text-on-surface-variant rounded-xl font-bold hover:bg-surface-container-high active:scale-95 transition-all text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5"
+                      >
+                        <span className="material-symbols-outlined text-sm">check_circle</span>
+                        Dismiss (Served)
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center text-center p-12 text-on-surface-variant/70 min-h-[50vh]">
+            <span className="material-symbols-outlined text-[64px] opacity-35 mb-4" style={{ fontVariationSettings: '"FILL" 1' }}>
+              outdoor_grill
+            </span>
+            <p className="text-sm font-bold font-display uppercase tracking-wider">All Clear! No orders in queue</p>
+            <p className="text-xs max-w-xs mt-1.5 leading-relaxed">
+              When servers send new orders to the kitchen, they will immediately appear as tickets in this live Masonry dashboard.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

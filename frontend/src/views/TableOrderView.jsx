@@ -26,68 +26,99 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
   // Load cart for active table
   const activeCart = tableCarts[selectedTable] || []
 
-  // Add Item to active table's cart
+  // Add Item to active table's cart (only creates/increments draft items, never mutates sent ones)
   const handleAddToCart = (product) => {
     if (product.outOfStock) return
     setTableCarts(prev => {
       const currentCart = prev[selectedTable] || []
-      const existing = currentCart.find(item => item.id === product.id)
+      const existingDraft = currentCart.find(
+        item => !item.sent && item.product_id === product.id
+      )
 
       let updatedCart
-      if (existing) {
+      if (existingDraft) {
         updatedCart = currentCart.map(item =>
-          item.id === product.id ? { ...item, qty: item.qty + 1, sent: false } : item
+          item.cartItemId === existingDraft.cartItemId
+            ? { ...item, qty: item.qty + 1 }
+            : item
         )
       } else {
-        updatedCart = [...currentCart, { id: product.id, name: product.name, price: product.price, qty: 1, sent: false, note: '' }]
+        updatedCart = [
+          ...currentCart,
+          {
+            cartItemId: `draft-${product.id}-${Date.now()}`,
+            product_id: product.id,
+            name: product.name,
+            price: product.price,
+            qty: 1,
+            sent: false,
+            note: '',
+          },
+        ]
       }
 
       return { ...prev, [selectedTable]: updatedCart }
     })
   }
 
-  const handleUpdateItemNote = (itemId, note) => {
+  const handleUpdateItemNote = (cartItemId, note) => {
     setTableCarts(prev => {
       const currentCart = prev[selectedTable] || []
+      const item = currentCart.find(i => i.cartItemId === cartItemId)
+      if (item?.sent) return prev // ignore editing sent items
       const updatedCart = currentCart.map(item =>
-        item.id === itemId ? { ...item, note } : item
+        item.cartItemId === cartItemId ? { ...item, note } : item
       )
       return { ...prev, [selectedTable]: updatedCart }
     })
   }
 
-  // Qty Changes
-  const handleQtyChange = (itemId, delta) => {
+  // Qty Changes (only for unsent items)
+  const handleQtyChange = (cartItemId, delta) => {
     setTableCarts(prev => {
       const currentCart = prev[selectedTable] || []
+      const item = currentCart.find(i => i.cartItemId === cartItemId)
+      if (item?.sent) return prev
       const updatedCart = currentCart.reduce((acc, item) => {
-        if (item.id !== itemId) return [...acc, item]
+        if (item.cartItemId !== cartItemId) return [...acc, item]
         const newQty = item.qty + delta
         if (newQty <= 0) return acc
-        return [...acc, { ...item, qty: newQty, sent: false }]
+        return [...acc, { ...item, qty: newQty }]
       }, [])
       return { ...prev, [selectedTable]: updatedCart }
     })
   }
 
-  // Remove Item
-  const handleRemoveItem = (itemId) => {
+  // Remove Item (only for unsent items)
+  const handleRemoveItem = (cartItemId) => {
     setTableCarts(prev => {
       const currentCart = prev[selectedTable] || []
-      const updatedCart = currentCart.filter(item => item.id !== itemId)
+      const item = currentCart.find(i => i.cartItemId === cartItemId)
+      if (item?.sent) return prev
+      const updatedCart = currentCart.filter(i => i.cartItemId !== cartItemId)
       return { ...prev, [selectedTable]: updatedCart }
     })
   }
 
   // Clear Cart
   const handleClearCart = async () => {
+    const hasUnsent = activeCart.some(item => !item.sent)
+    if (!hasUnsent) {
+      showToast('No unsent draft items to clear.', 'info')
+      return
+    }
+
     const confirmed = await showConfirm(
       'Clear Table Cart',
-      `Are you sure you want to clear all items for ${selectedTable}?`
+      `Are you sure you want to clear all unsent draft items for ${selectedTable}?`
     )
     if (confirmed) {
-      setTableCarts(prev => ({ ...prev, [selectedTable]: [] }))
-      showToast(`Cleared all items for ${selectedTable}`, 'info')
+      setTableCarts(prev => {
+        const currentCart = prev[selectedTable] || []
+        const updatedCart = currentCart.filter(item => item.sent)
+        return { ...prev, [selectedTable]: updatedCart }
+      })
+      showToast(`Cleared unsent draft items for ${selectedTable}`, 'info')
     }
   }
 
@@ -108,7 +139,8 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
 
   // Send pending items to kitchen
   const handleSendToKitchen = async () => {
-    if (activeCart.length === 0) return
+    const unsentItems = activeCart.filter(item => !item.sent)
+    if (unsentItems.length === 0) return
     setIsSendingToKitchen(true)
 
     try {
@@ -117,8 +149,8 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
         throw new Error(`Table ${selectedTable} not found in database.`)
       }
 
-      const itemsPayload = activeCart.map(item => ({
-        product_id: item.id,
+      const itemsPayload = unsentItems.map(item => ({
+        product_id: item.product_id || item.id,
         qty: item.qty,
         sent: true,
         note: item.note || ''
@@ -126,9 +158,11 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
 
       await submitOrderStore(tableObj.id, itemsPayload)
       
+      // Remove successfully transmitted drafts; DB sync (App.jsx) will repopulate sent items
       setTableCarts(prev => {
         const currentCart = prev[selectedTable] || []
-        const updatedCart = currentCart.map(item => ({ ...item, sent: true }))
+        const sentIds = new Set(unsentItems.map(i => i.cartItemId))
+        const updatedCart = currentCart.filter(i => !sentIds.has(i.cartItemId))
         return { ...prev, [selectedTable]: updatedCart }
       })
 
@@ -143,25 +177,30 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
 
   // Settle Bill
   const handleSettleBill = async () => {
-    if (activeCart.length === 0) return
+    const tableObj = storeTables.find((t) => t.name === selectedTable)
+    if (!tableObj) return
+
+    const activeOrders = storeOrders.filter(
+      (o) => (o.tableId === tableObj.id || o.table_id === tableObj.id) && o.status !== 'paid'
+    )
+
+    if (activeOrders.length === 0) {
+      showToast('No active orders to settle.', 'info')
+      return
+    }
 
     const confirmed = await showConfirm(
       'Confirm Settle Bill',
-      `Are you sure you want to settle the bill for ${selectedTable}? This will mark the active session as paid and clean the table.`
+      `Are you sure you want to settle the bill for ${selectedTable}? This will mark all active orders as paid and clean the table.`
     )
     if (!confirmed) return
 
     setIsSettling(true)
 
     try {
-      const tableObj = storeTables.find((t) => t.name === selectedTable)
-      const activeOrder = storeOrders.find((o) => (o.tableId === tableObj?.id || o.table_id === tableObj?.id) && o.status !== 'paid')
-      
-      if (!activeOrder) {
-        throw new Error('No active order found for this table.')
-      }
-
-      await updateOrderStatusStore(activeOrder.id, 'paid')
+      await Promise.all(
+        activeOrders.map(order => updateOrderStatusStore(order.id, 'paid'))
+      )
       
       showToast(`Bill for ${selectedTable} settled! Total of Rp ${Math.floor(grandTotal).toLocaleString('id-ID')} received.`, 'success')
       setTableCarts(prev => ({ ...prev, [selectedTable]: [] }))

@@ -51,20 +51,40 @@ export default function App() {
 
   // Sync database orders into local table carts
   useEffect(() => {
-    const newCarts = {}
-    orders.forEach((order) => {
-      if (order.status !== 'paid' && order.table) {
-        newCarts[order.table.name] = order.items.map((item) => ({
-          id: item.product_id || item.productId,
-          name: item.product?.name,
-          price: Number(item.unitPrice || item.unit_price),
-          qty: item.qty,
-          sent: item.sent,
-          note: item.note || '',
-        }))
-      }
+    setTableCarts((prevCarts) => {
+      const newCarts = { ...prevCarts }
+      
+      // Preserve only unsent draft items for each table cart
+      Object.keys(newCarts).forEach((tableName) => {
+        newCarts[tableName] = newCarts[tableName].filter((item) => !item.sent)
+      })
+
+      // Aggregate all items from active database orders (status !== paid)
+      orders.forEach((order) => {
+        if (order.status !== 'paid' && order.table) {
+          const tableName = order.table.name
+          if (!newCarts[tableName]) {
+            newCarts[tableName] = []
+          }
+
+          const dbItems = order.items.map((item) => ({
+            cartItemId: `sent-${item.id}`,
+            product_id: item.product_id || item.productId,
+            name: item.product?.name,
+            price: Number(item.unitPrice || item.unit_price),
+            qty: item.qty,
+            sent: true,
+            note: item.note || '',
+            status: order.status,
+            orderId: order.id,
+          }))
+
+          newCarts[tableName] = [...newCarts[tableName], ...dbItems]
+        }
+      })
+
+      return newCarts
     })
-    setTableCarts(newCarts)
   }, [orders])
 
   const handleLogout = async () => {

@@ -27,17 +27,20 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
 
   // Process live dynamic status based on orders
   const tables = rawTables.map(t => {
-    const activeOrder = orders.find(o => (o.tableId === t.id || o.table_id === t.id) && o.status !== 'paid');
+    const activeOrdersForTable = orders.filter(o => (o.tableId === t.id || o.table_id === t.id) && o.status !== 'paid');
     
     let status = 'Available';
     let billTotal = 0;
+    let hasReadyFood = false;
 
-    if (activeOrder) {
-      billTotal = Number(activeOrder.total);
-      if (['pending', 'preparing', 'ready'].includes(activeOrder.status)) {
+    if (activeOrdersForTable.length > 0) {
+      billTotal = activeOrdersForTable.reduce((sum, o) => sum + Number(o.total || 0), 0);
+      hasReadyFood = activeOrdersForTable.some(o => o.status === 'ready');
+      
+      if (hasReadyFood) {
+        status = 'Ready';
+      } else {
         status = 'Dining';
-      } else if (activeOrder.status === 'served') {
-        status = 'Billed';
       }
     } else {
       status = t.status === 'Reserved' ? 'Reserved' : 'Available';
@@ -46,7 +49,8 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
     return {
       ...t,
       status,
-      bill: billTotal
+      bill: billTotal,
+      hasReadyFood
     };
   });
 
@@ -156,8 +160,8 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
 
   const getStatusColor = (status) => {
     if (status === 'Dining') return 'bg-status-occupied border-status-occupied text-status-on-occupied';
-    if (status === 'Billed') return 'bg-status-warning border-status-warning text-status-on-warning';
     if (status === 'Reserved') return 'bg-status-reserved border-status-reserved text-status-on-reserved';
+    if (status === 'Ready') return 'bg-status-success border-status-success text-status-on-success animate-pulse shadow-[0_0_15px_rgba(45,106,79,0.8)]';
     return 'bg-surface border-outline-variant/35 text-on-surface';
   };
 
@@ -223,12 +227,12 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
             <span className="text-status-occupied">Dining</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-status-warning"></div>
-            <span className="text-status-warning">Billed</span>
-          </div>
-          <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-status-reserved"></div>
             <span className="text-status-reserved">Reserved</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-status-success animate-pulse shadow-[0_0_8px_rgba(45,106,79,0.5)]"></div>
+            <span className="text-status-success">Food Ready!</span>
           </div>
         </div>
 
@@ -283,6 +287,12 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                   }}
                   className={`transition-shadow duration-200 ${isEditMode ? 'hover:scale-[1.02] hover:shadow-lg' : ''}`}
                 >
+                  {table.status === 'Ready' && (
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-error text-on-error text-[8px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider shadow-md animate-bounce z-30 border border-surface flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[10px] font-extrabold animate-pulse">soup_kitchen</span>
+                      Food Ready
+                    </span>
+                  )}
                   <button
                     onClick={() => !isEditMode && onTableClick(table.name)}
                     disabled={isEditMode}
@@ -303,7 +313,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                           </div>
                         ) : (
                           <div className="text-[8px] font-bold opacity-60 uppercase tracking-wider mt-1">
-                            {table.status === 'Reserved' ? 'Reserved' : 'Ready'}
+                            {table.status === 'Reserved' ? 'Reserved' : 'Available'}
                           </div>
                         )}
                       </div>
@@ -324,7 +334,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                           </div>
                         ) : (
                           <div className="text-[8px] font-bold opacity-60 uppercase tracking-widest">
-                            {table.status === 'Reserved' ? 'Reserved' : 'Ready'}
+                            {table.status === 'Reserved' ? 'Reserved' : 'Available'}
                           </div>
                         )}
                       </div>
@@ -345,7 +355,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                           </div>
                         ) : (
                           <div className="text-[8px] font-bold opacity-60 uppercase tracking-widest">
-                            {table.status === 'Reserved' ? 'Reserved' : 'Ready'}
+                            {table.status === 'Reserved' ? 'Reserved' : 'Available'}
                           </div>
                         )}
                       </div>
