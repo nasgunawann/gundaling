@@ -52,7 +52,8 @@ export default function WaiterLogin({ onLoginSuccess }) {
     setErrorMsg('');
 
     try {
-      const loggedInUser = await loginStore(selectedStaff, pin);
+      const numericId = parseInt(selectedStaff, 10);
+      const loggedInUser = await loginStore(numericId, pin);
       setIsSubmitting(false);
       onLoginSuccess(loggedInUser);
     } catch (err) {

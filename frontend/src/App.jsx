@@ -52,7 +52,7 @@ export default function App() {
         newCarts[order.table.name] = order.items.map((item) => ({
           id: item.product_id,
           name: item.product?.name,
-          price: Number(item.unit_price),
+          price: Number(item.unitPrice || item.unit_price),
           qty: item.qty,
           sent: item.sent,
           note: item.note || '',

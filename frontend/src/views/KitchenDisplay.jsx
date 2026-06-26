@@ -71,8 +71,9 @@ export default function KitchenDisplay() {
   };
 
   const renderOrderCard = (order) => {
-    const elapsed = getElapsedTime(order.created_at, timeTick);
-    const isLate = Math.floor((new Date() - new Date(order.created_at)) / 60000) > 15;
+    const createdTime = order.createdAt || order.created_at;
+    const elapsed = getElapsedTime(createdTime, timeTick);
+    const isLate = Math.floor((new Date() - new Date(createdTime)) / 60000) > 15;
 
     return (
       <div 

@@ -80,7 +80,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
       y = Math.max(1, Math.min(85, y));
 
       setLocalTables(prev => 
-        prev.map(t => t.id === table.id ? { ...t, pos_x: parseFloat(x.toFixed(2)), pos_y: parseFloat(y.toFixed(2)) } : t)
+        prev.map(t => t.id === table.id ? { ...t, posX: parseFloat(x.toFixed(2)), posY: parseFloat(y.toFixed(2)) } : t)
       );
     };
 
@@ -95,7 +95,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
 
       const dragTarget = localTables.find(t => t.id === table.id);
       if (dragTarget) {
-        await updateTablePosition(table.id, dragTarget.pos_x, dragTarget.pos_y);
+        await updateTablePosition(table.id, dragTarget.posX, dragTarget.posY);
       }
     };
 
@@ -116,12 +116,12 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
     }
 
     try {
-      await api.post('/api/tables', {
+      await api.post('/tables', {
         name: newTableName,
         seats: parseInt(newTableSeats),
         shape: newTableShape,
-        pos_x: 45.00,
-        pos_y: 40.00,
+        posX: 45.00,
+        posY: 40.00,
         status: 'Available'
       });
 
@@ -144,7 +144,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
 
     if (confirmed) {
       try {
-        await api.delete(`/api/tables/${table.id}`);
+        await api.delete(`/tables/${table.id}`);
         showToast(`Table "${table.name}" deleted successfully.`, 'success');
         await fetchInitialData();
       } catch (err) {
@@ -266,6 +266,9 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                 ? 'rounded-2xl w-36 h-24 flex flex-col justify-between text-left p-3' 
                 : 'rounded-2xl w-28 h-28 flex flex-col justify-between text-left p-3';
 
+              const posXVal = table.posX !== undefined ? table.posX : table.pos_x;
+              const posYVal = table.posY !== undefined ? table.posY : table.pos_y;
+
               return (
                 <div
                   key={table.id}
@@ -273,8 +276,8 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                   onTouchStart={(e) => handleDragStart(e, table)}
                   style={{
                     position: 'absolute',
-                    left: `${table.pos_x}%`,
-                    top: `${table.pos_y}%`,
+                    left: `${posXVal}%`,
+                    top: `${posYVal}%`,
                     transform: 'translate(-50%, -50%)',
                     cursor: isEditMode ? 'move' : 'pointer',
                     zIndex: 20
