@@ -144,6 +144,13 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
   // Settle Bill
   const handleSettleBill = async () => {
     if (activeCart.length === 0) return
+
+    const confirmed = await showConfirm(
+      'Confirm Settle Bill',
+      `Are you sure you want to settle the bill for ${selectedTable}? This will mark the active session as paid and clean the table.`
+    )
+    if (!confirmed) return
+
     setIsSettling(true)
 
     try {
@@ -209,21 +216,6 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setIsCartOpen(!isCartOpen)}
-                className="relative h-12 px-5 bg-primary/10 text-primary hover:bg-primary/20 rounded-xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-all text-xs uppercase tracking-wider"
-              >
-                <span className="material-symbols-outlined text-base">shopping_cart</span>
-                <span>Cart Summary</span>
-                {activeCart.length > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-error text-on-error rounded-full flex items-center justify-center text-[9px] font-bold border border-surface">
-                    {activeCart.reduce((totalQty, item) => totalQty + item.qty, 0)}
-                  </span>
-                )}
-              </button>
             </div>
           </div>
         </header>
@@ -349,6 +341,21 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
         setShowReceiptModal={setShowReceiptModal}
         handleTriggerSystemPrint={handleTriggerSystemPrint}
       />
+
+      {/* Floating Action Button (FAB) for Cart Summary in bottom-right */}
+      <button
+        onClick={() => setIsCartOpen(!isCartOpen)}
+        className="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 z-30 h-16 px-6 bg-primary hover:bg-primary-container text-on-primary rounded-full font-bold flex items-center justify-center gap-3 active:scale-95 transition-all shadow-xl hover:shadow-2xl hover:scale-105"
+        title="View Cart Summary"
+      >
+        <span className="material-symbols-outlined text-2xl font-bold">shopping_cart</span>
+        <span className="text-sm font-bold uppercase tracking-wider hidden sm:inline">View Bill</span>
+        {activeCart.length > 0 && (
+          <span className="w-6 h-6 bg-error text-on-error rounded-full flex items-center justify-center text-xs font-bold shadow-sm border border-primary animate-pulse">
+            {activeCart.reduce((totalQty, item) => totalQty + item.qty, 0)}
+          </span>
+        )}
+      </button>
     </div>
   );
 }

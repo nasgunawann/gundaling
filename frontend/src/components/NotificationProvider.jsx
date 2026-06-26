@@ -82,13 +82,13 @@ export function NotificationProvider({ children }) {
             <div className="flex gap-3 justify-end mt-6">
               <button
                 onClick={confirmDialog.onCancel}
-                className="px-4.5 py-2.5 border border-outline-variant/35 rounded-xl text-xs font-bold text-on-surface-variant hover:bg-surface-container active:scale-95 transition-all uppercase tracking-wider"
+                className="px-6 py-2.5 border border-outline-variant/35 rounded-xl text-xs font-bold text-on-surface-variant hover:bg-surface-container active:scale-95 transition-all uppercase tracking-wider"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDialog.onConfirm}
-                className="px-5.5 py-2.5 bg-primary text-on-primary rounded-xl text-xs font-bold shadow-md hover:shadow-lg active:scale-95 transition-all uppercase tracking-wider"
+                className="px-6 py-2.5 bg-primary text-on-primary rounded-xl text-xs font-bold shadow-md hover:shadow-lg active:scale-95 transition-all uppercase tracking-wider"
               >
                 Confirm
               </button>
