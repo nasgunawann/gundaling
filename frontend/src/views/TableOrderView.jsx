@@ -16,9 +16,11 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
 
   const storeTables = useStore((state) => state.tables)
   const storeOrders = useStore((state) => state.orders)
+  const storeReservations = useStore((state) => state.reservations || [])
   const storeCategories = useStore((state) => state.categories || [])
   const submitOrderStore = useStore((state) => state.submitOrder)
   const updateOrderStatusStore = useStore((state) => state.updateOrderStatus)
+  const updateReservationStore = useStore((state) => state.updateReservation)
 
   const tablesList = storeTables && storeTables.length > 0 ? storeTables.map(t => t.name) : []
   const categories = ['All', ...storeCategories.map(c => c.name)]
@@ -201,6 +203,14 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
       await Promise.all(
         activeOrders.map(order => updateOrderStatusStore(order.id, 'paid'))
       )
+      
+      // Automatically complete any active seated reservations for this table
+      const seatedReservation = (storeReservations || []).find(
+        (r) => (r.tableId === tableObj.id || r.table_id === tableObj.id) && r.status === 'Seated'
+      )
+      if (seatedReservation) {
+        await updateReservationStore(seatedReservation.id, 'Completed')
+      }
       
       showToast(`Bill for ${selectedTable} settled! Total of Rp ${Math.floor(grandTotal).toLocaleString('id-ID')} received.`, 'success')
       setTableCarts(prev => ({ ...prev, [selectedTable]: [] }))

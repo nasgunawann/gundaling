@@ -158,6 +158,10 @@ export default function App() {
           <Reservations 
             reservations={reservations} 
             setReservations={() => {}}
+            onSeatGuest={(tableName) => {
+              setSelectedTable(tableName)
+              setCurrentView('table-menu')
+            }}
           />
         )}
         {currentView === 'kitchen-queue' && (

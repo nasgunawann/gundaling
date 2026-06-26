@@ -4,13 +4,14 @@ import useStore from '../store';
 import WebsocketStatus from '../components/WebsocketStatus';
 import Modal from '../components/Modal';
 
-export default function Reservations({ reservations }) {
-  const { showToast } = useNotification();
+export default function Reservations({ reservations, onSeatGuest }) {
+  const { showToast, showConfirm } = useNotification();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [showAddModal, setShowAddModal] = useState(false);
   
   const storeTables = useStore((state) => state.tables);
+  const storeOrders = useStore((state) => state.orders);
   const addReservationStore = useStore((state) => state.addReservation);
   const updateReservationStore = useStore((state) => state.updateReservation);
 
@@ -22,12 +23,32 @@ export default function Reservations({ reservations }) {
   const [newTime, setNewTime] = useState('19:00');
   const [newDate, setNewDate] = useState(() => new Date().toISOString().split('T')[0]);
 
-  const filterStatuses = ['All', 'Confirmed', 'Seated', 'Cancelled'];
+  const filterStatuses = ['All', 'Confirmed', 'Seated', 'Completed', 'Cancelled'];
 
   const handleStatusChange = async (id, newStatus) => {
+    const res = (reservations || []).find(r => r.id === id);
+    if (!res) return;
+
+    if (newStatus === 'Seated') {
+      const hasActiveOrders = (storeOrders || []).some(
+        (o) => (o.tableId === res.tableId || o.table_id === res.tableId) && o.status !== 'paid'
+      );
+      if (hasActiveOrders) {
+        const confirmed = await showConfirm(
+          'Table Occupied',
+          `"${res.table?.name || 'Table'}" currently has active orders. Are you sure you want to seat this guest?`
+        );
+        if (!confirmed) return;
+      }
+    }
+
     try {
       await updateReservationStore(id, newStatus);
       showToast(`Reservation status updated to ${newStatus}`, 'success');
+
+      if (newStatus === 'Seated' && onSeatGuest && res.table?.name) {
+        onSeatGuest(res.table.name);
+      }
     } catch (err) {
       console.error(err);
       showToast('Failed to update reservation status.', 'error');
@@ -54,7 +75,7 @@ export default function Reservations({ reservations }) {
         name: newName,
         phone: newPhone,
         guests: parseInt(newGuests),
-        table_id: parseInt(selectedTableId),
+        tableId: parseInt(selectedTableId),
         time: bookingTime,
         status: 'Confirmed'
       });
@@ -195,6 +216,8 @@ export default function Reservations({ reservations }) {
                             ? 'bg-status-success/10 border-status-success/20 text-status-success' 
                             : res.status === 'Cancelled'
                             ? 'bg-status-danger/10 border-status-danger/20 text-status-danger'
+                            : res.status === 'Completed'
+                            ? 'bg-surface-container-high/50 border-outline-variant/30 text-on-surface-variant'
                             : 'bg-status-reserved/10 border-status-reserved/20 text-status-reserved'
                         }`}>
                           {res.status}
@@ -220,10 +243,16 @@ export default function Reservations({ reservations }) {
                               </button>
                             </>
                           )}
-                          {res.status === 'Seated' && (
+                           {res.status === 'Seated' && (
                             <span className="text-xs font-bold text-status-success uppercase tracking-wider pr-3 py-2 leading-none flex items-center gap-1.5 justify-end">
                               <span className="material-symbols-outlined text-sm">check_circle</span>
                               Seated
+                            </span>
+                          )}
+                          {res.status === 'Completed' && (
+                            <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider pr-3 py-2 leading-none flex items-center gap-1.5 justify-end opacity-70">
+                              <span className="material-symbols-outlined text-sm">done_all</span>
+                              Completed
                             </span>
                           )}
                           {res.status === 'Cancelled' && (
@@ -302,9 +331,13 @@ export default function Reservations({ reservations }) {
                 {storeTables.map(t => {
                   const capacityOk = t.seats >= parseInt(newGuests || 1);
                   const prefix = capacityOk ? '' : '⚠️ [Capacity Low] ';
+                  const hasActiveOrders = (storeOrders || []).some(
+                    (o) => (o.tableId === t.id || o.table_id === t.id) && o.status !== 'paid'
+                  );
+                  const dynamicStatus = hasActiveOrders ? 'Dining' : t.status;
                   return (
                     <option key={t.id} value={t.id} className="text-on-surface bg-surface font-semibold">
-                      {prefix}{t.name} ({t.seats} Seats) — {t.status}
+                      {prefix}{t.name} ({t.seats} Seats) — {dynamicStatus}
                     </option>
                   );
                 })}

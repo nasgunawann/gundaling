@@ -13,6 +13,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
   const fetchInitialData = useStore((state) => state.fetchInitialData);
   const loading = useStore((state) => state.loading);
   const orders = useStore((state) => state.orders);
+  const reservations = useStore((state) => state.reservations);
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [localTables, setLocalTables] = useState([]);
@@ -26,7 +27,18 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
   const isLoading = loading && (!backendTables || backendTables.length === 0);
   const rawTables = backendTables && backendTables.length > 0 ? backendTables : [];
 
-  // Process live dynamic status based on orders
+  // Helper to check if a date is today
+  const isToday = (dateInput) => {
+    const d = new Date(dateInput);
+    const today = new Date();
+    return (
+      d.getDate() === today.getDate() &&
+      d.getMonth() === today.getMonth() &&
+      d.getFullYear() === today.getFullYear()
+    );
+  };
+
+  // Process live dynamic status based on orders & reservations
   const tables = rawTables.map(t => {
     const activeOrdersForTable = orders.filter(o => (o.tableId === t.id || o.table_id === t.id) && o.status !== 'paid');
     
@@ -44,7 +56,20 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
         status = 'Dining';
       }
     } else {
-      status = t.status === 'Reserved' ? 'Reserved' : 'Available';
+      // Check for reservations today
+      const tableReservations = (reservations || []).filter(
+        (r) => (r.tableId === t.id || r.table_id === t.id) && isToday(r.time)
+      );
+      const hasSeatedToday = tableReservations.some(r => r.status === 'Seated');
+      const hasConfirmedToday = tableReservations.some(r => r.status === 'Confirmed');
+
+      if (hasSeatedToday) {
+        status = 'Dining';
+      } else if (hasConfirmedToday) {
+        status = 'Reserved';
+      } else {
+        status = t.status === 'Reserved' ? 'Reserved' : 'Available';
+      }
     }
 
     return {
@@ -58,7 +83,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
   // Keep local tables in sync with database unless actively dragging
   useEffect(() => {
     setLocalTables(tables);
-  }, [backendTables, orders]);
+  }, [backendTables, orders, reservations]);
 
   const handleDragStart = (e, table) => {
     if (!isEditMode) return;
@@ -157,6 +182,18 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
         showToast('Failed to delete table.', 'error');
       }
     }
+  };
+
+  const handleTableClick = async (table) => {
+    if (isEditMode) return;
+    if (table.status === 'Reserved') {
+      const confirmed = await showConfirm(
+        'Table Reserved',
+        `"${table.name}" has an upcoming reservation today. Do you want to open this table anyway?`
+      );
+      if (!confirmed) return;
+    }
+    onTableClick(table.name);
   };
 
   const getStatusColor = (status) => {
@@ -295,7 +332,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                     </span>
                   )}
                   <button
-                    onClick={() => !isEditMode && onTableClick(table.name)}
+                    onClick={() => handleTableClick(table)}
                     disabled={isEditMode}
                     className={`border group shadow-sm select-none ${shapeClass} ${getStatusColor(table.status)}`}
                   >
