@@ -183,7 +183,12 @@ const useStore = create((set, get) => ({
     try {
       const res = await api.post('/reservations', data);
       const newRes = res.data;
-      set((state) => ({ reservations: [...state.reservations, newRes] }));
+      set((state) => {
+        if (state.reservations.some((r) => r.id === newRes.id)) {
+          return state;
+        }
+        return { reservations: [...state.reservations, newRes] };
+      });
       return newRes;
     } catch (err) {
       console.error(err);
@@ -268,9 +273,10 @@ const useStore = create((set, get) => ({
     });
 
     socket.on('table.created', (table) => {
-      set((state) => ({
-        tables: [...state.tables, table]
-      }));
+      set((state) => {
+        if (state.tables.some((t) => t.id === table.id)) return state;
+        return { tables: [...state.tables, table] };
+      });
     });
 
     socket.on('table.deleted', (tableId) => {
@@ -280,9 +286,10 @@ const useStore = create((set, get) => ({
     });
 
     socket.on('product.created', (product) => {
-      set((state) => ({
-        products: [...state.products, product]
-      }));
+      set((state) => {
+        if (state.products.some((p) => p.id === product.id)) return state;
+        return { products: [...state.products, product] };
+      });
     });
 
     socket.on('product.updated', (product) => {
@@ -298,9 +305,10 @@ const useStore = create((set, get) => ({
     });
 
     socket.on('category.created', (category) => {
-      set((state) => ({
-        categories: [...state.categories, category]
-      }));
+      set((state) => {
+        if (state.categories.some((c) => c.id === category.id)) return state;
+        return { categories: [...state.categories, category] };
+      });
     });
 
     socket.on('category.updated', (category) => {
@@ -316,9 +324,10 @@ const useStore = create((set, get) => ({
     });
 
     socket.on('reservation.created', (res) => {
-      set((state) => ({
-        reservations: [...state.reservations, res]
-      }));
+      set((state) => {
+        if (state.reservations.some((r) => r.id === res.id)) return state;
+        return { reservations: [...state.reservations, res] };
+      });
     });
 
     socket.on('reservation.updated', (res) => {
