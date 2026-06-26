@@ -19,42 +19,55 @@ export default function Sidebar({ currentView, onViewChange, user, onLogout, isC
     }`}>
       {/* Branding */}
       <div className={`px-6 py-6 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} border-b border-outline-variant/10 mb-2`}>
-        {!isCollapsed && (
-          <h1 className="font-display text-primary leading-tight font-bold text-[28px] tracking-tight">
-            Gundaling
-          </h1>
+        {!isCollapsed ? (
+          <>
+            <h1 className="font-display text-primary leading-tight font-bold text-[28px] tracking-tight">
+              Gundaling
+            </h1>
+            <button 
+              onClick={onToggleCollapse}
+              className="hidden md:flex items-center justify-center w-8 h-8 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-on-primary transition-all duration-200 border border-primary/20 shadow-sm active:scale-95 touch-manipulation focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+              title="Collapse Sidebar"
+              aria-label="Collapse Sidebar"
+              aria-expanded="true"
+            >
+              <span className="material-symbols-outlined text-base font-bold">
+                chevron_left
+              </span>
+            </button>
+          </>
+        ) : (
+          <button 
+            onClick={onToggleCollapse}
+            className="hidden md:flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-on-primary transition-all duration-200 border border-primary/20 shadow-sm active:scale-95 touch-manipulation focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+            title="Expand Sidebar"
+            aria-label="Expand Sidebar"
+            aria-expanded="false"
+          >
+            <span className="material-symbols-outlined text-base font-bold">
+              chevron_right
+            </span>
+          </button>
         )}
-        {isCollapsed && (
-          <h1 className="font-display text-primary leading-tight font-bold text-[22px] tracking-tight">
-            G
-          </h1>
-        )}
-        <button 
-          onClick={onToggleCollapse}
-          className="hidden md:flex items-center justify-center w-8 h-8 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-on-primary transition-all duration-200 border border-primary/20 shadow-sm active:scale-95"
-          title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-        >
-          <span className="material-symbols-outlined text-base font-bold">
-            {isCollapsed ? 'chevron_right' : 'chevron_left'}
-          </span>
-        </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-grow flex flex-col gap-1 mt-4 px-2">
+      <nav className="flex-grow flex flex-col gap-1 mt-4 px-2" aria-label="Main Navigation">
         {menuItems.map((item) => {
           const isActive = currentView === item.id
           return (
             <button
               key={item.id}
               onClick={() => onViewChange(item.id)}
-              className={`flex items-center gap-3 transition-all rounded-full font-semibold ${
+              className={`flex items-center gap-3 transition-all rounded-full font-semibold touch-manipulation focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none ${
                 isCollapsed ? 'justify-center w-12 h-12 mx-auto' : 'w-full px-4 py-3 text-left'
               } ${isActive
                   ? 'bg-primary/10 text-primary'
                   : 'text-on-surface-variant hover:bg-surface-container-high'
                 }`}
               title={isCollapsed ? item.label : undefined}
+              aria-label={isCollapsed ? item.label : undefined}
+              aria-current={isActive ? 'page' : undefined}
             >
               <span
                 className="material-symbols-outlined"
@@ -83,26 +96,28 @@ export default function Sidebar({ currentView, onViewChange, user, onLogout, isC
             <button
               onClick={onLogout}
               title="Log Out Staff"
-              className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-full transition-all"
+              aria-label="Log Out Staff"
+              className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-full transition-all touch-manipulation focus-visible:ring-2 focus-visible:ring-error focus-visible:outline-none"
             >
               <span className="material-symbols-outlined text-lg">logout</span>
             </button>
           </div>
         ) : (
           <div className="px-4 py-3 mx-2 bg-surface-container rounded-2xl flex items-center justify-between border border-outline-variant/20">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-sm shadow-sm border border-outline-variant/10">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-sm shadow-sm border border-outline-variant/10 shrink-0">
                 {user.name.charAt(0)}
               </div>
-              <div>
-                <p className="text-xs font-bold text-on-surface leading-snug">{user.name}</p>
-                <p className="text-[10px] font-semibold text-on-surface-variant/80 uppercase tracking-wider">{user.role}</p>
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-on-surface leading-snug truncate" title={user.name}>{user.name}</p>
+                <p className="text-[10px] font-semibold text-on-surface-variant/80 uppercase tracking-wider truncate">{user.role}</p>
               </div>
             </div>
             <button
               onClick={onLogout}
               title="Log Out Staff"
-              className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-full transition-all"
+              aria-label="Log Out Staff"
+              className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-full transition-all shrink-0 touch-manipulation focus-visible:ring-2 focus-visible:ring-error focus-visible:outline-none"
             >
               <span className="material-symbols-outlined text-lg">logout</span>
             </button>

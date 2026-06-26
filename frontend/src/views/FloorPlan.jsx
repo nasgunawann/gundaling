@@ -3,6 +3,7 @@ import useStore from '../store';
 import { useNotification } from '../components/NotificationProvider';
 import api from '../api';
 import WebsocketStatus from '../components/WebsocketStatus';
+import Modal from '../components/Modal';
 
 export default function FloorPlan({ onTableClick, user, tableCarts, tables: backendTables }) {
   const { showToast, showConfirm } = useNotification();
@@ -379,66 +380,57 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
       </div>
 
       {/* Add Table Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-inverse-on-surface/40 backdrop-blur-md">
-          <div className="bg-surface w-full max-w-sm rounded-3xl shadow-[0_16px_36px_rgba(0,0,0,0.12)] p-8 border border-outline-variant/30 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center border-b border-outline-variant/20 pb-4 mb-6">
-              <h3 className="text-base font-bold font-display text-on-surface">Add New Table</h3>
-              <button 
-                onClick={() => setShowAddModal(false)}
-                className="p-1 hover:bg-surface-container rounded-full text-on-surface-variant"
-              >
-                <span className="material-symbols-outlined">close</span>
-              </button>
-            </div>
-
-            <form onSubmit={handleAddTableSubmit} className="space-y-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Table Identifier</label>
-                <input 
-                  type="text" 
-                  value={newTableName} 
-                  onChange={(e) => setNewTableName(e.target.value)}
-                  placeholder="e.g. Table 15"
-                  required
-                  className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-xs font-semibold shadow-sm focus:ring-2 focus:ring-primary"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Seats Count</label>
-                <select 
-                  value={newTableSeats} 
-                  onChange={(e) => setNewTableSeats(parseInt(e.target.value))}
-                  className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-xs font-semibold shadow-sm focus:ring-2 focus:ring-primary cursor-pointer"
-                >
-                  {[2, 4, 6, 8, 10, 12].map(n => <option key={n} value={n}>{n} Seats</option>)}
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Table Shape</label>
-                <select 
-                  value={newTableShape} 
-                  onChange={(e) => setNewTableShape(e.target.value)}
-                  className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-xs font-semibold shadow-sm focus:ring-2 focus:ring-primary cursor-pointer"
-                >
-                  <option value="circle">Circle</option>
-                  <option value="square">Square</option>
-                  <option value="rectangle">Rectangle</option>
-                </select>
-              </div>
-
-              <button 
-                type="submit"
-                className="w-full h-12 bg-primary text-on-primary rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-md mt-6 text-xs uppercase tracking-wider"
-              >
-                Register Table
-              </button>
-            </form>
+      <Modal 
+        isOpen={showAddModal} 
+        onClose={() => setShowAddModal(false)} 
+        title="Add New Table"
+        maxWidth="max-w-sm"
+      >
+        <form onSubmit={handleAddTableSubmit} className="space-y-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Table Identifier</label>
+            <input 
+              type="text" 
+              value={newTableName} 
+              onChange={(e) => setNewTableName(e.target.value)}
+              placeholder="e.g. Table 15"
+              required
+              className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-xs font-semibold shadow-sm focus:ring-2 focus:ring-primary"
+            />
           </div>
-        </div>
-      )}
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Seats Count</label>
+            <select 
+              value={newTableSeats} 
+              onChange={(e) => setNewTableSeats(parseInt(e.target.value))}
+              className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-xs font-semibold shadow-sm focus:ring-2 focus:ring-primary cursor-pointer"
+            >
+              {[2, 4, 6, 8, 10, 12].map(n => <option key={n} value={n}>{n} Seats</option>)}
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Table Shape</label>
+            <select 
+              value={newTableShape} 
+              onChange={(e) => setNewTableShape(e.target.value)}
+              className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-xs font-semibold shadow-sm focus:ring-2 focus:ring-primary cursor-pointer"
+            >
+              <option value="circle">Circle</option>
+              <option value="square">Square</option>
+              <option value="rectangle">Rectangle</option>
+            </select>
+          </div>
+
+          <button 
+            type="submit"
+            className="w-full h-12 bg-primary text-on-primary rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-md mt-6 text-xs uppercase tracking-wider"
+          >
+            Register Table
+          </button>
+        </form>
+      </Modal>
     </div>
   );
 }

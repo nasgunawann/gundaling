@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNotification } from '../components/NotificationProvider';
 import useStore from '../store';
 import WebsocketStatus from '../components/WebsocketStatus';
+import Modal from '../components/Modal';
 
 export default function Reservations({ reservations }) {
   const { showToast } = useNotification();
@@ -250,106 +251,97 @@ export default function Reservations({ reservations }) {
       </div>
 
       {/* Book Table Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-inverse-on-surface/40 backdrop-blur-md">
-          <div className="bg-surface w-full max-w-md rounded-3xl shadow-[0_16px_36px_rgba(0,0,0,0.12)] p-8 border border-outline-variant/30 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center border-b border-outline-variant/20 pb-4 mb-6">
-              <h3 className="text-lg font-bold font-display text-on-surface">Book Table</h3>
-              <button 
-                onClick={() => setShowAddModal(false)}
-                className="p-1 hover:bg-surface-container rounded-full text-on-surface-variant"
+      <Modal 
+        isOpen={showAddModal} 
+        onClose={() => setShowAddModal(false)} 
+        title="Book Table"
+        maxWidth="max-w-md"
+      >
+        <form onSubmit={handleAddReservation} className="space-y-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Guest Name</label>
+            <input 
+              type="text" 
+              value={newName} 
+              onChange={(e) => setNewName(e.target.value)}
+              placeholder="e.g. John Doe"
+              className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold shadow-sm focus:ring-2 focus:ring-primary"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Contact Number</label>
+            <input 
+              type="text" 
+              value={newPhone} 
+              onChange={(e) => setNewPhone(e.target.value)}
+              placeholder="e.g. +62 812..."
+              className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold shadow-sm focus:ring-2 focus:ring-primary"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Guests Count</label>
+              <select 
+                value={newGuests} 
+                onChange={(e) => setNewGuests(e.target.value)}
+                className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold shadow-sm focus:ring-2 focus:ring-primary"
               >
-                <span className="material-symbols-outlined">close</span>
-              </button>
+                {[1,2,3,4,5,6,7,8].map(n => <option key={n} value={n}>{n} Persons</option>)}
+              </select>
             </div>
 
-            <form onSubmit={handleAddReservation} className="space-y-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Guest Name</label>
-                <input 
-                  type="text" 
-                  value={newName} 
-                  onChange={(e) => setNewName(e.target.value)}
-                  placeholder="e.g. John Doe"
-                  className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold shadow-sm focus:ring-2 focus:ring-primary"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Contact Number</label>
-                <input 
-                  type="text" 
-                  value={newPhone} 
-                  onChange={(e) => setNewPhone(e.target.value)}
-                  placeholder="e.g. +62 812..."
-                  className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold shadow-sm focus:ring-2 focus:ring-primary"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Guests Count</label>
-                  <select 
-                    value={newGuests} 
-                    onChange={(e) => setNewGuests(e.target.value)}
-                    className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold shadow-sm focus:ring-2 focus:ring-primary"
-                  >
-                    {[1,2,3,4,5,6,7,8].map(n => <option key={n} value={n}>{n} Persons</option>)}
-                  </select>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Booking Table</label>
-                  <select 
-                    value={newTable} 
-                    onChange={(e) => setNewTable(e.target.value)}
-                    className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold shadow-sm focus:ring-2 focus:ring-primary cursor-pointer"
-                  >
-                    {storeTables.map(t => {
-                      const capacityOk = t.seats >= parseInt(newGuests || 1);
-                      const prefix = capacityOk ? '' : '⚠️ [Capacity Low] ';
-                      return (
-                        <option key={t.id} value={t.id} className="text-on-surface bg-surface font-semibold">
-                          {prefix}{t.name} ({t.seats} Seats) — {t.status}
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Booking Date</label>
-                  <input 
-                    type="date" 
-                    value={newDate} 
-                    onChange={(e) => setNewDate(e.target.value)}
-                    className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold shadow-sm focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Time Schedule</label>
-                  <input 
-                    type="time" 
-                    value={newTime} 
-                    onChange={(e) => setNewTime(e.target.value)}
-                    className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold shadow-sm focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-              </div>
-
-              <button 
-                type="submit"
-                className="w-full h-14 bg-primary text-on-primary rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-md mt-6 text-sm font-display"
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Booking Table</label>
+              <select 
+                value={newTable} 
+                onChange={(e) => setNewTable(e.target.value)}
+                className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold shadow-sm focus:ring-2 focus:ring-primary cursor-pointer"
               >
-                Confirm Table Reservation
-              </button>
-            </form>
+                {storeTables.map(t => {
+                  const capacityOk = t.seats >= parseInt(newGuests || 1);
+                  const prefix = capacityOk ? '' : '⚠️ [Capacity Low] ';
+                  return (
+                    <option key={t.id} value={t.id} className="text-on-surface bg-surface font-semibold">
+                      {prefix}{t.name} ({t.seats} Seats) — {t.status}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
           </div>
-        </div>
-      )}
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Booking Date</label>
+              <input 
+                type="date" 
+                value={newDate} 
+                onChange={(e) => setNewDate(e.target.value)}
+                className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold shadow-sm focus:ring-2 focus:ring-primary"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Time Schedule</label>
+              <input 
+                type="time" 
+                value={newTime} 
+                onChange={(e) => setNewTime(e.target.value)}
+                className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold shadow-sm focus:ring-2 focus:ring-primary"
+              />
+            </div>
+          </div>
+
+          <button 
+            type="submit"
+            className="w-full h-14 bg-primary text-on-primary rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-md mt-6 text-sm font-display"
+          >
+            Confirm Table Reservation
+          </button>
+        </form>
+      </Modal>
     </div>
   );
 }

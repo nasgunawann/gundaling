@@ -16,7 +16,7 @@
 C:\laragon\www\gundaling\
 ├── frontend/              ← React + Vite
 │   ├── src/
-│   │   ├── components/    ← Common components (Sidebar, CartDrawer, WebsocketStatus, etc.)
+│   │   ├── components/    ← Common components (Sidebar, CartDrawer, WebsocketStatus, Modal, TicketCard, etc.)
 │   │   ├── views/         ← WaiterLogin, FloorPlan, TableOrderView, KitchenDisplay, ProductEnrichment, Reservations
 │   │   ├── App.jsx
 │   │   ├── api.js
@@ -176,6 +176,7 @@ All REST endpoints are prefixed with `/api`.
 - **Item Plating Strikes**: Line items are checkable and struck out (`line-through`) individually by cooks.
 - **Expeditor Screen Mode**: Fullscreen API (`document.documentElement.requestFullscreen()`) integrated on the KDS view to dedicate full screen real-estate to the kitchen.
 - **Waiter Ready Pickup**: When orders enter `ready` status, tables on the floor plan flash/pulse Green and display a "Food Ready!" badge directly.
+- **Floor Plan Statuses**: Simplified statuses to Available, Dining, Reserved, and Food Ready!. Served/Billed tables map directly to Dining (billed status is removed). Empty, unreserved tables display "Available" fallback text.
 
 ---
 

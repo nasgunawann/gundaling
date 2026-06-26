@@ -161,7 +161,7 @@ export default function App() {
           />
         )}
         {currentView === 'kitchen-queue' && (
-          <KitchenDisplay />
+          <KitchenDisplay setIsSidebarCollapsed={setIsSidebarCollapsed} />
         )}
       </div>
     </div>
