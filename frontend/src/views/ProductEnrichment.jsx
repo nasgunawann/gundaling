@@ -190,7 +190,7 @@ export default function ProductEnrichment({ products }) {
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border ${
+              className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border shrink-0 ${
                 activeCategory === cat 
                   ? 'bg-primary text-on-primary border-primary shadow-sm' 
                   : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border-outline-variant/15'
