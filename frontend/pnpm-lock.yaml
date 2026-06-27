@@ -11,6 +11,9 @@ importers:
       axios:
         specifier: ^1.18.0
         version: 1.18.1
+      idb-keyval:
+        specifier: ^6.2.5
+        version: 6.2.5
       laravel-echo:
         specifier: ^2.3.7
         version: 2.3.7(pusher-js@8.5.0)(socket.io-client@4.8.3)
@@ -1458,6 +1461,9 @@ packages:
   https-proxy-agent@5.0.1:
     resolution: {integrity: sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==}
     engines: {node: '>= 6'}
+
+  idb-keyval@6.2.5:
+    resolution: {integrity: sha512-eKQkTnS0relYsSOYomx8ozIbmdsQCKUdhyuIaQ2DZgKuaxtyQQMkyD/wlnQN32pO3yutN1b1L8uqwcDKaJd7/Q==}
 
   idb@7.1.1:
     resolution: {integrity: sha512-gchesWBzyvGHRO9W8tzUWFDycow5gwjvFKfyV9FF32Y7F50yZMp7mP+T2mJIWFx49zicqyC4uefHM17o6xKIVQ==}
@@ -3891,6 +3897,8 @@ snapshots:
       debug: 4.4.3
     transitivePeerDependencies:
       - supports-color
+
+  idb-keyval@6.2.5: {}
 
   idb@7.1.1: {}
 

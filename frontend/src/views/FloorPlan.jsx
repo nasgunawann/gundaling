@@ -310,6 +310,10 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
               const posXVal = table.posX !== undefined ? table.posX : table.pos_x;
               const posYVal = table.posY !== undefined ? table.posY : table.pos_y;
 
+              const tableOrders = orders.filter((o) => (o.tableId || o.table_id) === table.id);
+              const hasPendingSyncOrder = tableOrders.some((o) => o.isPendingSync);
+              const isTablePendingSync = table.isPendingSync || hasPendingSyncOrder;
+
               return (
                 <div
                   key={table.id}
@@ -325,6 +329,11 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                   }}
                   className={`transition-shadow duration-200 ${isEditMode ? 'hover:scale-[1.02] hover:shadow-lg' : ''}`}
                 >
+                  {isTablePendingSync && (
+                    <span className="absolute -top-3 -right-1 bg-status-warning text-status-on-warning text-[8px] font-extrabold p-1 rounded-full uppercase tracking-wider shadow-md animate-pulse z-30 border border-surface flex items-center justify-center" title="Pending Sync">
+                      <span className="material-symbols-outlined text-[12px] font-extrabold">cloud_upload</span>
+                    </span>
+                  )}
                   {table.status === 'Ready' && (
                     <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-error text-on-error text-[8px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider shadow-md animate-bounce z-30 border border-surface flex items-center gap-1">
                       <span className="material-symbols-outlined text-[10px] font-extrabold animate-pulse">soup_kitchen</span>

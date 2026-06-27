@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import api, { initSocket } from './api';
+import { get as idbGet, set as idbSet } from 'idb-keyval';
 
 const parseJwt = (token) => {
   try {
@@ -43,23 +44,36 @@ const useStore = create((set, get) => ({
   categories: [],
   socket: null,
   loading: false,
-  syncQueue: JSON.parse(localStorage.getItem('gundaling_sync_queue') || '[]'),
+  syncQueue: [],
   isSyncing: false,
 
-  loadOfflineData: () => {
+  initializeStore: async () => {
     try {
-      const products = JSON.parse(localStorage.getItem('gundaling_cache_products') || '[]');
-      const categories = JSON.parse(localStorage.getItem('gundaling_cache_categories') || '[]');
-      const tables = JSON.parse(localStorage.getItem('gundaling_cache_tables') || '[]');
-      const orders = JSON.parse(localStorage.getItem('gundaling_cache_orders') || '[]');
-      const reservations = JSON.parse(localStorage.getItem('gundaling_cache_reservations') || '[]');
-      set({ products, categories, tables, orders, reservations });
+      const syncQueue = await idbGet('gundaling_sync_queue') || [];
+      set({ syncQueue });
+      if (navigator.onLine && syncQueue.length > 0) {
+        get().processQueue();
+      }
+    } catch (e) {
+      console.error('Failed to initialize store queue', e);
+    }
+  },
+
+  loadOfflineData: async () => {
+    try {
+      const products = await idbGet('gundaling_cache_products') || [];
+      const categories = await idbGet('gundaling_cache_categories') || [];
+      const tables = await idbGet('gundaling_cache_tables') || [];
+      const orders = await idbGet('gundaling_cache_orders') || [];
+      const reservations = await idbGet('gundaling_cache_reservations') || [];
+      const syncQueue = await idbGet('gundaling_sync_queue') || [];
+      set({ products, categories, tables, orders, reservations, syncQueue });
     } catch (e) {
       console.error('Failed to load offline data', e);
     }
   },
 
-  addToQueue: (action, payload, tempId = null) => {
+  addToQueue: async (action, payload, tempId = null) => {
     const queueItem = {
       id: Date.now() + Math.random().toString(36).substr(2, 9),
       action,
@@ -69,7 +83,7 @@ const useStore = create((set, get) => ({
     const { syncQueue } = get();
     const newQueue = [...syncQueue, queueItem];
     set({ syncQueue: newQueue });
-    localStorage.setItem('gundaling_sync_queue', JSON.stringify(newQueue));
+    await idbSet('gundaling_sync_queue', newQueue);
     if (navigator.onLine) {
       get().processQueue();
     }
@@ -142,7 +156,7 @@ const useStore = create((set, get) => ({
 
         remainingQueue.shift();
         set({ syncQueue: remainingQueue });
-        localStorage.setItem('gundaling_sync_queue', JSON.stringify(remainingQueue));
+        await idbSet('gundaling_sync_queue', remainingQueue);
       } catch (err) {
         console.error('Failed to sync item', item, err);
         if (!err.response || err.code === 'ERR_NETWORK') {
@@ -150,7 +164,7 @@ const useStore = create((set, get) => ({
         }
         remainingQueue.shift();
         set({ syncQueue: remainingQueue });
-        localStorage.setItem('gundaling_sync_queue', JSON.stringify(remainingQueue));
+        await idbSet('gundaling_sync_queue', remainingQueue);
       }
     }
 
@@ -252,11 +266,11 @@ const useStore = create((set, get) => ({
         orders: ordersRes.data,
         reservations: reservationsRes.data,
       });
-      localStorage.setItem('gundaling_cache_products', JSON.stringify(productsRes.data));
-      localStorage.setItem('gundaling_cache_categories', JSON.stringify(categoriesRes.data));
-      localStorage.setItem('gundaling_cache_tables', JSON.stringify(tablesRes.data));
-      localStorage.setItem('gundaling_cache_orders', JSON.stringify(ordersRes.data));
-      localStorage.setItem('gundaling_cache_reservations', JSON.stringify(reservationsRes.data));
+      idbSet('gundaling_cache_products', productsRes.data);
+      idbSet('gundaling_cache_categories', categoriesRes.data);
+      idbSet('gundaling_cache_tables', tablesRes.data);
+      idbSet('gundaling_cache_orders', ordersRes.data);
+      idbSet('gundaling_cache_reservations', reservationsRes.data);
     } catch (err) {
       console.error('Failed to fetch initial data', err);
       get().loadOfflineData();
@@ -328,8 +342,8 @@ const useStore = create((set, get) => ({
           return { orders: newOrders, tables: newTables };
         });
 
-        localStorage.setItem('gundaling_cache_orders', JSON.stringify(get().orders));
-        localStorage.setItem('gundaling_cache_tables', JSON.stringify(get().tables));
+        idbSet('gundaling_cache_orders', get().orders);
+        idbSet('gundaling_cache_tables', get().tables);
         return updatedOrder;
       } catch (err) {
         if (!err.response || err.code === 'ERR_NETWORK') {
@@ -375,7 +389,7 @@ const useStore = create((set, get) => ({
         return item;
       });
       set({ syncQueue: newQueue });
-      localStorage.setItem('gundaling_sync_queue', JSON.stringify(newQueue));
+      idbSet('gundaling_sync_queue', newQueue);
       return get().orders.find(o => o.id === orderId);
     }
 
@@ -391,8 +405,8 @@ const useStore = create((set, get) => ({
           );
           return { orders: newOrders, tables: newTables };
         });
-        localStorage.setItem('gundaling_cache_orders', JSON.stringify(get().orders));
-        localStorage.setItem('gundaling_cache_tables', JSON.stringify(get().tables));
+        idbSet('gundaling_cache_orders', get().orders);
+        idbSet('gundaling_cache_tables', get().tables);
         return updatedOrder;
       } catch (err) {
         if (!err.response || err.code === 'ERR_NETWORK') {
@@ -447,8 +461,8 @@ const useStore = create((set, get) => ({
           );
           return { orders: newOrders, tables: newTables };
         });
-        localStorage.setItem('gundaling_cache_orders', JSON.stringify(get().orders));
-        localStorage.setItem('gundaling_cache_tables', JSON.stringify(get().tables));
+        idbSet('gundaling_cache_orders', get().orders);
+        idbSet('gundaling_cache_tables', get().tables);
         return updatedOrder;
       } catch (err) {
         if (!err.response || err.code === 'ERR_NETWORK') {
@@ -484,7 +498,7 @@ const useStore = create((set, get) => ({
           const filtered = state.reservations.filter((r) => r.id !== tempId);
           return { reservations: [...filtered, newRes] };
         });
-        localStorage.setItem('gundaling_cache_reservations', JSON.stringify(get().reservations));
+        idbSet('gundaling_cache_reservations', get().reservations);
         return newRes;
       } catch (err) {
         if (!err.response || err.code === 'ERR_NETWORK') {
@@ -519,7 +533,7 @@ const useStore = create((set, get) => ({
         set((state) => ({
           reservations: state.reservations.map((r) => r.id === id ? updated : r),
         }));
-        localStorage.setItem('gundaling_cache_reservations', JSON.stringify(get().reservations));
+        idbSet('gundaling_cache_reservations', get().reservations);
         return updated;
       } catch (err) {
         if (!err.response || err.code === 'ERR_NETWORK') {
@@ -546,7 +560,7 @@ const useStore = create((set, get) => ({
         set((state) => ({
           tables: state.tables.map((t) => t.id === tableId ? updatedTable : t),
         }));
-        localStorage.setItem('gundaling_cache_tables', JSON.stringify(get().tables));
+        idbSet('gundaling_cache_tables', get().tables);
       } catch (err) {
         if (!err.response || err.code === 'ERR_NETWORK') {
           get().addToQueue('updateTablePosition', { tableId, posX, posY });
@@ -683,12 +697,8 @@ if (typeof window !== 'undefined') {
   window.addEventListener('online', () => {
     useStore.getState().processQueue();
   });
-  // Also try to process queue when store loads initially
-  setTimeout(() => {
-    if (navigator.onLine) {
-      useStore.getState().processQueue();
-    }
-  }, 1000);
+  // Initialize queue and cache from idb-keyval on startup
+  useStore.getState().initializeStore();
 }
 
 export default useStore;

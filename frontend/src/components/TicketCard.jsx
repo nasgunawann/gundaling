@@ -16,19 +16,26 @@ export default function TicketCard({
 
   return (
     <div
-      className={`break-inside-avoid mb-6 rounded-3xl border shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all duration-200 flex flex-col justify-between overflow-hidden ${styles.cardBorder}`}
+      className={`break-inside-avoid mb-6 rounded-3xl border shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all duration-200 flex flex-col justify-between overflow-hidden ${
+        order.isPendingSync ? 'border-dashed border-status-warning shadow-[0_4px_12px_rgba(245,158,11,0.15)]' : styles.cardBorder
+      }`}
     >
       <div>
         {/* SLA styled Header */}
-        <div className={`p-4 flex justify-between items-center font-display ${styles.headerBg}`}>
+        <div className={`p-4 flex justify-between items-center font-display ${order.isPendingSync ? 'bg-status-warning/10 text-status-warning' : styles.headerBg}`}>
           <div>
-            <h4 className="text-sm font-extrabold">{order.table?.name || 'Table'}</h4>
+            <div className="flex items-center gap-1.5">
+              <h4 className="text-sm font-extrabold">{order.table?.name || 'Table'}</h4>
+              {order.isPendingSync && (
+                <span className="material-symbols-outlined text-[14px] animate-pulse" title="Pending Sync">cloud_upload</span>
+              )}
+            </div>
             <p className="text-[9px] font-bold opacity-80 uppercase tracking-wider mt-0.5 font-mono">
               Order #{order.id}
             </p>
           </div>
-          <span className={`text-[10px] font-mono rounded-full px-2.5 py-0.5 select-none ${styles.timerBadge}`}>
-            {elapsed}
+          <span className={`text-[10px] font-mono rounded-full px-2.5 py-0.5 select-none ${order.isPendingSync ? 'bg-status-warning/20 text-status-warning font-bold' : styles.timerBadge}`}>
+            {order.isPendingSync ? 'OFFLINE' : elapsed}
           </span>
         </div>
 
@@ -78,31 +85,46 @@ export default function TicketCard({
       <div className="p-4 pt-0 mt-1 flex gap-2">
         {order.status === 'pending' && (
           <button
+            disabled={order.isPendingSync}
             onClick={() => handleStatusTransition(order.id, 'preparing')}
-            className="w-full py-3 bg-status-warning text-status-on-warning rounded-xl font-bold hover:opacity-95 active:scale-[0.98] transition-all text-[11px] uppercase tracking-wider shadow-sm flex items-center justify-center gap-1.5"
+            className={`w-full py-3 rounded-xl font-bold active:scale-[0.98] transition-all text-[11px] uppercase tracking-wider shadow-sm flex items-center justify-center gap-1.5 ${
+              order.isPendingSync
+                ? 'bg-outline-variant/20 text-on-surface-variant/40 cursor-not-allowed'
+                : 'bg-status-warning text-status-on-warning hover:opacity-95'
+            }`}
           >
             <span className="material-symbols-outlined text-sm">outdoor_grill</span>
-            Start Cooking
+            {order.isPendingSync ? 'Syncing...' : 'Start Cooking'}
           </button>
         )}
 
         {order.status === 'preparing' && (
           <button
+            disabled={order.isPendingSync}
             onClick={() => handleStatusTransition(order.id, 'ready')}
-            className="w-full py-3 bg-status-success text-status-on-success rounded-xl font-bold hover:opacity-95 active:scale-[0.98] transition-all text-[11px] uppercase tracking-wider shadow-sm flex items-center justify-center gap-1.5"
+            className={`w-full py-3 rounded-xl font-bold active:scale-[0.98] transition-all text-[11px] uppercase tracking-wider shadow-sm flex items-center justify-center gap-1.5 ${
+              order.isPendingSync
+                ? 'bg-outline-variant/20 text-on-surface-variant/40 cursor-not-allowed'
+                : 'bg-status-success text-status-on-success hover:opacity-95'
+            }`}
           >
             <span className="material-symbols-outlined text-sm">notifications_active</span>
-            Mark Ready
+            {order.isPendingSync ? 'Syncing...' : 'Mark Ready'}
           </button>
         )}
 
         {order.status === 'ready' && (
           <button
+            disabled={order.isPendingSync}
             onClick={() => handleStatusTransition(order.id, 'served')}
-            className="w-full py-3 bg-surface-container border border-outline-variant/30 text-on-surface-variant rounded-xl font-bold hover:bg-surface-container-high active:scale-95 transition-all text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5"
+            className={`w-full py-3 rounded-xl font-bold active:scale-95 transition-all text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 ${
+              order.isPendingSync
+                ? 'bg-outline-variant/20 border border-outline-variant/10 text-on-surface-variant/40 cursor-not-allowed'
+                : 'bg-surface-container border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-high'
+            }`}
           >
             <span className="material-symbols-outlined text-sm">check_circle</span>
-            Dismiss (Served)
+            {order.isPendingSync ? 'Syncing...' : 'Dismiss (Served)'}
           </button>
         )}
       </div>

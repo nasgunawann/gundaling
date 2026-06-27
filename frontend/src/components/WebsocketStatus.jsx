@@ -4,6 +4,7 @@ import useStore from '../store';
 export default function WebsocketStatus({ showLabel = true }) {
   const [status, setStatus] = useState('disconnected');
   const socket = useStore((state) => state.socket);
+  const syncQueue = useStore((state) => state.syncQueue);
 
   useEffect(() => {
     if (!socket) {
@@ -30,6 +31,9 @@ export default function WebsocketStatus({ showLabel = true }) {
   }, [socket]);
 
   const getStatusDetails = () => {
+    if (syncQueue.length > 0) {
+      return { color: 'bg-status-warning animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.5)]', label: `Syncing (${syncQueue.length})` };
+    }
     switch (status) {
       case 'connected':
         return { color: 'bg-status-success shadow-[0_0_8px_rgba(45,106,79,0.5)]', label: 'Live' };
