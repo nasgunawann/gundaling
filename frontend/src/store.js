@@ -1,10 +1,24 @@
 import { create } from 'zustand';
 import api, { initSocket } from './api';
 
+const parseJwt = (token) => {
+  try {
+    return JSON.parse(atob(token.split('.')[1]));
+  } catch (e) {
+    return null;
+  }
+};
+
 const getInitialState = () => {
   const token = localStorage.getItem('gundaling_token');
   let user = null;
   if (token) {
+    const payload = parseJwt(token);
+    if (!payload || (payload.exp && payload.exp * 1000 < Date.now())) {
+      localStorage.removeItem('gundaling_token');
+      localStorage.removeItem('gundaling_user');
+      return { token: null, user: null };
+    }
     try {
       const savedUser = localStorage.getItem('gundaling_user');
       if (savedUser) {
@@ -29,6 +43,122 @@ const useStore = create((set, get) => ({
   categories: [],
   socket: null,
   loading: false,
+  syncQueue: JSON.parse(localStorage.getItem('gundaling_sync_queue') || '[]'),
+  isSyncing: false,
+
+  loadOfflineData: () => {
+    try {
+      const products = JSON.parse(localStorage.getItem('gundaling_cache_products') || '[]');
+      const categories = JSON.parse(localStorage.getItem('gundaling_cache_categories') || '[]');
+      const tables = JSON.parse(localStorage.getItem('gundaling_cache_tables') || '[]');
+      const orders = JSON.parse(localStorage.getItem('gundaling_cache_orders') || '[]');
+      const reservations = JSON.parse(localStorage.getItem('gundaling_cache_reservations') || '[]');
+      set({ products, categories, tables, orders, reservations });
+    } catch (e) {
+      console.error('Failed to load offline data', e);
+    }
+  },
+
+  addToQueue: (action, payload, tempId = null) => {
+    const queueItem = {
+      id: Date.now() + Math.random().toString(36).substr(2, 9),
+      action,
+      payload,
+      tempId,
+    };
+    const { syncQueue } = get();
+    const newQueue = [...syncQueue, queueItem];
+    set({ syncQueue: newQueue });
+    localStorage.setItem('gundaling_sync_queue', JSON.stringify(newQueue));
+    if (navigator.onLine) {
+      get().processQueue();
+    }
+  },
+
+  processQueue: async () => {
+    if (get().isSyncing) return;
+    const { syncQueue } = get();
+    if (syncQueue.length === 0) return;
+
+    set({ isSyncing: true });
+    const remainingQueue = [...syncQueue];
+
+    while (remainingQueue.length > 0) {
+      const item = remainingQueue[0];
+      try {
+        if (item.action === 'submitOrder') {
+          const res = await api.post('/orders', item.payload);
+          const updatedOrder = res.data;
+          set((state) => {
+            const filteredOrders = state.orders.filter((o) => o.id !== item.tempId);
+            const index = filteredOrders.findIndex((o) => o.id === updatedOrder.id);
+            const newOrders = [...filteredOrders];
+            if (index > -1) {
+              newOrders[index] = updatedOrder;
+            } else {
+              newOrders.push(updatedOrder);
+            }
+            const updatedTableId = updatedOrder.tableId || updatedOrder.table_id;
+            const newTables = state.tables.map((t) => 
+              t.id === updatedTableId ? updatedOrder.table : t
+            );
+            return { orders: newOrders, tables: newTables };
+          });
+          remainingQueue.forEach((qItem) => {
+            if (qItem.payload && qItem.payload.orderId === item.tempId) {
+              qItem.payload.orderId = updatedOrder.id;
+            }
+          });
+        } else if (item.action === 'transmitOrder') {
+          const res = await api.post(`/orders/${item.payload.orderId}/transmit`);
+          const updatedOrder = res.data;
+          set((state) => {
+            const newOrders = state.orders.map((o) => o.id === item.payload.orderId ? updatedOrder : o);
+            return { orders: newOrders };
+          });
+        } else if (item.action === 'updateOrderStatus') {
+          const res = await api.put(`/orders/${item.payload.orderId}/status`, { status: item.payload.status });
+          const updatedOrder = res.data;
+          set((state) => {
+            const newOrders = state.orders.map((o) => o.id === item.payload.orderId ? updatedOrder : o);
+            return { orders: newOrders };
+          });
+        } else if (item.action === 'addReservation') {
+          const res = await api.post('/reservations', item.payload);
+          const newRes = res.data;
+          set((state) => {
+            const filtered = state.reservations.filter((r) => r.id !== item.tempId);
+            return { reservations: [...filtered, newRes] };
+          });
+        } else if (item.action === 'updateReservation') {
+          const res = await api.put(`/reservations/${item.payload.id}`, { status: item.payload.status });
+          const updated = res.data;
+          set((state) => ({
+            reservations: state.reservations.map((r) => r.id === item.payload.id ? updated : r),
+          }));
+        } else if (item.action === 'updateTablePosition') {
+          await api.put(`/tables/${item.payload.tableId}`, { pos_x: item.payload.posX, pos_y: item.payload.posY });
+        }
+
+        remainingQueue.shift();
+        set({ syncQueue: remainingQueue });
+        localStorage.setItem('gundaling_sync_queue', JSON.stringify(remainingQueue));
+      } catch (err) {
+        console.error('Failed to sync item', item, err);
+        if (!err.response || err.code === 'ERR_NETWORK') {
+          break;
+        }
+        remainingQueue.shift();
+        set({ syncQueue: remainingQueue });
+        localStorage.setItem('gundaling_sync_queue', JSON.stringify(remainingQueue));
+      }
+    }
+
+    set({ isSyncing: false });
+    if (remainingQueue.length === 0) {
+      await get().fetchInitialData();
+    }
+  },
 
   setTables: (tables) => set({ tables }),
   setOrders: (orders) => set({ orders }),
@@ -86,6 +216,19 @@ const useStore = create((set, get) => ({
       set({ loading: false });
       return true;
     } catch (err) {
+      if (!err.response || err.code === 'ERR_NETWORK') {
+        const userStr = localStorage.getItem('gundaling_user');
+        if (userStr) {
+          const payload = parseJwt(token);
+          if (payload && (!payload.exp || payload.exp * 1000 > Date.now())) {
+            const user = JSON.parse(userStr);
+            set({ user, token, socket: null });
+            await get().loadOfflineData();
+            set({ loading: false });
+            return true;
+          }
+        }
+      }
       localStorage.removeItem('gundaling_token');
       localStorage.removeItem('gundaling_user');
       set({ token: null, user: null, loading: false });
@@ -109,116 +252,308 @@ const useStore = create((set, get) => ({
         orders: ordersRes.data,
         reservations: reservationsRes.data,
       });
+      localStorage.setItem('gundaling_cache_products', JSON.stringify(productsRes.data));
+      localStorage.setItem('gundaling_cache_categories', JSON.stringify(categoriesRes.data));
+      localStorage.setItem('gundaling_cache_tables', JSON.stringify(tablesRes.data));
+      localStorage.setItem('gundaling_cache_orders', JSON.stringify(ordersRes.data));
+      localStorage.setItem('gundaling_cache_reservations', JSON.stringify(reservationsRes.data));
     } catch (err) {
       console.error('Failed to fetch initial data', err);
+      get().loadOfflineData();
     }
   },
 
   submitOrder: async (tableId, items) => {
-    try {
-      const res = await api.post('/orders', { table_id: tableId, items });
-      const updatedOrder = res.data;
-      
-      set((state) => {
-        const index = state.orders.findIndex((o) => o.id === updatedOrder.id);
-        const newOrders = [...state.orders];
-        if (index > -1) {
-          newOrders[index] = updatedOrder;
-        } else {
-          newOrders.push(updatedOrder);
-        }
-        const updatedTableId = updatedOrder.tableId || updatedOrder.table_id;
-        const newTables = state.tables.map((t) => 
-          t.id === updatedTableId ? updatedOrder.table : t
-        );
-        return { orders: newOrders, tables: newTables };
-      });
+    const tempId = 'temp-' + Date.now();
+    const { user, products, tables } = get();
+    const table = tables.find(t => t.id === tableId);
+    
+    const orderItems = items.map((item, idx) => {
+      const product = products.find(p => p.id === item.product_id);
+      return {
+        id: 'temp-item-' + idx + '-' + Date.now(),
+        orderId: tempId,
+        productId: item.product_id,
+        qty: item.qty,
+        unitPrice: product ? product.price : 0,
+        sent: item.sent ?? false,
+        note: item.note ?? null,
+        product: product || { name: 'Unknown Product', price: 0 }
+      };
+    });
 
-      return updatedOrder;
-    } catch (err) {
-      console.error(err);
-      throw err;
+    const subtotal = orderItems.reduce((acc, item) => acc + Number(item.unitPrice) * item.qty, 0);
+    const total = subtotal * 1.1;
+
+    const tempOrder = {
+      id: tempId,
+      tableId,
+      userId: user ? user.id : 0,
+      status: 'pending',
+      total,
+      isPendingSync: true,
+      table: table ? { ...table, status: 'Occupied' } : null,
+      user: user ? { id: user.id, name: user.name, role: user.role, email: user.email } : null,
+      items: orderItems,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    set((state) => {
+      const newOrders = [...state.orders, tempOrder];
+      const newTables = state.tables.map((t) => 
+        t.id === tableId ? { ...t, status: 'Occupied' } : t
+      );
+      return { orders: newOrders, tables: newTables };
+    });
+
+    if (navigator.onLine) {
+      try {
+        const res = await api.post('/orders', { table_id: tableId, items });
+        const updatedOrder = res.data;
+        
+        set((state) => {
+          const filteredOrders = state.orders.filter(o => o.id !== tempId);
+          const index = filteredOrders.findIndex((o) => o.id === updatedOrder.id);
+          const newOrders = [...filteredOrders];
+          if (index > -1) {
+            newOrders[index] = updatedOrder;
+          } else {
+            newOrders.push(updatedOrder);
+          }
+          const updatedTableId = updatedOrder.tableId || updatedOrder.table_id;
+          const newTables = state.tables.map((t) => 
+            t.id === updatedTableId ? updatedOrder.table : t
+          );
+          return { orders: newOrders, tables: newTables };
+        });
+
+        localStorage.setItem('gundaling_cache_orders', JSON.stringify(get().orders));
+        localStorage.setItem('gundaling_cache_tables', JSON.stringify(get().tables));
+        return updatedOrder;
+      } catch (err) {
+        if (!err.response || err.code === 'ERR_NETWORK') {
+          get().addToQueue('submitOrder', { table_id: tableId, items }, tempId);
+          return tempOrder;
+        }
+        set((state) => {
+          const newOrders = state.orders.filter(o => o.id !== tempId);
+          const newTables = state.tables.map((t) => 
+            t.id === tableId ? { ...t, status: 'Available' } : t
+          );
+          return { orders: newOrders, tables: newTables };
+        });
+        throw err;
+      }
+    } else {
+      get().addToQueue('submitOrder', { table_id: tableId, items }, tempId);
+      return tempOrder;
     }
   },
 
   transmitOrder: async (orderId) => {
-    try {
-      const res = await api.post(`/orders/${orderId}/transmit`);
-      const updatedOrder = res.data;
-      set((state) => {
-        const newOrders = state.orders.map((o) => o.id === orderId ? updatedOrder : o);
-        const updatedTableId = updatedOrder.tableId || updatedOrder.table_id;
-        const newTables = state.tables.map((t) => 
-          t.id === updatedTableId ? updatedOrder.table : t
-        );
-        return { orders: newOrders, tables: newTables };
+    const isTemp = typeof orderId === 'string' && orderId.startsWith('temp-');
+    
+    set((state) => {
+      const newOrders = state.orders.map((o) => {
+        if (o.id === orderId) {
+          const updatedItems = o.items.map(item => ({ ...item, sent: true }));
+          return { ...o, status: 'pending', items: updatedItems, isPendingSync: true };
+        }
+        return o;
       });
-      return updatedOrder;
-    } catch (err) {
-      console.error(err);
-      throw err;
+      return { orders: newOrders };
+    });
+
+    if (isTemp) {
+      const { syncQueue } = get();
+      const newQueue = syncQueue.map(item => {
+        if (item.action === 'submitOrder' && item.tempId === orderId) {
+          const updatedPayloadItems = item.payload.items.map(i => ({ ...i, sent: true }));
+          return { ...item, payload: { ...item.payload, items: updatedPayloadItems } };
+        }
+        return item;
+      });
+      set({ syncQueue: newQueue });
+      localStorage.setItem('gundaling_sync_queue', JSON.stringify(newQueue));
+      return get().orders.find(o => o.id === orderId);
+    }
+
+    if (navigator.onLine) {
+      try {
+        const res = await api.post(`/orders/${orderId}/transmit`);
+        const updatedOrder = res.data;
+        set((state) => {
+          const newOrders = state.orders.map((o) => o.id === orderId ? updatedOrder : o);
+          const updatedTableId = updatedOrder.tableId || updatedOrder.table_id;
+          const newTables = state.tables.map((t) => 
+            t.id === updatedTableId ? updatedOrder.table : t
+          );
+          return { orders: newOrders, tables: newTables };
+        });
+        localStorage.setItem('gundaling_cache_orders', JSON.stringify(get().orders));
+        localStorage.setItem('gundaling_cache_tables', JSON.stringify(get().tables));
+        return updatedOrder;
+      } catch (err) {
+        if (!err.response || err.code === 'ERR_NETWORK') {
+          get().addToQueue('transmitOrder', { orderId });
+          return get().orders.find(o => o.id === orderId);
+        }
+        throw err;
+      }
+    } else {
+      get().addToQueue('transmitOrder', { orderId });
+      return get().orders.find(o => o.id === orderId);
     }
   },
 
   updateOrderStatus: async (orderId, status) => {
-    try {
-      const res = await api.put(`/orders/${orderId}/status`, { status });
-      const updatedOrder = res.data;
-      set((state) => {
-        const newOrders = state.orders.map((o) => o.id === orderId ? updatedOrder : o);
-        const updatedTableId = updatedOrder.tableId || updatedOrder.table_id;
-        const newTables = state.tables.map((t) => 
-          t.id === updatedTableId ? updatedOrder.table : t
-        );
-        return { orders: newOrders, tables: newTables };
+    const isTemp = typeof orderId === 'string' && orderId.startsWith('temp-');
+
+    set((state) => {
+      const newOrders = state.orders.map((o) => {
+        if (o.id === orderId) {
+          const isPaid = status === 'paid';
+          const updatedItems = isPaid ? o.items.map(i => ({ ...i, sent: true })) : o.items;
+          return { ...o, status, items: updatedItems, isPendingSync: true };
+        }
+        return o;
       });
-      return updatedOrder;
-    } catch (err) {
-      console.error(err);
-      throw err;
+      let newTables = state.tables;
+      if (status === 'paid') {
+        const order = state.orders.find(o => o.id === orderId);
+        if (order) {
+          const orderTableId = order.tableId || order.table_id;
+          newTables = state.tables.map(t => t.id === orderTableId ? { ...t, status: 'Available' } : t);
+        }
+      }
+      return { orders: newOrders, tables: newTables };
+    });
+
+    if (isTemp) {
+      get().addToQueue('updateOrderStatus', { orderId, status });
+      return get().orders.find(o => o.id === orderId);
+    }
+
+    if (navigator.onLine) {
+      try {
+        const res = await api.put(`/orders/${orderId}/status`, { status });
+        const updatedOrder = res.data;
+        set((state) => {
+          const newOrders = state.orders.map((o) => o.id === orderId ? updatedOrder : o);
+          const updatedTableId = updatedOrder.tableId || updatedOrder.table_id;
+          const newTables = state.tables.map((t) => 
+            t.id === updatedTableId ? updatedOrder.table : t
+          );
+          return { orders: newOrders, tables: newTables };
+        });
+        localStorage.setItem('gundaling_cache_orders', JSON.stringify(get().orders));
+        localStorage.setItem('gundaling_cache_tables', JSON.stringify(get().tables));
+        return updatedOrder;
+      } catch (err) {
+        if (!err.response || err.code === 'ERR_NETWORK') {
+          get().addToQueue('updateOrderStatus', { orderId, status });
+          return get().orders.find(o => o.id === orderId);
+        }
+        throw err;
+      }
+    } else {
+      get().addToQueue('updateOrderStatus', { orderId, status });
+      return get().orders.find(o => o.id === orderId);
     }
   },
 
   addReservation: async (data) => {
-    try {
-      const res = await api.post('/reservations', data);
-      const newRes = res.data;
-      set((state) => {
-        if (state.reservations.some((r) => r.id === newRes.id)) {
-          return state;
+    const tempId = 'temp-' + Date.now();
+    const tempReservation = {
+      id: tempId,
+      ...data,
+      status: 'Confirmed',
+      isPendingSync: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    set((state) => ({ reservations: [...state.reservations, tempReservation] }));
+
+    if (navigator.onLine) {
+      try {
+        const res = await api.post('/reservations', data);
+        const newRes = res.data;
+        set((state) => {
+          const filtered = state.reservations.filter((r) => r.id !== tempId);
+          return { reservations: [...filtered, newRes] };
+        });
+        localStorage.setItem('gundaling_cache_reservations', JSON.stringify(get().reservations));
+        return newRes;
+      } catch (err) {
+        if (!err.response || err.code === 'ERR_NETWORK') {
+          get().addToQueue('addReservation', data, tempId);
+          return tempReservation;
         }
-        return { reservations: [...state.reservations, newRes] };
-      });
-      return newRes;
-    } catch (err) {
-      console.error(err);
-      throw err;
+        set((state) => ({ reservations: state.reservations.filter((r) => r.id !== tempId) }));
+        throw err;
+      }
+    } else {
+      get().addToQueue('addReservation', data, tempId);
+      return tempReservation;
     }
   },
 
   updateReservation: async (id, status) => {
-    try {
-      const res = await api.put(`/reservations/${id}`, { status });
-      const updated = res.data;
-      set((state) => ({
-        reservations: state.reservations.map((r) => r.id === id ? updated : r),
-      }));
-      return updated;
-    } catch (err) {
-      console.error(err);
-      throw err;
+    const isTemp = typeof id === 'string' && id.startsWith('temp-');
+
+    set((state) => ({
+      reservations: state.reservations.map((r) => r.id === id ? { ...r, status, isPendingSync: true } : r),
+    }));
+
+    if (isTemp) {
+      get().addToQueue('updateReservation', { id, status });
+      return get().reservations.find(r => r.id === id);
+    }
+
+    if (navigator.onLine) {
+      try {
+        const res = await api.put(`/reservations/${id}`, { status });
+        const updated = res.data;
+        set((state) => ({
+          reservations: state.reservations.map((r) => r.id === id ? updated : r),
+        }));
+        localStorage.setItem('gundaling_cache_reservations', JSON.stringify(get().reservations));
+        return updated;
+      } catch (err) {
+        if (!err.response || err.code === 'ERR_NETWORK') {
+          get().addToQueue('updateReservation', { id, status });
+          return get().reservations.find(r => r.id === id);
+        }
+        throw err;
+      }
+    } else {
+      get().addToQueue('updateReservation', { id, status });
+      return get().reservations.find(r => r.id === id);
     }
   },
 
   updateTablePosition: async (tableId, posX, posY) => {
-    try {
-      const res = await api.put(`/tables/${tableId}`, { pos_x: posX, pos_y: posY });
-      const updatedTable = res.data;
-      set((state) => ({
-        tables: state.tables.map((t) => t.id === tableId ? updatedTable : t),
-      }));
-    } catch (err) {
-      console.error(err);
+    set((state) => ({
+      tables: state.tables.map((t) => t.id === tableId ? { ...t, pos_x: posX, pos_y: posY, isPendingSync: true } : t),
+    }));
+
+    if (navigator.onLine) {
+      try {
+        const res = await api.put(`/tables/${tableId}`, { pos_x: posX, pos_y: posY });
+        const updatedTable = res.data;
+        set((state) => ({
+          tables: state.tables.map((t) => t.id === tableId ? updatedTable : t),
+        }));
+        localStorage.setItem('gundaling_cache_tables', JSON.stringify(get().tables));
+      } catch (err) {
+        if (!err.response || err.code === 'ERR_NETWORK') {
+          get().addToQueue('updateTablePosition', { tableId, posX, posY });
+        }
+      }
+    } else {
+      get().addToQueue('updateTablePosition', { tableId, posX, posY });
     }
   },
 
@@ -343,5 +678,17 @@ const useStore = create((set, get) => ({
     });
   },
 }));
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    useStore.getState().processQueue();
+  });
+  // Also try to process queue when store loads initially
+  setTimeout(() => {
+    if (navigator.onLine) {
+      useStore.getState().processQueue();
+    }
+  }, 1000);
+}
 
 export default useStore;
