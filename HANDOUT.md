@@ -43,7 +43,7 @@ C:\laragon\www\gundaling\
 ## Database Schema (Prisma)
 
 ### Users
-- `id` (Int, PK, autoincrement)
+- `id` (String, PK, uuid())
 - `name` (String)
 - `email` (String, unique)
 - `password` (String)
@@ -52,17 +52,17 @@ C:\laragon\www\gundaling\
 - `createdAt`, `updatedAt`
 
 ### Categories
-- `id` (Int, PK, autoincrement)
+- `id` (String, PK, uuid())
 - `name` (String)
 - `sortOrder` (Int)
 - `products` (Product[])
 - `createdAt`, `updatedAt`
 
 ### Products
-- `id` (Int, PK, autoincrement)
+- `id` (String, PK, uuid())
 - `name` (String)
 - `price` (Decimal)
-- `categoryId` (Int, FK → Category.id)
+- `categoryId` (String, FK → Category.id)
 - `image` (String, nullable)
 - `desc` (String, nullable)
 - `badge` (String, nullable)
@@ -73,7 +73,7 @@ C:\laragon\www\gundaling\
 - `createdAt`, `updatedAt`
 
 ### Tables
-- `id` (Int, PK, autoincrement)
+- `id` (String, PK, uuid())
 - `name` (String)
 - `seats` (Int)
 - `shape` (String) - `circle`, `square`, `rectangle`
@@ -85,29 +85,29 @@ C:\laragon\www\gundaling\
 - `createdAt`, `updatedAt`
 
 ### Orders
-- `id` (Int, PK, autoincrement)
-- `tableId` (Int, FK → Table.id)
-- `userId` (Int, FK → User.id)
+- `id` (String, PK, uuid())
+- `tableId` (String, FK → Table.id)
+- `userId` (String, FK → User.id)
 - `status` (Enum: `pending`, `preparing`, `ready`, `served`, `paid`)
 - `total` (Decimal)
 - `items` (OrderItem[])
 - `createdAt`, `updatedAt`
 
 ### OrderItems
-- `id` (Int, PK, autoincrement)
-- `orderId` (Int, FK → Order.id)
-- `productId` (Int, FK → Product.id)
+- `id` (String, PK, uuid())
+- `orderId` (String, FK → Order.id)
+- `productId` (String, FK → Product.id)
 - `qty` (Int)
 - `unitPrice` (Decimal)
 - `sent` (Boolean, default false)
 - `note` (String, nullable)
 
 ### Reservations
-- `id` (Int, PK, autoincrement)
+- `id` (String, PK, uuid())
 - `name` (String)
 - `phone` (String)
 - `guests` (Int)
-- `tableId` (Int, FK → Table.id)
+- `tableId` (String, FK → Table.id)
 - `time` (DateTime)
 - `status` (Enum: `Confirmed`, `Arrived`, `Seated`, `Cancelled`)
 - `createdAt`, `updatedAt`
@@ -177,6 +177,16 @@ All REST endpoints are prefixed with `/api`.
 - **Expeditor Screen Mode**: Fullscreen API (`document.documentElement.requestFullscreen()`) integrated on the KDS view to dedicate full screen real-estate to the kitchen.
 - **Waiter Ready Pickup**: When orders enter `ready` status, tables on the floor plan flash/pulse Green and display a "Food Ready!" badge directly.
 - **Floor Plan Statuses**: Simplified statuses to Available, Dining, Reserved, and Food Ready!. Served/Billed tables map directly to Dining (billed status is removed). Empty, unreserved tables display "Available" fallback text.
+
+### 4. Offline Capability & Data Sync (PWA)
+- **Offline-First Storage**: Replaced `localStorage` with `idb-keyval` (IndexedDB) for async storage of cached tables, categories, products, active orders, active reservations, and the sync queue.
+- **Replay Sync Queue**: Transmissions (e.g. order creations, updates) attempted offline are queued with temporary client-side IDs (`temp-*`) and automatically replayed in order once a websocket connection is re-established.
+- **UI Visual Cues**:
+  - **Connection Pill**: Shows orange warning state and the count of pending sync actions.
+  - **KDS Tickets**: Displays warning badge for pending/offline sync states, restricting transition triggers until successfully synced.
+  - **Floor Plan Tables**: Places an absolute positioned orange cloud-upload badge overlay on tables with unsynced offline updates.
+- **Service Worker Cache**: Built using `vite-plugin-pwa` to cache all static bundles, icons, and pages for seamless offline functionality.
+- **UUID Identity Design**: Migrated primary keys across backend/DB from autoincrement integers to UUID strings to avoid client-side ID assignment conflicts during sync replay.
 
 ---
 
