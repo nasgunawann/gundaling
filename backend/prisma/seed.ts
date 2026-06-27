@@ -1,4 +1,4 @@
-import { PrismaClient, Role } from "@prisma/client";
+import { PrismaClient, Role, TableStatus } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
@@ -93,7 +93,6 @@ async function main() {
 
   const p1 = await prisma.product.create({
     data: {
-      id: 1,
       name: "Truffle Tagliatelle",
       price: 260000,
       categoryId: meals.id,
@@ -107,7 +106,6 @@ async function main() {
 
   const p2 = await prisma.product.create({
     data: {
-      id: 2,
       name: "Crispy Skin Salmon",
       price: 285000,
       categoryId: meals.id,
@@ -121,7 +119,6 @@ async function main() {
 
   const p3 = await prisma.product.create({
     data: {
-      id: 3,
       name: "Heirloom Tomato Salad",
       price: 160000,
       categoryId: meals.id,
@@ -135,7 +132,6 @@ async function main() {
 
   const p4 = await prisma.product.create({
     data: {
-      id: 4,
       name: "Fresh Gundaling Cow Milk",
       price: 65000,
       categoryId: dairy.id,
@@ -149,7 +145,6 @@ async function main() {
 
   const p5 = await prisma.product.create({
     data: {
-      id: 5,
       name: "Single Origin Latte",
       price: 55000,
       categoryId: coffee.id,
@@ -163,7 +158,6 @@ async function main() {
 
   const p6 = await prisma.product.create({
     data: {
-      id: 6,
       name: "Organic Strawberry Gelato",
       price: 85000,
       categoryId: desserts.id,
@@ -177,32 +171,39 @@ async function main() {
   });
 
   const t1 = await prisma.table.create({
-    data: { id: 1, name: "Table 01", seats: 4, shape: "circle", posX: 10, posY: 15, status: "Available" },
+    data: { name: "Table 01", seats: 4, shape: "circle", posX: 10, posY: 15, status: TableStatus.Available },
   });
   const t2 = await prisma.table.create({
-    data: { id: 2, name: "Table 02", seats: 2, shape: "square", posX: 30, posY: 15, status: "Available" },
+    data: { name: "Table 02", seats: 2, shape: "square", posX: 30, posY: 15, status: TableStatus.Available },
   });
   const t3 = await prisma.table.create({
-    data: { id: 3, name: "Table 03", seats: 4, shape: "square", posX: 50, posY: 15, status: "Available" },
+    data: { name: "Table 03", seats: 4, shape: "square", posX: 50, posY: 15, status: TableStatus.Available },
   });
   const t4 = await prisma.table.create({
-    data: { id: 4, name: "Table 04", seats: 4, shape: "square", posX: 70, posY: 15, status: "Available" },
+    data: { name: "Table 04", seats: 4, shape: "square", posX: 70, posY: 15, status: TableStatus.Available },
   });
   const t5 = await prisma.table.create({
-    data: { id: 5, name: "Table 05", seats: 6, shape: "rectangle", posX: 10, posY: 45, status: "Available" },
+    data: { name: "Table 05", seats: 6, shape: "rectangle", posX: 10, posY: 45, status: TableStatus.Available },
   });
   const t6 = await prisma.table.create({
-    data: { id: 6, name: "Table 06", seats: 2, shape: "circle", posX: 30, posY: 45, status: "Available" },
+    data: { name: "Table 06", seats: 2, shape: "circle", posX: 30, posY: 45, status: TableStatus.Available },
   });
   const t7 = await prisma.table.create({
-    data: { id: 7, name: "Table 07", seats: 8, shape: "rectangle", posX: 50, posY: 45, status: "Available" },
+    data: { name: "Table 07", seats: 8, shape: "rectangle", posX: 50, posY: 45, status: TableStatus.Available },
   });
   const t8 = await prisma.table.create({
-    data: { id: 8, name: "Table 08", seats: 6, shape: "rectangle", posX: 70, posY: 45, status: "Available" },
+    data: { name: "Table 08", seats: 6, shape: "rectangle", posX: 70, posY: 45, status: TableStatus.Available },
   });
   const t12 = await prisma.table.create({
-    data: { id: 12, name: "Table 12", seats: 4, shape: "circle", posX: 90, posY: 45, status: "Available" },
+    data: { name: "Table 12", seats: 4, shape: "circle", posX: 90, posY: 45, status: TableStatus.Available },
   });
+
+  // Print created user IDs for the user/frontend use
+  console.log("Users seeded successfully. Credentials:");
+  const users = await prisma.user.findMany();
+  for (const u of users) {
+    console.log(`- Role: ${u.role}, Name: ${u.name}, ID: ${u.id}, PIN: 1234`);
+  }
 }
 
 main()
