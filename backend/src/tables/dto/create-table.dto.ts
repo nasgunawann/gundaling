@@ -4,6 +4,7 @@ import {
   IsInt,
   IsNumber,
   IsOptional,
+  IsIn,
 } from 'class-validator';
 
 export class CreateTableDto {
@@ -29,5 +30,6 @@ export class CreateTableDto {
 
   @IsString()
   @IsOptional()
+  @IsIn(['Available', 'Occupied'])
   status?: string;
 }

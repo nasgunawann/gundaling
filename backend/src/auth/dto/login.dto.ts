@@ -1,11 +1,9 @@
-import { IsInt, IsNotEmpty } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class LoginDto {
-  @Type(() => Number)
-  @IsInt()
+  @IsString()
   @IsNotEmpty()
-  id: number;
+  id: string;
 
   @IsNotEmpty()
   pin: string;

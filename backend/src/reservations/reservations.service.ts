@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { PosGateway } from '../events/pos.gateway';
+import { ReservationStatus } from '@prisma/client';
 
 @Injectable()
 export class ReservationsService {
@@ -34,7 +35,7 @@ export class ReservationsService {
     return reservation;
   }
 
-  async update(id: number, dto: UpdateReservationDto) {
+  async update(id: string, dto: UpdateReservationDto) {
     const resExists = await this.prisma.reservation.findUnique({
       where: { id },
     });
@@ -45,7 +46,7 @@ export class ReservationsService {
     const reservation = await this.prisma.reservation.update({
       where: { id },
       data: {
-        status: dto.status,
+        status: dto.status as ReservationStatus,
       },
       include: { table: true },
     });

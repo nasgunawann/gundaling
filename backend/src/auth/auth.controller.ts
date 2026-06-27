@@ -21,7 +21,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  async getMe(@Request() req: { user: { sub: number } }) {
+  async getMe(@Request() req: { user: { sub: string } }) {
     return this.authService.validateUserById(req.user.sub);
   }
 }

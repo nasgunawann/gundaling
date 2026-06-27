@@ -7,6 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { PosGateway } from '../events/pos.gateway';
+import { OrderStatus } from '@prisma/client';
 
 @Injectable()
 export class OrdersService {
@@ -32,7 +33,7 @@ export class OrdersService {
     });
   }
 
-  async create(dto: CreateOrderDto, userId: number) {
+  async create(dto: CreateOrderDto, userId: string) {
     const table = await this.prisma.table.findUnique({
       where: { id: dto.table_id },
     });
@@ -70,6 +71,7 @@ export class OrdersService {
         data: {
           orderId: order.id,
           productId: item.product_id,
+          productName: product.name,
           qty: item.qty,
           unitPrice: product.price,
           sent,
@@ -98,7 +100,7 @@ export class OrdersService {
     return updatedOrder;
   }
 
-  async transmit(id: number) {
+  async transmit(id: string) {
     const order = await this.prisma.order.findUnique({
       where: { id },
       include: { table: true },
@@ -165,7 +167,7 @@ export class OrdersService {
     });
   }
 
-  async updateStatus(id: number, dto: UpdateOrderStatusDto) {
+  async updateStatus(id: string, dto: UpdateOrderStatusDto) {
     const order = await this.prisma.order.findUnique({
       where: { id },
       include: { table: true },
@@ -177,7 +179,7 @@ export class OrdersService {
 
     await this.prisma.order.update({
       where: { id },
-      data: { status: dto.status },
+      data: { status: dto.status as OrderStatus },
     });
 
     if (dto.status === 'paid') {
@@ -217,7 +219,7 @@ export class OrdersService {
     return updatedOrder;
   }
 
-  private async recalculateOrderTotal(orderId: number) {
+  private async recalculateOrderTotal(orderId: string) {
     const items = await this.prisma.orderItem.findMany({
       where: { orderId },
     });

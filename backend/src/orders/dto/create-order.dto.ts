@@ -6,13 +6,14 @@ import {
   IsOptional,
   IsString,
   IsBoolean,
+  IsUUID,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class OrderItemDto {
-  @IsInt()
+  @IsUUID()
   @IsNotEmpty()
-  product_id: number;
+  product_id: string;
 
   @IsInt()
   @IsNotEmpty()
@@ -28,9 +29,9 @@ export class OrderItemDto {
 }
 
 export class CreateOrderDto {
-  @IsInt()
+  @IsUUID()
   @IsNotEmpty()
-  table_id: number;
+  table_id: string;
 
   @IsArray()
   @ValidateNested({ each: true })

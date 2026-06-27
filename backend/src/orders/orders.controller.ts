@@ -5,7 +5,6 @@ import {
   Put,
   Body,
   Param,
-  ParseIntPipe,
   UseGuards,
   Request,
 } from '@nestjs/common';
@@ -27,19 +26,19 @@ export class OrdersController {
   @Post()
   async create(
     @Body() dto: CreateOrderDto,
-    @Request() req: { user: { sub: number } },
+    @Request() req: { user: { sub: string } },
   ) {
     return this.ordersService.create(dto, req.user.sub);
   }
 
   @Post(':id/transmit')
-  async transmit(@Param('id', ParseIntPipe) id: number) {
+  async transmit(@Param('id') id: string) {
     return this.ordersService.transmit(id);
   }
 
   @Put(':id/status')
   async updateStatus(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() dto: UpdateOrderStatusDto,
   ) {
     return this.ordersService.updateStatus(id, dto);

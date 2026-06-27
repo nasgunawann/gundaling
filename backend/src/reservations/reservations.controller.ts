@@ -5,7 +5,6 @@ import {
   Put,
   Body,
   Param,
-  ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
 import { ReservationsService } from './reservations.service';
@@ -29,10 +28,7 @@ export class ReservationsController {
   }
 
   @Put(':id')
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateReservationDto,
-  ) {
+  async update(@Param('id') id: string, @Body() dto: UpdateReservationDto) {
     return this.reservationsService.update(id, dto);
   }
 }

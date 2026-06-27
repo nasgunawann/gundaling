@@ -19,9 +19,13 @@ export class JwtAuthGuard implements CanActivate {
     if (!token) {
       throw new UnauthorizedException();
     }
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new UnauthorizedException('JWT Secret configuration missing');
+    }
     try {
       const payload: unknown = await this.jwtService.verifyAsync(token, {
-        secret: process.env.JWT_SECRET || 'restoran-secret-key-12345',
+        secret,
       });
       request.user = payload;
     } catch {

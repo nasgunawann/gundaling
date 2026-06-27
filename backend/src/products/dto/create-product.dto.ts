@@ -2,7 +2,6 @@ import {
   IsString,
   IsNotEmpty,
   IsNumber,
-  IsInt,
   IsOptional,
   IsBoolean,
   IsObject,
@@ -17,9 +16,9 @@ export class CreateProductDto {
   @IsNotEmpty()
   price: number;
 
-  @IsInt()
+  @IsString()
   @IsNotEmpty()
-  categoryId: number;
+  categoryId: string;
 
   @IsString()
   @IsOptional()

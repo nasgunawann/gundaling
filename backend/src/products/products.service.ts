@@ -38,7 +38,7 @@ export class ProductsService {
     return product;
   }
 
-  async update(id: number, dto: UpdateProductDto) {
+  async update(id: string, dto: UpdateProductDto) {
     const product = await this.prisma.product.update({
       where: { id },
       data: {
@@ -52,7 +52,7 @@ export class ProductsService {
     return product;
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     await this.prisma.product.delete({ where: { id } });
     this.posGateway.emitEvent('product.deleted', id);
     return { success: true };

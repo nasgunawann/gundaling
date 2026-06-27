@@ -6,7 +6,6 @@ import {
   Delete,
   Body,
   Param,
-  ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
 import { TablesService } from './tables.service';
@@ -35,17 +34,14 @@ export class TablesController {
   }
 
   @Put(':id')
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateTableDto,
-  ) {
+  async update(@Param('id') id: string, @Body() dto: UpdateTableDto) {
     return this.tablesService.update(id, dto);
   }
 
   @Delete(':id')
   @UseGuards(RolesGuard)
   @Roles(Role.Manager)
-  async remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Param('id') id: string) {
     return this.tablesService.remove(id);
   }
 }

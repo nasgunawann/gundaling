@@ -6,7 +6,6 @@ import {
   Delete,
   Body,
   Param,
-  ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
@@ -37,17 +36,14 @@ export class ProductsController {
   @Put(':id')
   @UseGuards(RolesGuard)
   @Roles(Role.Manager)
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateProductDto,
-  ) {
+  async update(@Param('id') id: string, @Body() dto: UpdateProductDto) {
     return this.productsService.update(id, dto);
   }
 
   @Delete(':id')
   @UseGuards(RolesGuard)
   @Roles(Role.Manager)
-  async remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Param('id') id: string) {
     return this.productsService.remove(id);
   }
 }

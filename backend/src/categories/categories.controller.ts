@@ -6,7 +6,6 @@ import {
   Delete,
   Body,
   Param,
-  ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
@@ -37,17 +36,14 @@ export class CategoriesController {
   @Put(':id')
   @UseGuards(RolesGuard)
   @Roles(Role.Manager)
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateCategoryDto,
-  ) {
+  async update(@Param('id') id: string, @Body() dto: UpdateCategoryDto) {
     return this.categoriesService.update(id, dto);
   }
 
   @Delete(':id')
   @UseGuards(RolesGuard)
   @Roles(Role.Manager)
-  async remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Param('id') id: string) {
     return this.categoriesService.remove(id);
   }
 }

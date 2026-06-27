@@ -28,7 +28,7 @@ export class CategoriesService {
     return category;
   }
 
-  async update(id: number, dto: UpdateCategoryDto) {
+  async update(id: string, dto: UpdateCategoryDto) {
     const category = await this.prisma.category.update({
       where: { id },
       data: dto,
@@ -37,7 +37,7 @@ export class CategoriesService {
     return category;
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     await this.prisma.category.delete({ where: { id } });
     this.posGateway.emitEvent('category.deleted', id);
     return { success: true };

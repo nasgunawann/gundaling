@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateTableDto } from './dto/create-table.dto';
 import { UpdateTableDto } from './dto/update-table.dto';
 import { PosGateway } from '../events/pos.gateway';
+import { TableStatus } from '@prisma/client';
 
 @Injectable()
 export class TablesService {
@@ -23,14 +24,14 @@ export class TablesService {
         shape: dto.shape,
         posX: dto.posX,
         posY: dto.posY,
-        status: dto.status ?? 'Available',
+        status: (dto.status as TableStatus) ?? TableStatus.Available,
       },
     });
     this.posGateway.emitEvent('table.created', table);
     return table;
   }
 
-  async update(id: number, dto: UpdateTableDto) {
+  async update(id: string, dto: UpdateTableDto) {
     const tableExists = await this.prisma.table.findUnique({
       where: { id },
     });
@@ -38,10 +39,10 @@ export class TablesService {
       throw new NotFoundException(`Table with ID ${id} not found`);
     }
 
-    const data: { posX?: number; posY?: number; status?: string } = {};
+    const data: { posX?: number; posY?: number; status?: TableStatus } = {};
     if (dto.pos_x !== undefined) data.posX = dto.pos_x;
     if (dto.pos_y !== undefined) data.posY = dto.pos_y;
-    if (dto.status !== undefined) data.status = dto.status;
+    if (dto.status !== undefined) data.status = dto.status as TableStatus;
 
     const table = await this.prisma.table.update({
       where: { id },
@@ -51,7 +52,7 @@ export class TablesService {
     return table;
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     await this.prisma.table.delete({ where: { id } });
     this.posGateway.emitEvent('table.deleted', id);
     return { success: true };

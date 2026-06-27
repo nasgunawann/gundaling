@@ -13,9 +13,9 @@ export class CreateReservationDto {
   @IsNotEmpty()
   guests: number;
 
-  @IsInt()
+  @IsString()
   @IsNotEmpty()
-  tableId: number;
+  tableId: string;
 
   @IsDateString()
   @IsNotEmpty()
