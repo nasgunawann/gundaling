@@ -109,7 +109,7 @@ export default function App() {
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
-      <div className={`flex-1 ${isSidebarCollapsed ? 'md:ml-[80px]' : 'md:ml-[280px]'} ml-0 h-screen overflow-hidden flex flex-col transition-all duration-300`}>
+      <div className={`flex-1 ${isSidebarCollapsed ? 'md:ml-[80px]' : 'md:ml-[280px]'} ml-0 h-screen overflow-hidden flex flex-col`}>
         {currentView === 'floor-plan' && (
           <FloorPlan 
             onTableClick={(tableName) => {

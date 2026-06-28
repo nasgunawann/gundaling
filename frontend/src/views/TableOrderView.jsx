@@ -307,17 +307,16 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
               <div
                 key={p.id}
                 onClick={() => handleAddToCart(p)}
-                className={`bg-surface rounded-2xl overflow-hidden border border-outline-variant/35 shadow-[0_4px_12px_rgba(0,0,0,0.02)] transition-all duration-200 flex flex-col justify-between group ${p.outOfStock
+                className={`bg-surface rounded-2xl overflow-hidden border border-outline-variant/35 shadow-sm flex flex-col justify-between group ${p.outOfStock
                     ? 'opacity-50 cursor-not-allowed select-none'
-                    : 'hover:shadow-[0_8px_24px_rgba(0,0,0,0.05)] cursor-pointer active:scale-[0.98]'
+                    : 'cursor-pointer active:scale-[0.98]'
                   }`}
               >
                 <div>
                   <div className="aspect-[4/3] bg-surface-container-highest relative overflow-hidden">
                     <img
                       alt={p.name}
-                      className={`w-full h-full object-cover transition-transform duration-300 ${p.outOfStock ? 'grayscale' : 'group-hover:scale-105'
-                        }`}
+                      className={`w-full h-full object-cover ${p.outOfStock ? 'grayscale' : ''}`}
                       src={p.image}
                     />
                     <span className={`absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest shadow-sm ${p.outOfStock ? 'bg-error text-on-error' : 'bg-primary text-on-primary'
@@ -326,8 +325,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
                     </span>
                   </div>
                   <div className="p-3 pb-2">
-                    <h3 className={`font-display font-bold text-xs mb-0.5 leading-snug truncate transition-colors ${p.outOfStock ? 'text-on-surface/60' : 'text-on-surface group-hover:text-primary'
-                      }`}>
+                    <h3 className={`font-display font-bold text-xs mb-0.5 leading-snug truncate ${p.outOfStock ? 'text-on-surface/60' : 'text-on-surface'}`}>
                       {p.name}
                     </h3>
                     <p className={`text-[10px] line-clamp-1 leading-relaxed ${p.outOfStock ? 'text-on-surface-variant/40' : 'text-on-surface-variant/80'

@@ -14,7 +14,7 @@ export default function Sidebar({ currentView, onViewChange, user, onLogout, isC
   ]
 
   return (
-    <aside className={`relative md:fixed md:left-0 md:top-0 h-auto md:h-full bg-surface-container-low md:border-r border-outline-variant/30 flex flex-col z-50 font-display transition-all duration-300 ${
+    <aside className={`relative md:fixed md:left-0 md:top-0 h-auto md:h-full bg-surface-container-low md:border-r border-outline-variant/30 flex flex-col z-50 font-display transition-all duration-75 ${
       isCollapsed ? 'w-full md:w-[80px]' : 'w-full md:w-[280px]'
     }`}>
       {/* Branding */}

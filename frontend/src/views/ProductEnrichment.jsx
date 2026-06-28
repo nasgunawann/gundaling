@@ -208,17 +208,17 @@ export default function ProductEnrichment({ products }) {
               <div 
                 key={p.id} 
                 onClick={() => handleSelectProduct(p)}
-                className={`bg-surface rounded-3xl overflow-hidden border transition-all duration-200 cursor-pointer flex flex-col justify-between group shadow-sm ${
+                className={`bg-surface rounded-3xl overflow-hidden border cursor-pointer flex flex-col justify-between group shadow-sm ${
                   selectedProduct?.id === p.id 
                     ? 'ring-2 ring-primary ring-offset-2 border-primary' 
-                    : 'border-outline-variant/35 hover:shadow-md'
+                    : 'border-outline-variant/35 shadow-sm'
                 }`}
               >
                 <div>
                   <div className="aspect-[16/10] bg-surface-container-highest relative overflow-hidden">
                     <img 
                       alt={p.name} 
-                      className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
+                      className="w-full h-full object-cover"
                       src={p.image}
                     />
                     <span className="absolute top-2.5 left-2.5 bg-primary text-on-primary px-2.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest shadow-sm">
@@ -226,7 +226,7 @@ export default function ProductEnrichment({ products }) {
                     </span>
                   </div>
                   <div className="p-3 pb-2">
-                    <h3 className="font-display font-bold text-xs text-on-surface mb-0.5 leading-snug group-hover:text-primary transition-colors truncate">
+                    <h3 className="font-display font-bold text-xs text-on-surface mb-0.5 leading-snug truncate">
                       {p.name}
                     </h3>
                     <p className="text-[10px] text-on-surface-variant/80 line-clamp-1 leading-relaxed">

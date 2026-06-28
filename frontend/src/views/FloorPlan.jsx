@@ -327,7 +327,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                     cursor: isEditMode ? 'move' : 'pointer',
                     zIndex: 20
                   }}
-                  className={`transition-shadow duration-200 ${isEditMode ? 'hover:scale-[1.02] hover:shadow-lg' : ''}`}
+                  className={`${isEditMode ? 'hover:shadow-lg' : ''}`}
                 >
                   {isTablePendingSync && (
                     <span className="absolute -top-3 -right-1 bg-status-warning text-status-on-warning text-[8px] font-extrabold p-1 rounded-full uppercase tracking-wider shadow-md animate-pulse z-30 border border-surface flex items-center justify-center" title="Pending Sync">

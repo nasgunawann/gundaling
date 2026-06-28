@@ -126,12 +126,12 @@ export default function WaiterLogin({ onLoginSuccess }) {
 
             <div className="flex flex-col gap-1.5">
               <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-1">Secure PIN</label>
-              <div className="flex justify-between items-center bg-surface-container-low h-12 md:h-14 rounded-xl px-8 border-2 border-transparent focus-within:border-primary transition-all shadow-sm">
+              <div className="flex justify-between items-center bg-surface-container-low h-12 md:h-14 rounded-xl px-8 border-2 border-transparent focus-within:border-primary shadow-sm">
                 <div className="flex gap-4">
                   {[0, 1, 2, 3].map((index) => (
                     <div
                       key={index}
-                      className={`w-3.5 h-3.5 rounded-full transition-all duration-150 ${index < pin.length ? 'bg-primary scale-110 shadow-sm' : 'bg-outline-variant/60'
+                      className={`w-3.5 h-3.5 rounded-full ${index < pin.length ? 'bg-primary scale-110 shadow-sm' : 'bg-outline-variant/60'
                         }`}
                     />
                   ))}
@@ -141,7 +141,7 @@ export default function WaiterLogin({ onLoginSuccess }) {
             </div>
 
             {errorMsg && (
-              <div className="text-error text-xs font-bold text-center mt-0.5 flex items-center justify-center gap-1.5 bg-error/10 py-2 rounded-lg border border-error/20 animate-in fade-in duration-200">
+              <div className="text-error text-xs font-bold text-center mt-0.5 flex items-center justify-center gap-1.5 bg-error/10 py-2 rounded-lg border border-error/20">
                 <span className="material-symbols-outlined text-sm">error</span>
                 {errorMsg}
               </div>

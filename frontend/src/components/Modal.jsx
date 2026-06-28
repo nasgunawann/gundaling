@@ -6,7 +6,7 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = 'ma
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/60">
       <div 
-        className={`bg-surface w-full ${maxWidth} rounded-3xl shadow-[0_16px_36px_rgba(0,0,0,0.12)] p-8 border border-outline-variant/30 animate-in fade-in zoom-in-95 duration-200`}
+        className={`bg-surface w-full ${maxWidth} rounded-3xl shadow-[0_16px_36px_rgba(0,0,0,0.12)] p-8 border border-outline-variant/30`}
         role="dialog"
         aria-modal="true"
       >
