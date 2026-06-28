@@ -10,7 +10,7 @@ import useStore from './store'
 import { useNotification } from './components/NotificationProvider'
 
 export default function App() {
-  const { showToast } = useNotification()
+  const { showToast, showConfirm } = useNotification()
   const [currentView, setCurrentView] = useState(() => localStorage.getItem('gundaling_current_view') || 'floor-plan')
   const [selectedTable, setSelectedTable] = useState(() => localStorage.getItem('gundaling_selected_table') || 'Table 12')
   const [tableCarts, setTableCarts] = useState({})
@@ -88,6 +88,12 @@ export default function App() {
   }, [orders])
 
   const handleLogout = async () => {
+    const confirmed = await showConfirm(
+      'Log Out Staff',
+      'Are you sure you want to end your active shifts and log out of the POS system?'
+    )
+    if (!confirmed) return
+
     await logoutStore()
     localStorage.removeItem('gundaling_current_view')
     localStorage.removeItem('gundaling_selected_table')
