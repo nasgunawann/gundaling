@@ -21,7 +21,7 @@ export default function Sidebar({ currentView, onViewChange, user, onLogout, isC
       <div className={`px-4 py-6 flex flex-col items-center justify-center border-b border-outline-variant/10 mb-2 relative`}>
         {!isCollapsed ? (
           <div className="w-full flex flex-col items-center justify-center gap-4">
-            <div className="h-12 flex items-center justify-center">
+            <div className="h-20 flex items-center justify-center">
               <img src="/logo.png" alt="Gundaling Logo" className="h-full w-auto object-contain" />
             </div>
             <button 
@@ -38,7 +38,7 @@ export default function Sidebar({ currentView, onViewChange, user, onLogout, isC
           </div>
         ) : (
           <div className="flex flex-col items-center gap-3">
-            <div className="h-8 w-8 flex items-center justify-center">
+            <div className="h-12 w-12 flex items-center justify-center">
               <img src="/logo.png" alt="Gundaling Logo" className="h-full w-auto object-contain" />
             </div>
             <button 

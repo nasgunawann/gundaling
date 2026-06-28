@@ -71,11 +71,11 @@ export default function WaiterLogin({ onLoginSuccess }) {
         ></div>
 
         <div className="relative z-10 flex flex-col gap-unit">
-          <div className="h-10 md:h-16 flex items-center justify-start mb-3 md:mb-6">
+          <div className="h-10 md:h-20 flex items-center justify-start mb-3 md:mb-6">
             <img src="/logo.png" alt="Gundaling Farmstead Logo" className="h-full w-auto object-contain" />
           </div>
           <h1 className="font-display font-bold text-display-lg leading-tight text-[28px] md:text-[40px] text-on-primary">
-            Gundaling<br />Farmstead
+            Gundaling Farmstead
           </h1>
           <p className="hidden md:block text-body-lg opacity-80 max-w-xs leading-relaxed mt-2">
             Premium Farm-to-Table Experience & Service Management System.
@@ -88,7 +88,7 @@ export default function WaiterLogin({ onLoginSuccess }) {
             <span className="font-semibold text-[10px] md:text-xs tracking-wider uppercase">POS Connected</span>
           </div>
           <p className="text-[9px] md:text-[10px] font-bold mt-0 md:mt-4 opacity-50 uppercase tracking-widest">
-            Version 4.2.1
+            Version {import.meta.env.VITE_APP_VERSION || '-'}
           </p>
         </div>
 
@@ -194,7 +194,7 @@ export default function WaiterLogin({ onLoginSuccess }) {
 
           <div className="flex justify-between w-full text-[10px] md:text-xs font-semibold text-outline px-2">
             <button onClick={() => alert("Please contact your administrator or manager to reset your secure PIN.")} className="hover:text-primary transition-colors">Forgot PIN?</button>
-            <button onClick={() => alert("Gundaling POS v4.2.1 - System fully operational.")} className="hover:text-primary transition-colors">System Support</button>
+            <button onClick={() => alert(`Gundaling POS v${import.meta.env.VITE_APP_VERSION || '-'} - System fully operational.`)} className="hover:text-primary transition-colors">System Support</button>
           </div>
         </div>
       </div>
