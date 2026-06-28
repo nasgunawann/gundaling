@@ -2,7 +2,7 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: `http://${window.location.hostname}:8000/api`,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -20,7 +20,7 @@ api.interceptors.request.use((config) => {
 });
 
 export const initSocket = (token) => {
-  const socket = io('http://localhost:8000', {
+  const socket = io(`http://${window.location.hostname}:8000`, {
     auth: {
       token,
     },
