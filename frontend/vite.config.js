@@ -2,7 +2,10 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
+const host = process.env.TAURI_DEV_HOST
+
 export default defineConfig({
+  clearScreen: false,
   plugins: [
     react(),
     VitePWA({
@@ -47,8 +50,19 @@ export default defineConfig({
   ],
   server: {
     port: 5173,
-    host: true,
+    strictPort: true,
+    host: host || true,
     allowedHosts: true,
+    hmr: host
+      ? {
+          protocol: 'ws',
+          host,
+          port: 1421,
+        }
+      : undefined,
+    watch: {
+      ignored: ['**/src-tauri/**'],
+    },
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:8000',
