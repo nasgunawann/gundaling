@@ -12,3 +12,4 @@ backend/storage/logs/
 .vscode/
 .idea/
 .DS_Store
+HANDOUT.md
