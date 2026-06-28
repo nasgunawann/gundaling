@@ -246,7 +246,7 @@ export default function CartDrawer({
       {isCartOpen && (
         <div 
           onClick={() => setIsCartOpen(false)}
-          className="fixed inset-0 bg-black/40 backdrop-blur-xs z-40 transition-opacity duration-300"
+          className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
         />
       )}
 

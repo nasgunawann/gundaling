@@ -215,7 +215,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
   return (
     <div className="flex-1 flex flex-col bg-background h-full w-full overflow-hidden">
       {/* Top Header */}
-      <header className="h-20 bg-surface/80 backdrop-blur-md flex justify-between items-center px-container_margin border-b border-outline-variant/10 z-10 font-display">
+      <header className="h-20 bg-surface flex justify-between items-center px-container_margin border-b border-outline-variant/10 z-10 font-display">
         <div className="flex items-center gap-4">
           <div>
             <h2 className="text-xl font-bold text-on-surface leading-tight">Table Management</h2>
@@ -290,7 +290,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
           }}
         >
           {isLoading ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-surface/30 backdrop-blur-sm z-30">
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-surface/80 z-30">
               <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-3 text-primary animate-spin">
                 <span className="material-symbols-outlined text-2xl font-bold">sync</span>
               </div>

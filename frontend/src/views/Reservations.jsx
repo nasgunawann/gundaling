@@ -109,7 +109,7 @@ export default function Reservations({ reservations, onSeatGuest }) {
   return (
     <div className="flex-1 flex flex-col bg-background h-full w-full overflow-hidden">
       {/* Header */}
-      <header className="h-20 bg-surface/80 backdrop-blur-md flex justify-between items-center px-container_margin border-b border-outline-variant/10 z-10">
+      <header className="h-20 bg-surface flex justify-between items-center px-container_margin border-b border-outline-variant/10 z-10">
         <div className="flex items-center gap-4">
           <div>
             <h2 className="text-xl font-bold text-on-surface font-display leading-tight">Reservation & Guest Management</h2>

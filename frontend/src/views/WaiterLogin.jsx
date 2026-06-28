@@ -83,7 +83,7 @@ export default function WaiterLogin({ onLoginSuccess }) {
         </div>
 
         <div className="relative z-10 flex md:flex-col justify-between items-center md:items-start w-full">
-          <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md rounded-full px-4 py-1.5 md:px-6 md:py-3 w-fit border border-white/10">
+          <div className="flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 md:px-6 md:py-3 w-fit border border-white/10">
             <div className="w-2 h-2 md:w-2.5 md:h-2.5 bg-green-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(74,222,128,0.5)]"></div>
             <span className="font-semibold text-[10px] md:text-xs tracking-wider uppercase">POS Connected</span>
           </div>

@@ -161,7 +161,7 @@ export default function ProductEnrichment({ products }) {
       <div className="flex-1 flex flex-col h-full overflow-hidden border-r border-outline-variant/20">
         
         {/* Header */}
-        <header className="h-20 bg-surface/80 backdrop-blur-md flex justify-between items-center px-container_margin border-b border-outline-variant/10 z-10 font-display">
+        <header className="h-20 bg-surface flex justify-between items-center px-container_margin border-b border-outline-variant/10 z-10 font-display">
           <div className="flex items-center gap-4 flex-1">
             <div className="relative w-full max-w-xs">
               <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-base">search</span>

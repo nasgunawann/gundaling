@@ -148,7 +148,7 @@ export default function KitchenDisplay({ setIsSidebarCollapsed }) {
   return (
     <div className="flex-1 flex flex-col bg-background h-full w-full overflow-hidden">
       {/* Top Header */}
-      <header className="h-20 bg-surface/80 backdrop-blur-md flex justify-between items-center px-container_margin border-b border-outline-variant/10 z-10 font-display shrink-0">
+      <header className="h-20 bg-surface flex justify-between items-center px-container_margin border-b border-outline-variant/10 z-10 font-display shrink-0">
         <div>
           <h2 className="text-xl font-bold text-on-surface leading-tight">Kitchen Displays</h2>
           <p className="text-xs text-on-surface-variant/80 uppercase tracking-widest mt-0.5">

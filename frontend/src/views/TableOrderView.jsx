@@ -245,7 +245,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
       <div className="flex-1 flex flex-col h-full overflow-hidden lg:border-r border-outline-variant/20">
 
         {/* Header with Table Selection Selector */}
-        <header className="h-20 bg-surface/80 backdrop-blur-md flex justify-between items-center px-container_margin border-b border-outline-variant/10 z-10 font-display shrink-0">
+        <header className="h-20 bg-surface flex justify-between items-center px-container_margin border-b border-outline-variant/10 z-10 font-display shrink-0">
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-4">
               <div className="flex flex-col">
