@@ -18,15 +18,15 @@ export default function Sidebar({ currentView, onViewChange, user, onLogout, isC
       isCollapsed ? 'w-full md:w-[80px]' : 'w-full md:w-[280px]'
     }`}>
       {/* Branding */}
-      <div className={`px-6 py-6 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} border-b border-outline-variant/10 mb-2`}>
+      <div className={`px-4 py-6 flex flex-col items-center justify-center border-b border-outline-variant/10 mb-2 relative`}>
         {!isCollapsed ? (
-          <>
-            <h1 className="font-display text-primary leading-tight font-bold text-[28px] tracking-tight">
-              Gundaling
-            </h1>
+          <div className="w-full flex flex-col items-center justify-center gap-4">
+            <div className="h-12 flex items-center justify-center">
+              <img src="/logo.png" alt="Gundaling Logo" className="h-full w-auto object-contain" />
+            </div>
             <button 
               onClick={onToggleCollapse}
-              className="hidden md:flex items-center justify-center w-8 h-8 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-on-primary transition-all duration-200 border border-primary/20 shadow-sm active:scale-95 touch-manipulation focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+              className="absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex items-center justify-center w-8 h-8 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-on-primary transition-all duration-200 border border-primary/20 shadow-sm active:scale-95 touch-manipulation focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
               title="Collapse Sidebar"
               aria-label="Collapse Sidebar"
               aria-expanded="true"
@@ -35,19 +35,24 @@ export default function Sidebar({ currentView, onViewChange, user, onLogout, isC
                 chevron_left
               </span>
             </button>
-          </>
+          </div>
         ) : (
-          <button 
-            onClick={onToggleCollapse}
-            className="hidden md:flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-on-primary transition-all duration-200 border border-primary/20 shadow-sm active:scale-95 touch-manipulation focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
-            title="Expand Sidebar"
-            aria-label="Expand Sidebar"
-            aria-expanded="false"
-          >
-            <span className="material-symbols-outlined text-base font-bold">
-              chevron_right
-            </span>
-          </button>
+          <div className="flex flex-col items-center gap-3">
+            <div className="h-8 w-8 flex items-center justify-center">
+              <img src="/logo.png" alt="Gundaling Logo" className="h-full w-auto object-contain" />
+            </div>
+            <button 
+              onClick={onToggleCollapse}
+              className="hidden md:flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-on-primary transition-all duration-200 border border-primary/20 shadow-sm active:scale-95 touch-manipulation focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+              title="Expand Sidebar"
+              aria-label="Expand Sidebar"
+              aria-expanded="false"
+            >
+              <span className="material-symbols-outlined text-base font-bold">
+                chevron_right
+              </span>
+            </button>
+          </div>
         )}
       </div>
 
