@@ -124,14 +124,14 @@ export default function KitchenDisplay({ setIsSidebarCollapsed }) {
   };
 
   const getSlaTimerStyles = (elapsedMins) => {
-    if (elapsedMins >= 15) {
+    if (elapsedMins >= 25) {
       return {
         cardBorder: 'bg-surface shadow-lg ring-1 ring-status-danger/15',
         headerBg: 'bg-status-danger text-status-on-danger',
         timerBadge: 'bg-white/20 text-white border border-white/20 font-mono font-bold',
       };
     }
-    if (elapsedMins >= 10) {
+    if (elapsedMins >= 15) {
       return {
         cardBorder: 'bg-surface shadow-md ring-1 ring-status-warning/15',
         headerBg: 'bg-status-warning text-status-on-warning',

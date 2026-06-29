@@ -34,6 +34,8 @@ export class TablesController {
   }
 
   @Put(':id')
+  @UseGuards(RolesGuard)
+  @Roles(Role.Manager, Role.Server)
   async update(@Param('id') id: string, @Body() dto: UpdateTableDto) {
     return this.tablesService.update(id, dto);
   }

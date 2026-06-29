@@ -1,5 +1,6 @@
 import React from 'react';
 import ReceiptModal from './ReceiptModal';
+import useStore from '../store';
 
 export default function CartDrawer({
   isCartOpen,
@@ -26,6 +27,8 @@ export default function CartDrawer({
   setShowReceiptModal,
   handleTriggerSystemPrint
 }) {
+  const user = useStore((state) => state.user)
+  const isManager = user?.role === 'Manager'
   return (
     <>
       {/* RIGHT: High-density Collapsible Billing & Cart Summary Side Panel */}

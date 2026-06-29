@@ -6,7 +6,7 @@ import WebsocketStatus from '../components/WebsocketStatus';
 import Modal from '../components/Modal';
 
 export default function FloorPlan({ onTableClick, user, tableCarts, tables: backendTables }) {
-  const { showToast, showConfirm } = useNotification();
+  const { showToast, showConfirm, requestManagerApproval } = useNotification();
   const containerRef = useRef(null);
 
   const updateTablePosition = useStore((state) => state.updateTablePosition);
@@ -23,6 +23,13 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
   const [newTableName, setNewTableName] = useState('');
   const [newTableSeats, setNewTableSeats] = useState(4);
   const [newTableShape, setNewTableShape] = useState('square');
+
+  // Edit table modal states
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingTable, setEditingTable] = useState(null);
+  const [editTableName, setEditTableName] = useState('');
+  const [editTableSeats, setEditTableSeats] = useState(4);
+  const [editTableShape, setEditTableShape] = useState('square');
 
   const isLoading = loading && (!backendTables || backendTables.length === 0);
   const rawTables = backendTables && backendTables.length > 0 ? backendTables : [];
@@ -165,22 +172,59 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
     }
   };
 
+  const handleEditTableClick = (table, e) => {
+    e.stopPropagation();
+    setEditingTable(table);
+    setEditTableName(table.name);
+    setEditTableSeats(table.seats);
+    setEditTableShape(table.shape);
+    setShowEditModal(true);
+  };
+
+  const handleEditTableSubmit = async (e) => {
+    e.preventDefault();
+    if (!editTableName.trim()) {
+      showToast('Please specify a table name.', 'error');
+      return;
+    }
+
+    try {
+      await api.put(`/tables/${editingTable.id}`, {
+        name: editTableName,
+        seats: parseInt(editTableSeats),
+        shape: editTableShape,
+      });
+
+      showToast(`Table "${editTableName}" updated successfully!`, 'success');
+      setShowEditModal(false);
+      setEditingTable(null);
+      await fetchInitialData();
+    } catch (err) {
+      console.error(err);
+      showToast(err.response?.data?.message || 'Failed to update table properties.', 'error');
+    }
+  };
+
   const handleDeleteTable = async (table, e) => {
     e.stopPropagation();
-    const confirmed = await showConfirm(
-      'Delete Table',
-      `Are you sure you want to remove "${table.name}" from the floor plan?`
-    );
+    if (user?.role !== 'Manager') {
+      const authorized = await requestManagerApproval('Delete Table requires Supervisor PIN override.')
+      if (!authorized) return
+    } else {
+      const confirmed = await showConfirm(
+        'Delete Table',
+        `Are you sure you want to remove "${table.name}" from the floor plan?`
+      );
+      if (!confirmed) return
+    }
 
-    if (confirmed) {
-      try {
-        await api.delete(`/tables/${table.id}`);
-        showToast(`Table "${table.name}" deleted successfully.`, 'success');
-        await fetchInitialData();
-      } catch (err) {
-        console.error(err);
-        showToast('Failed to delete table.', 'error');
-      }
+    try {
+      await api.delete(`/tables/${table.id}`);
+      showToast(`Table "${table.name}" deleted successfully.`, 'success');
+      await fetchInitialData();
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to delete table.', 'error');
     }
   };
 
@@ -410,13 +454,22 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                   </button>
 
                   {isEditMode && (
-                    <button
-                      onClick={(e) => handleDeleteTable(table, e)}
-                      className="absolute -top-2 -right-2 w-6 h-6 bg-error text-on-error rounded-full flex items-center justify-center shadow-md hover:scale-110 active:scale-95 transition-all border border-surface"
-                      title="Delete Table"
-                    >
-                      <span className="material-symbols-outlined text-xs font-bold">close</span>
-                    </button>
+                    <>
+                      <button
+                        onClick={(e) => handleEditTableClick(table, e)}
+                        className="absolute -top-2 -left-2 w-6 h-6 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-md hover:scale-110 active:scale-95 transition-all border border-surface"
+                        title="Edit Table Properties"
+                      >
+                        <span className="material-symbols-outlined text-[10px] font-bold">edit</span>
+                      </button>
+                      <button
+                        onClick={(e) => handleDeleteTable(table, e)}
+                        className="absolute -top-2 -right-2 w-6 h-6 bg-error text-on-error rounded-full flex items-center justify-center shadow-md hover:scale-110 active:scale-95 transition-all border border-surface"
+                        title="Delete Table"
+                      >
+                        <span className="material-symbols-outlined text-xs font-bold">close</span>
+                      </button>
+                    </>
                   )}
                 </div>
               );
@@ -474,6 +527,62 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
             className="w-full h-12 bg-primary text-on-primary rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-md mt-6 text-xs uppercase tracking-wider"
           >
             Register Table
+          </button>
+        </form>
+      </Modal>
+
+      {/* Edit Table Modal */}
+      <Modal 
+        isOpen={showEditModal} 
+        onClose={() => {
+          setShowEditModal(false);
+          setEditingTable(null);
+        }} 
+        title="Edit Table Properties"
+        maxWidth="max-w-sm"
+      >
+        <form onSubmit={handleEditTableSubmit} className="space-y-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Table Identifier</label>
+            <input 
+              type="text" 
+              value={editTableName} 
+              onChange={(e) => setEditTableName(e.target.value)}
+              placeholder="e.g. Table 15"
+              required
+              className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-xs font-semibold shadow-sm focus:ring-2 focus:ring-primary"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Seats Count</label>
+            <select 
+              value={editTableSeats} 
+              onChange={(e) => setEditTableSeats(parseInt(e.target.value))}
+              className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-xs font-semibold shadow-sm focus:ring-2 focus:ring-primary cursor-pointer"
+            >
+              {[2, 4, 6, 8, 10, 12].map(n => <option key={n} value={n}>{n} Seats</option>)}
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Table Shape</label>
+            <select 
+              value={editTableShape} 
+              onChange={(e) => setEditTableShape(e.target.value)}
+              className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-xs font-semibold shadow-sm focus:ring-2 focus:ring-primary cursor-pointer"
+            >
+              <option value="circle">Circle</option>
+              <option value="square">Square</option>
+              <option value="rectangle">Rectangle</option>
+            </select>
+          </div>
+
+          <button 
+            type="submit"
+            className="w-full h-12 bg-primary text-on-primary rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-md mt-6 text-xs uppercase tracking-wider"
+          >
+            Save Changes
           </button>
         </form>
       </Modal>

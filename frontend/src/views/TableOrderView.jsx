@@ -4,7 +4,7 @@ import useStore from '../store'
 import CartDrawer from '../components/CartDrawer'
 
 export default function TableOrderView({ selectedTable, setSelectedTable, products, tableCarts, setTableCarts }) {
-  const { showToast, showConfirm } = useNotification()
+  const { showToast, showConfirm, requestManagerApproval } = useNotification()
   const [activeCategory, setActiveCategory] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
   const [isPrinting, setIsPrinting] = useState(false)
@@ -21,6 +21,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
   const submitOrderStore = useStore((state) => state.submitOrder)
   const updateOrderStatusStore = useStore((state) => state.updateOrderStatus)
   const updateReservationStore = useStore((state) => state.updateReservation)
+  const user = useStore((state) => state.user)
 
   const tablesList = storeTables && storeTables.length > 0 ? storeTables.map(t => t.name) : []
   const categories = ['All', ...storeCategories.map(c => c.name)]
@@ -92,7 +93,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
   }
 
   // Remove Item (only for unsent items)
-  const handleRemoveItem = (cartItemId) => {
+  const handleRemoveItem = async (cartItemId) => {
     setTableCarts(prev => {
       const currentCart = prev[selectedTable] || []
       const item = currentCart.find(i => i.cartItemId === cartItemId)

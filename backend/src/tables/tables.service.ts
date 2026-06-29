@@ -39,7 +39,10 @@ export class TablesService {
       throw new NotFoundException(`Table with ID ${id} not found`);
     }
 
-    const data: { posX?: number; posY?: number; status?: TableStatus } = {};
+    const data: { name?: string; seats?: number; shape?: string; posX?: number; posY?: number; status?: TableStatus } = {};
+    if (dto.name !== undefined) data.name = dto.name;
+    if (dto.seats !== undefined) data.seats = dto.seats;
+    if (dto.shape !== undefined) data.shape = dto.shape;
     if (dto.pos_x !== undefined) data.posX = dto.pos_x;
     if (dto.pos_y !== undefined) data.posY = dto.pos_y;
     if (dto.status !== undefined) data.status = dto.status as TableStatus;

@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -47,5 +48,18 @@ export class AuthService {
         role: true,
       },
     });
+  }
+
+  async verifyManagerPin(pin: string): Promise<boolean> {
+    const managers = await this.prisma.user.findMany({
+      where: { role: Role.Manager },
+    });
+    for (const manager of managers) {
+      const isPinValid = await bcrypt.compare(pin, manager.pinHash);
+      if (isPinValid) {
+        return true;
+      }
+    }
+    return false;
   }
 }

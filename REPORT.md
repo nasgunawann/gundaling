@@ -77,7 +77,7 @@ This report details the current system implementation for each user role (Manage
 ### Phase 2: Medium Priority (Kitchen & FOH Operations)
 1.  **KDS Ticket Color Coding:**
     *   Calculate elapsed time from order `createdAt` in `TicketCard.jsx`.
-    *   Apply visual indicators: amber border for $>15$ mins, red blinking border/alert for $>25$ mins.
+    *   Apply visual indicators: amber border for $>15$ mins, red for $>25$ mins.
 2.  **Table Configuration Panel (Manager):**
     *   Create a `PUT /api/tables/:id` backend route.
     *   Add an "Edit Table Properties" modal to allow managers to change table names and seat capacities.

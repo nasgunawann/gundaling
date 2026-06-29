@@ -87,6 +87,13 @@ export default function App() {
     })
   }, [orders])
 
+  // Prevent Chef from accessing other screens
+  useEffect(() => {
+    if (user?.role === 'Chef' && currentView !== 'kitchen-queue') {
+      setCurrentView('kitchen-queue')
+    }
+  }, [user, currentView])
+
   const handleLogout = async () => {
     const confirmed = await showConfirm(
       'Log Out Staff',
@@ -101,7 +108,13 @@ export default function App() {
   }
 
   if (!user) {
-    return <WaiterLogin onLoginSuccess={() => setCurrentView('floor-plan')} />
+    return <WaiterLogin onLoginSuccess={(loggedInUser) => {
+      if (loggedInUser?.role === 'Chef') {
+        setCurrentView('kitchen-queue')
+      } else {
+        setCurrentView('floor-plan')
+      }
+    }} />
   }
 
   return (

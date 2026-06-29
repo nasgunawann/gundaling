@@ -3,14 +3,16 @@ import WebsocketStatus from './WebsocketStatus'
 
 export default function Sidebar({ currentView, onViewChange, user, onLogout, isCollapsed, onToggleCollapse }) {
   const isManager = user?.role === 'Manager'
-  const isChefOrManager = user?.role === 'Chef' || user?.role === 'Manager'
+  const isChef = user?.role === 'Chef'
 
   const menuItems = [
-    { id: 'floor-plan', label: 'Floor Plan', icon: 'layers' },
-    { id: 'table-menu', label: 'Table Menu', icon: 'restaurant_menu' },
-    ...(isChefOrManager ? [{ id: 'kitchen-queue', label: 'Kitchen KDS', icon: 'soup_kitchen' }] : []),
+    ...(isChef ? [] : [
+      { id: 'floor-plan', label: 'Floor Plan', icon: 'layers' },
+      { id: 'table-menu', label: 'Table Menu', icon: 'restaurant_menu' },
+    ]),
+    ...(isChef || isManager ? [{ id: 'kitchen-queue', label: 'Kitchen KDS', icon: 'soup_kitchen' }] : []),
     ...(isManager ? [{ id: 'product-enrichment', label: 'Product Management', icon: 'inventory_2' }] : []),
-    { id: 'reservations', label: 'Reservations', icon: 'event_seat' },
+    ...(isChef ? [] : [{ id: 'reservations', label: 'Reservations', icon: 'event_seat' }]),
   ]
 
   return (
