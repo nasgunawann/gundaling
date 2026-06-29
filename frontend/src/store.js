@@ -178,10 +178,10 @@ const useStore = create((set, get) => ({
   setOrders: (orders) => set({ orders }),
   setReservations: (reservations) => set({ reservations }),
 
-  login: async (id, pin) => {
+  login: async (employeeId, pin) => {
     set({ loading: true });
     try {
-      const res = await api.post('/auth/login', { id, pin });
+      const res = await api.post('/auth/login', { employeeId, pin });
       const { user, token } = res.data;
       localStorage.setItem('gundaling_token', token);
       localStorage.setItem('gundaling_user', JSON.stringify(user));
