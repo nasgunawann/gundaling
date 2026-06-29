@@ -5,18 +5,33 @@ export default function Sidebar({ currentView, onViewChange, user, onLogout, isC
   const isManager = user?.role === 'Manager'
   const isChef = user?.role === 'Chef'
 
-  const menuItems = [
-    ...(isChef ? [] : [
-      { id: 'floor-plan', label: 'Floor Plan', icon: 'layers' },
-      { id: 'table-menu', label: 'Table Menu', icon: 'restaurant_menu' },
-    ]),
-    ...(isChef || isManager ? [{ id: 'kitchen-queue', label: 'Kitchen KDS', icon: 'soup_kitchen' }] : []),
-    ...(isManager ? [
-      { id: 'product-enrichment', label: 'Product Management', icon: 'inventory_2' },
-      { id: 'staff-management', label: 'Staff Management', icon: 'badge' }
-    ] : []),
-    ...(isChef ? [] : [{ id: 'reservations', label: 'Reservations', icon: 'event_seat' }]),
-  ]
+  const menuGroups = [
+    {
+      title: 'OPERASIONAL FOH',
+      items: [
+        ...(isChef ? [] : [
+          { id: 'floor-plan', label: 'Floor Plan', icon: 'layers' },
+          { id: 'table-menu', label: 'Table Menu', icon: 'restaurant_menu' },
+          { id: 'reservations', label: 'Reservations', icon: 'event_seat' },
+        ]),
+      ].filter(Boolean)
+    },
+    {
+      title: 'DAPUR BOH',
+      items: [
+        ...(isChef || isManager ? [{ id: 'kitchen-queue', label: 'Kitchen KDS', icon: 'soup_kitchen' }] : []),
+      ]
+    },
+    {
+      title: 'ADMINISTRASI',
+      items: [
+        ...(isManager ? [
+          { id: 'product-enrichment', label: 'Product Management', icon: 'inventory_2' },
+          { id: 'staff-management', label: 'Staff Management', icon: 'badge' }
+        ] : []),
+      ]
+    }
+  ].filter(group => group.items.length > 0)
 
   return (
     <aside className={`relative md:fixed md:left-0 md:top-0 h-auto md:h-full bg-surface-container-low md:border-r border-outline-variant/30 flex flex-col z-50 font-display transition-all duration-75 ${
@@ -62,33 +77,43 @@ export default function Sidebar({ currentView, onViewChange, user, onLogout, isC
       </div>
 
       {/* Navigation */}
-      <nav className="flex-grow flex flex-col gap-1 mt-4 px-2" aria-label="Main Navigation">
-        {menuItems.map((item) => {
-          const isActive = currentView === item.id
-          return (
-            <button
-              key={item.id}
-              onClick={() => onViewChange(item.id)}
-              className={`flex items-center gap-3 transition-all rounded-full font-semibold touch-manipulation focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none ${
-                isCollapsed ? 'justify-center w-12 h-12 mx-auto' : 'w-full px-4 py-3 text-left'
-              } ${isActive
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-on-surface-variant hover:bg-surface-container-high'
-                }`}
-              title={isCollapsed ? item.label : undefined}
-              aria-label={isCollapsed ? item.label : undefined}
-              aria-current={isActive ? 'page' : undefined}
-            >
-              <span
-                className="material-symbols-outlined"
-                style={isActive ? { fontVariationSettings: '"FILL" 1' } : {}}
-              >
-                {item.icon}
+      <nav className="flex-grow flex flex-col gap-4 mt-4 px-2 overflow-y-auto" aria-label="Main Navigation">
+        {menuGroups.map((group) => (
+          <div key={group.title} className="flex flex-col gap-1">
+            {!isCollapsed && (
+              <span className="px-4 py-1 text-[9px] font-bold text-on-surface-variant/50 uppercase tracking-widest">
+                {group.title}
               </span>
-              {!isCollapsed && <span className="text-sm font-semibold">{item.label}</span>}
-            </button>
-          )
-        })}
+            )}
+            {group.items.map((item) => {
+              const isActive = currentView === item.id
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => onViewChange(item.id)}
+                  className={`flex items-center gap-3 transition-all rounded-full font-semibold touch-manipulation focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none ${
+                    isCollapsed ? 'justify-center w-12 h-12 mx-auto' : 'w-full px-4 py-3 text-left'
+                  } ${isActive
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-on-surface-variant hover:bg-surface-container-high'
+                    }`}
+                  title={isCollapsed ? item.label : undefined}
+                  aria-label={isCollapsed ? item.label : undefined}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  <span
+                    className="material-symbols-outlined"
+                    style={isActive ? { fontVariationSettings: '"FILL" 1' } : {}}
+                  >
+                    {item.icon}
+                  </span>
+                  {!isCollapsed && <span className="text-sm font-semibold">{item.label}</span>}
+                </button>
+              )
+            })}
+            {!isCollapsed && <hr className="border-t border-outline-variant/10 my-1 mx-2" />}
+          </div>
+        ))}
       </nav>
 
       {/* Footer / User Profile */}
