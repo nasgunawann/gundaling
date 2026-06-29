@@ -6,6 +6,7 @@ import TableOrderView from './views/TableOrderView'
 import ProductEnrichment from './views/ProductEnrichment'
 import Reservations from './views/Reservations'
 import KitchenDisplay from './views/KitchenDisplay'
+import StaffManagement from './views/StaffManagement'
 import useStore from './store'
 import { useNotification } from './components/NotificationProvider'
 
@@ -182,6 +183,27 @@ export default function App() {
               setCurrentView('table-menu')
             }}
           />
+        )}
+        {currentView === 'staff-management' && (
+          user?.role === 'Manager' ? (
+            <StaffManagement />
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center p-12 text-center bg-surface select-none">
+              <div className="w-20 h-20 bg-error/10 text-error rounded-3xl flex items-center justify-center mb-6 border border-error/20 shadow-sm">
+                <span className="material-symbols-outlined text-[40px]">gavel</span>
+              </div>
+              <h2 className="text-xl font-bold font-display text-on-surface mb-2">Access Restrained</h2>
+              <p className="text-xs text-on-surface-variant max-w-sm leading-relaxed px-4">
+                Only staff members with registered <strong>Manager</strong> credentials are authorized to access Staff Management.
+              </p>
+              <button 
+                onClick={() => setCurrentView('floor-plan')}
+                className="mt-8 px-6 py-3 bg-primary text-on-primary rounded-xl font-bold shadow-md hover:shadow-lg active:scale-95 transition-all text-xs uppercase tracking-wider"
+              >
+                Return to Floor Plan
+              </button>
+            </div>
+          )
         )}
         {currentView === 'kitchen-queue' && (
           <KitchenDisplay setIsSidebarCollapsed={setIsSidebarCollapsed} />

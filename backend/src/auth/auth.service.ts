@@ -14,7 +14,7 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     const user = await this.prisma.user.findUnique({
-      where: { id: loginDto.id },
+      where: { employeeId: loginDto.employeeId },
     });
     if (!user) {
       throw new UnauthorizedException('User not found or PIN is incorrect');
@@ -30,6 +30,7 @@ export class AuthService {
     return {
       user: {
         id: user.id,
+        employeeId: user.employeeId,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -43,6 +44,7 @@ export class AuthService {
       where: { id },
       select: {
         id: true,
+        employeeId: true,
         name: true,
         email: true,
         role: true,

@@ -11,7 +11,10 @@ export default function Sidebar({ currentView, onViewChange, user, onLogout, isC
       { id: 'table-menu', label: 'Table Menu', icon: 'restaurant_menu' },
     ]),
     ...(isChef || isManager ? [{ id: 'kitchen-queue', label: 'Kitchen KDS', icon: 'soup_kitchen' }] : []),
-    ...(isManager ? [{ id: 'product-enrichment', label: 'Product Management', icon: 'inventory_2' }] : []),
+    ...(isManager ? [
+      { id: 'product-enrichment', label: 'Product Management', icon: 'inventory_2' },
+      { id: 'staff-management', label: 'Staff Management', icon: 'badge' }
+    ] : []),
     ...(isChef ? [] : [{ id: 'reservations', label: 'Reservations', icon: 'event_seat' }]),
   ]
 

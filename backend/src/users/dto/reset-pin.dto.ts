@@ -1,10 +1,7 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class LoginDto {
+export class ResetPinDto {
   @IsString()
-  @IsNotEmpty()
-  employeeId: string;
-
   @IsNotEmpty()
   pin: string;
 }

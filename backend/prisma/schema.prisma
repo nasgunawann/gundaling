@@ -8,15 +8,16 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  role      Role
-  pinHash   String   @map("pin_hash")
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  orders    Order[]
+  id         String   @id @default(uuid())
+  employeeId String   @unique @map("employee_id")
+  name       String   @unique
+  role       Role
+  pinHash    String   @map("pin_hash")
+  email      String   @unique
+  password   String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  orders     Order[]
 
   @@map("users")
 }

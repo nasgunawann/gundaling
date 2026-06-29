@@ -19,6 +19,7 @@ async function main() {
     where: { email: "andi@gundaling.com" },
     update: {},
     create: {
+      employeeId: "101",
       name: "Andi Pratama",
       role: Role.Server,
       pinHash,
@@ -31,6 +32,7 @@ async function main() {
     where: { email: "siti@gundaling.com" },
     update: {},
     create: {
+      employeeId: "102",
       name: "Siti Aminah",
       role: Role.Server,
       pinHash,
@@ -43,6 +45,7 @@ async function main() {
     where: { email: "budi@gundaling.com" },
     update: {},
     create: {
+      employeeId: "103",
       name: "Budi Santoso",
       role: Role.Server,
       pinHash,
@@ -55,6 +58,7 @@ async function main() {
     where: { email: "david@gundaling.com" },
     update: {},
     create: {
+      employeeId: "201",
       name: "David Lee",
       role: Role.Manager,
       pinHash,
@@ -67,6 +71,7 @@ async function main() {
     where: { email: "juna@gundaling.com" },
     update: {},
     create: {
+      employeeId: "301",
       name: "Chef Juna",
       role: Role.Chef,
       pinHash,
