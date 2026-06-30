@@ -304,7 +304,21 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
           {/* Category Filters Container */}
           <div className="flex-1 flex items-center gap-2 max-w-full md:max-w-[calc(100%-300px)]">
             
-            {/* Scrollable all categories */}
+            {/* Static "All" button — always visible */}
+            <button
+              onClick={() => setActiveCategory('All')}
+              className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border shrink-0 ${activeCategory === 'All'
+                  ? 'bg-primary text-on-primary border-primary shadow-sm'
+                  : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border-outline-variant/15'
+                }`}
+            >
+              All
+            </button>
+
+            {/* Divider */}
+            <div className="w-px h-7 bg-outline-variant/20 shrink-0"></div>
+
+            {/* Scrollable remaining categories */}
             <div className="relative flex-grow overflow-hidden flex items-center group/nav">
               {/* Left Scroll Button */}
               <button 
@@ -325,7 +339,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
                 id="category-scroll-container-order"
                 className="flex gap-2 overflow-x-auto scrollbar-none py-1 px-8 w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth items-center"
               >
-                {allCategories.map((cat) => (
+                {allCategories.slice(1).map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setActiveCategory(cat)}
@@ -365,6 +379,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
               placeholder="Search menu..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur() }}
               className="w-full bg-surface-container-low border-none rounded-full py-2.5 pl-11 pr-10 text-xs font-semibold focus:ring-2 focus:ring-primary/20 shadow-sm"
             />
             {searchQuery && (
@@ -379,7 +394,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
         </div>
 
         {/* Product Cards Grid - Text-only with color-coded categories */}
-        <div className="flex-grow p-container_margin overflow-y-auto custom-scrollbar pb-16 bg-surface-container-lowest/30">
+        <div onClick={() => document.activeElement?.blur()} className="flex-grow p-container_margin overflow-y-auto custom-scrollbar pb-16 bg-surface-container-lowest/30">
           <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
             {filteredProducts.length > 0 ? filteredProducts.map((p) => {
               const catName = p.category?.name || p.category || ''
