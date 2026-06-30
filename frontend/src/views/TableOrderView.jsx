@@ -360,7 +360,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
                     />
                     <span className={`absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest shadow-sm ${p.outOfStock ? 'bg-error text-on-error' : 'bg-primary text-on-primary'
                       }`}>
-                      {p.badge}
+                      {p.category?.name || p.category || ''}
                     </span>
                   </div>
                   <div className="p-3 pb-2">

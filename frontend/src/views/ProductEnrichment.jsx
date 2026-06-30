@@ -284,11 +284,9 @@ export default function ProductEnrichment({ products }) {
                       className={`w-full h-full object-cover ${p.outOfStock ? 'grayscale' : ''}`}
                       src={p.image}
                     />
-                    {p.badge && (
-                      <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest shadow-sm bg-primary text-on-primary">
-                        {p.badge}
-                      </span>
-                    )}
+                    <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest shadow-sm bg-primary text-on-primary">
+                      {p.category?.name || p.category || ''}
+                    </span>
                     {p.outOfStock && (
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                         <span className="bg-error text-on-error text-[10px] font-bold px-3 py-1 rounded-lg uppercase tracking-wider shadow-md">
