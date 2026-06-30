@@ -170,6 +170,13 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
     if (unsentItems.length === 0) return
     setIsSendingToKitchen(true)
 
+    // Remove drafts immediately to prevent double display race condition
+    setTableCarts(prev => {
+      const currentCart = prev[selectedTable] || []
+      const sentIds = new Set(unsentItems.map(i => i.cartItemId))
+      return { ...prev, [selectedTable]: currentCart.filter(i => !sentIds.has(i.cartItemId)) }
+    })
+
     try {
       const tableObj = storeTables.find((t) => t.name === selectedTable)
       if (!tableObj) {
@@ -184,18 +191,18 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
       }))
 
       await submitOrderStore(tableObj.id, itemsPayload)
-      
-      // Remove successfully transmitted drafts; DB sync (App.jsx) will repopulate sent items
-      setTableCarts(prev => {
-        const currentCart = prev[selectedTable] || []
-        const sentIds = new Set(unsentItems.map(i => i.cartItemId))
-        const updatedCart = currentCart.filter(i => !sentIds.has(i.cartItemId))
-        return { ...prev, [selectedTable]: updatedCart }
-      })
 
       showToast(`Order for ${selectedTable} successfully transmitted to kitchen displays!`, 'success')
     } catch (err) {
       console.error(err)
+      // Restore drafts on failure
+      setTableCarts(prev => ({
+        ...prev,
+        [selectedTable]: [
+          ...(prev[selectedTable] || []),
+          ...unsentItems.map(i => ({ ...i, sent: false }))
+        ]
+      }))
       showToast(err.message || 'Failed to send order to kitchen.', 'error')
     } finally {
       setIsSendingToKitchen(false)
