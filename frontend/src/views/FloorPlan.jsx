@@ -8,6 +8,10 @@ import Modal from '../components/Modal';
 export default function FloorPlan({ onTableClick, user, tableCarts, tables: backendTables }) {
   const { showToast, showConfirm, requestManagerApproval } = useNotification();
   const containerRef = useRef(null);
+  const isDraggingRef = useRef(false);
+  const dragOffsetRef = useRef({ x: 0, y: 0 });
+  const dragTableIdRef = useRef(null);
+  const dragLatestPosRef = useRef({ x: 0, y: 0 });
 
   const updateTablePosition = useStore((state) => state.updateTablePosition);
   const fetchInitialData = useStore((state) => state.fetchInitialData);
@@ -17,6 +21,35 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [localTables, setLocalTables] = useState([]);
+  const [draggedTableId, setDraggedTableId] = useState(null);
+  const [snapEnabled, setSnapEnabled] = useState(true);
+  const [isPlacingTable, setIsPlacingTable] = useState(false);
+  const [placeCoords, setPlaceCoords] = useState({ x: 45, y: 40 });
+  const SNAP_GRID = 5;
+
+  const snapToGrid = (val) => Math.round(val / SNAP_GRID) * SNAP_GRID;
+
+  const OVERLAP_THRESHOLD = 18;
+  const getOverlappingIds = (tables) => {
+    const ids = new Set();
+    for (let i = 0; i < tables.length; i++) {
+      for (let j = i + 1; j < tables.length; j++) {
+        const a = tables[i];
+        const b = tables[j];
+        const ax = a.posX !== undefined ? a.posX : (a.pos_x || 0);
+        const ay = a.posY !== undefined ? a.posY : (a.pos_y || 0);
+        const bx = b.posX !== undefined ? b.posX : (b.pos_x || 0);
+        const by = b.posY !== undefined ? b.posY : (b.pos_y || 0);
+        const dx = ax - bx;
+        const dy = ay - by;
+        if (Math.sqrt(dx * dx + dy * dy) < OVERLAP_THRESHOLD) {
+          ids.add(a.id);
+          ids.add(b.id);
+        }
+      }
+    }
+    return ids;
+  };
   
   // Create table modal states
   const [showAddModal, setShowAddModal] = useState(false);
@@ -30,9 +63,10 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
   const [editTableName, setEditTableName] = useState('');
   const [editTableSeats, setEditTableSeats] = useState(4);
   const [editTableShape, setEditTableShape] = useState('square');
+  const [editPosX, setEditPosX] = useState(45);
+  const [editPosY, setEditPosY] = useState(40);
 
   const isLoading = loading && (!backendTables || backendTables.length === 0);
-  const rawTables = backendTables && backendTables.length > 0 ? backendTables : [];
 
   // Helper to check if a date is today
   const isToday = (dateInput) => {
@@ -46,7 +80,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
   };
 
   // Process live dynamic status based on orders & reservations
-  const tables = rawTables.map(t => {
+  const tables = (backendTables || []).map(t => {
     const activeOrdersForTable = orders.filter(o => (o.tableId === t.id || o.table_id === t.id) && o.status !== 'paid');
     
     let status = 'Available';
@@ -89,60 +123,92 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
 
   // Keep local tables in sync with database unless actively dragging
   useEffect(() => {
-    setLocalTables(tables);
+    if (!isDraggingRef.current) {
+      setLocalTables(tables);
+    }
   }, [backendTables, orders, reservations]);
 
-  const handleDragStart = (e, table) => {
+  const handlePointerDown = (e, table) => {
     if (!isEditMode) return;
-    if (e.cancelable) e.preventDefault();
-    
+    e.preventDefault();
+
     const container = containerRef.current;
     if (!container) return;
-    
+
+    e.currentTarget.setPointerCapture(e.pointerId);
+
     const rect = container.getBoundingClientRect();
-    const isTouch = e.type === 'touchstart';
+    const posX = table.posX !== undefined ? table.posX : (table.pos_x || 0);
+    const posY = table.posY !== undefined ? table.posY : (table.pos_y || 0);
 
-    const getCoordinates = (evt) => {
-      const clientX = isTouch ? evt.touches[0].clientX : evt.clientX;
-      const clientY = isTouch ? evt.touches[0].clientY : evt.clientY;
-      return { clientX, clientY };
+    const cursorX = ((e.clientX - rect.left) / rect.width) * 100;
+    const cursorY = ((e.clientY - rect.top) / rect.height) * 100;
+
+    dragOffsetRef.current = {
+      x: cursorX - posX,
+      y: cursorY - posY,
     };
+    dragTableIdRef.current = table.id;
+    dragLatestPosRef.current = { x: posX, y: posY };
+    isDraggingRef.current = true;
+    setDraggedTableId(table.id);
+  };
 
-    const handleDragMove = (moveEvent) => {
-      const { clientX, clientY } = getCoordinates(moveEvent);
-      let x = ((clientX - rect.left) / rect.width) * 100;
-      let y = ((clientY - rect.top) / rect.height) * 100;
+  const handlePointerMove = (e) => {
+    if (!isDraggingRef.current) return;
+    if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
 
-      x = Math.max(1, Math.min(88, x));
-      y = Math.max(1, Math.min(85, y));
+    const container = containerRef.current;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
 
-      setLocalTables(prev => 
-        prev.map(t => t.id === table.id ? { ...t, posX: parseFloat(x.toFixed(2)), posY: parseFloat(y.toFixed(2)) } : t)
-      );
-    };
+    let x = ((e.clientX - rect.left) / rect.width) * 100 - dragOffsetRef.current.x;
+    let y = ((e.clientY - rect.top) / rect.height) * 100 - dragOffsetRef.current.y;
 
-    const handleDragEnd = async () => {
-      if (isTouch) {
-        document.removeEventListener('touchmove', handleDragMove);
-        document.removeEventListener('touchend', handleDragEnd);
-      } else {
-        document.removeEventListener('mousemove', handleDragMove);
-        document.removeEventListener('mouseup', handleDragEnd);
-      }
+    x = Math.max(1, Math.min(88, parseFloat(x.toFixed(2))));
+    y = Math.max(1, Math.min(85, parseFloat(y.toFixed(2))));
 
-      const dragTarget = localTables.find(t => t.id === table.id);
-      if (dragTarget) {
-        await updateTablePosition(table.id, dragTarget.posX, dragTarget.posY);
-      }
-    };
-
-    if (isTouch) {
-      document.addEventListener('touchmove', handleDragMove, { passive: false });
-      document.addEventListener('touchend', handleDragEnd);
-    } else {
-      document.addEventListener('mousemove', handleDragMove);
-      document.addEventListener('mouseup', handleDragEnd);
+    if (snapEnabled) {
+      x = snapToGrid(x);
+      y = snapToGrid(y);
     }
+
+    dragLatestPosRef.current = { x, y };
+
+    setLocalTables((prev) =>
+      prev.map((t) =>
+        t.id === dragTableIdRef.current ? { ...t, posX: x, posY: y } : t,
+      ),
+    );
+  };
+
+  const handlePointerUp = async () => {
+    if (!isDraggingRef.current) return;
+
+    const tableId = dragTableIdRef.current;
+    isDraggingRef.current = false;
+    dragTableIdRef.current = null;
+    setDraggedTableId(null);
+
+    const { x, y } = dragLatestPosRef.current;
+    await updateTablePosition(tableId, x, y);
+  };
+
+  const handleCanvasClick = (e) => {
+    if (!isPlacingTable) return;
+    if (e.target !== e.currentTarget) return;
+
+    const container = containerRef.current;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    let x = ((e.clientX - rect.left) / rect.width) * 100;
+    let y = ((e.clientY - rect.top) / rect.height) * 100;
+    if (snapEnabled) { x = snapToGrid(x); y = snapToGrid(y); }
+    x = Math.max(1, Math.min(88, parseFloat(x.toFixed(2))));
+    y = Math.max(1, Math.min(85, parseFloat(y.toFixed(2))));
+    setPlaceCoords({ x, y });
+    setIsPlacingTable(false);
+    setShowAddModal(true);
   };
 
   const handleAddTableSubmit = async (e) => {
@@ -157,8 +223,8 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
         name: newTableName,
         seats: parseInt(newTableSeats),
         shape: newTableShape,
-        posX: 45.00,
-        posY: 40.00,
+        posX: placeCoords.x,
+        posY: placeCoords.y,
         status: 'Available'
       });
 
@@ -178,6 +244,8 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
     setEditTableName(table.name);
     setEditTableSeats(table.seats);
     setEditTableShape(table.shape);
+    setEditPosX(table.posX !== undefined ? table.posX : (table.pos_x || 45));
+    setEditPosY(table.posY !== undefined ? table.posY : (table.pos_y || 40));
     setShowEditModal(true);
   };
 
@@ -193,6 +261,8 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
         name: editTableName,
         seats: parseInt(editTableSeats),
         shape: editTableShape,
+        pos_x: parseFloat(editPosX),
+        pos_y: parseFloat(editPosY),
       });
 
       showToast(`Table "${editTableName}" updated successfully!`, 'success');
@@ -270,13 +340,35 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
         {isManager && (
           <div className="flex items-center gap-3">
             {isEditMode && (
+              <>
               <button
-                onClick={() => setShowAddModal(true)}
-                className="h-12 px-4 bg-secondary text-on-secondary rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all text-xs uppercase tracking-wider"
+                onClick={() => setSnapEnabled(!snapEnabled)}
+                className={`h-12 px-3 rounded-xl font-bold flex items-center justify-center gap-1.5 active:scale-95 transition-all text-xs uppercase tracking-wider ${
+                  snapEnabled
+                    ? 'bg-primary/15 text-primary'
+                    : 'bg-surface-container-low text-on-surface-variant/60'
+                }`}
+                title={snapEnabled ? 'Snap to grid ON' : 'Snap to grid OFF'}
               >
-                <span className="material-symbols-outlined text-sm">add_box</span>
-                Add Table
+                <span className="material-symbols-outlined text-sm">grid_on</span>
               </button>
+              <button
+                onClick={() => {
+                  setIsPlacingTable(!isPlacingTable);
+                  if (!isPlacingTable) setShowAddModal(false);
+                }}
+                className={`h-12 px-4 rounded-xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-all text-xs uppercase tracking-wider ${
+                  isPlacingTable
+                    ? 'bg-primary text-on-primary shadow-lg scale-105 ring-2 ring-primary ring-offset-2'
+                    : 'bg-secondary text-on-secondary hover:opacity-90'
+                }`}
+              >
+                <span className="material-symbols-outlined text-sm">
+                  {isPlacingTable ? 'touch_app' : 'add_box'}
+                </span>
+                {isPlacingTable ? 'Tap Canvas' : 'Add Table'}
+              </button>
+              </>
             )}
             <button
               onClick={() => setIsEditMode(!isEditMode)}
@@ -321,9 +413,12 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
         {/* Floor Canvas container */}
         <div 
           ref={containerRef}
+          onClick={handleCanvasClick}
           className={`flex-grow w-full rounded-[36px] relative overflow-hidden border-2 border-dashed transition-all duration-300 ${
             isEditMode 
-              ? 'border-amber-500 bg-amber-500/5 shadow-inner' 
+              ? isPlacingTable
+                ? 'border-primary bg-primary/5 shadow-inner cursor-crosshair'
+                : 'border-amber-500 bg-amber-500/5 shadow-inner'
               : 'border-outline-variant/30 bg-surface-container-lowest/30 shadow-sm'
           }`}
           style={{
@@ -343,7 +438,10 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
               </p>
             </div>
           ) : (
-            localTables.map((table) => {
+            (() => {
+              const overlappingIds = isEditMode ? getOverlappingIds(localTables) : new Set();
+              return localTables.map((table) => {
+              const isOverlapping = overlappingIds.has(table.id);
               // Standardized responsive layout sizes
               const shapeClass = table.shape === 'circle' 
                 ? 'rounded-full aspect-square w-28 h-28 flex flex-col items-center justify-center text-center p-3' 
@@ -361,17 +459,27 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
               return (
                 <div
                   key={table.id}
-                  onMouseDown={(e) => handleDragStart(e, table)}
-                  onTouchStart={(e) => handleDragStart(e, table)}
+                  onPointerDown={(e) => handlePointerDown(e, table)}
+                  onPointerMove={handlePointerMove}
+                  onPointerUp={handlePointerUp}
                   style={{
                     position: 'absolute',
                     left: `${posXVal}%`,
                     top: `${posYVal}%`,
                     transform: 'translate(-50%, -50%)',
-                    cursor: isEditMode ? 'move' : 'pointer',
-                    zIndex: 20
+                    touchAction: 'none',
+                    willChange: isEditMode ? 'left, top' : 'auto',
+                    zIndex: draggedTableId === table.id ? 50 : 20
                   }}
-                  className={`${isEditMode ? 'hover:shadow-lg' : ''}`}
+                  className={`${isEditMode
+                    ? draggedTableId === table.id
+                      ? 'cursor-grabbing scale-105 shadow-2xl'
+                      : isOverlapping
+                        ? 'cursor-grab ring-2 ring-error ring-offset-2 ring-offset-transparent animate-pulse'
+                        : 'cursor-grab hover:shadow-xl'
+                    : 'cursor-pointer'
+                  }`}
+                  title={isOverlapping ? 'Table overlaps with another table!' : undefined}
                 >
                   {isTablePendingSync && (
                     <span className="absolute -top-3 -right-1 bg-status-warning text-status-on-warning text-[8px] font-extrabold p-1 rounded-full uppercase tracking-wider shadow-md animate-pulse z-30 border border-surface flex items-center justify-center" title="Pending Sync">
@@ -474,6 +582,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                 </div>
               );
             })
+          })()
           )}
         </div>
       </div>
@@ -520,6 +629,29 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
               <option value="square">Square</option>
               <option value="rectangle">Rectangle</option>
             </select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Position X%</label>
+              <input 
+                type="number" 
+                step="0.5" min="1" max="88"
+                value={placeCoords.x} 
+                onChange={(e) => setPlaceCoords(prev => ({ ...prev, x: parseFloat(e.target.value) || 0 }))}
+                className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-xs font-semibold shadow-sm focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Position Y%</label>
+              <input 
+                type="number" 
+                step="0.5" min="1" max="85"
+                value={placeCoords.y} 
+                onChange={(e) => setPlaceCoords(prev => ({ ...prev, y: parseFloat(e.target.value) || 0 }))}
+                className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-xs font-semibold shadow-sm focus:ring-2 focus:ring-primary"
+              />
+            </div>
           </div>
 
           <button 
@@ -576,6 +708,29 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
               <option value="square">Square</option>
               <option value="rectangle">Rectangle</option>
             </select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Position X%</label>
+              <input 
+                type="number" 
+                step="0.5" min="1" max="88"
+                value={editPosX} 
+                onChange={(e) => setEditPosX(parseFloat(e.target.value) || 0)}
+                className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-xs font-semibold shadow-sm focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Position Y%</label>
+              <input 
+                type="number" 
+                step="0.5" min="1" max="85"
+                value={editPosY} 
+                onChange={(e) => setEditPosY(parseFloat(e.target.value) || 0)}
+                className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-xs font-semibold shadow-sm focus:ring-2 focus:ring-primary"
+              />
+            </div>
           </div>
 
           <button 
