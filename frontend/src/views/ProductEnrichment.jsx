@@ -168,8 +168,13 @@ export default function ProductEnrichment({ products }) {
   const filteredProducts = products.filter(product => {
     const matchesCat = activeCategory === 'All' || 
                        (product.category && (product.category.name === activeCategory || product.category === activeCategory));
+    
+    const catName = product.category?.name || product.category || ''
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                           (product.desc && product.desc.toLowerCase().includes(searchQuery.toLowerCase()));
+                           (product.desc && product.desc.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                           (typeof catName === 'string' && catName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                           (product.badge && product.badge.toLowerCase().includes(searchQuery.toLowerCase()));
+    
     return matchesCat && matchesSearch;
   });
 
