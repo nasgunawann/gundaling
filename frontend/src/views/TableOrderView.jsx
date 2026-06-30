@@ -225,9 +225,9 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
     setIsSettling(true)
 
     try {
-      await Promise.all(
-        activeOrders.map(order => updateOrderStatusStore(order.id, 'paid'))
-      )
+      for (const order of activeOrders) {
+        await updateOrderStatusStore(order.id, 'paid')
+      }
       
       // Automatically complete any active seated reservations for this table
       const seatedReservation = (storeReservations || []).find(

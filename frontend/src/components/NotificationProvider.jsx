@@ -87,7 +87,7 @@ export function NotificationProvider({ children }) {
 
     setManagerPinModal(prev => ({ ...prev, submitting: true, error: '' }))
     try {
-      await api.post('/auth/verify-manager-pin', { pin: managerPinModal.pin })
+      await api.post('/auth/verify-manager-pin', { pin: managerPinModal.pin }, { timeout: 10000 })
       const resolve = managerPinModal.resolve
       setManagerPinModal(null)
       resolve(true)

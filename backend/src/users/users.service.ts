@@ -3,11 +3,16 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ResetPinDto } from './dto/reset-pin.dto';
+import { randomUUID } from 'crypto';
 import * as bcrypt from 'bcrypt';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private auditService: AuditService,
+  ) {}
 
   async findAll() {
     return this.prisma.user.findMany({
@@ -43,9 +48,9 @@ export class UsersService {
     }
 
     const pinHash = await bcrypt.hash(dto.pin, 10);
-    const passwordHash = await bcrypt.hash('gundaling123', 10);
+    const passwordHash = await bcrypt.hash(randomUUID(), 10);
 
-    return this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: {
         name: dto.name,
         employeeId: dto.employeeId,
@@ -62,6 +67,15 @@ export class UsersService {
         email: true,
       },
     });
+
+    await this.auditService.log({
+      action: 'USER_CREATED',
+      entity: 'User',
+      entityId: user.id,
+      detail: `${dto.name} created as ${dto.role}`,
+    });
+
+    return user;
   }
 
   async update(id: string, dto: UpdateUserDto) {
@@ -108,6 +122,13 @@ export class UsersService {
       data: { pinHash },
     });
 
+    await this.auditService.log({
+      action: 'PIN_RESET',
+      entity: 'User',
+      entityId: id,
+      detail: `PIN reset for ${user.name}`,
+    });
+
     return { success: true };
   }
 
@@ -116,6 +137,13 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('User not found.');
     }
+
+    await this.auditService.log({
+      action: 'USER_DELETED',
+      entity: 'User',
+      entityId: id,
+      detail: `${user.name} (${user.role}) deleted`,
+    });
 
     await this.prisma.user.delete({ where: { id } });
     return { success: true };

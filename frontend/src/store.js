@@ -182,7 +182,7 @@ const useStore = create((set, get) => ({
   login: async (employeeId, pin) => {
     set({ loading: true });
     try {
-      const res = await api.post('/auth/login', { employeeId, pin });
+      const res = await api.post('/auth/login', { employeeId, pin }, { timeout: 10000 });
       const { user, token } = res.data;
       localStorage.setItem('gundaling_token', token);
       localStorage.setItem('gundaling_user', JSON.stringify(user));
@@ -217,7 +217,7 @@ const useStore = create((set, get) => ({
 
     set({ token, loading: true });
     try {
-      const res = await api.get('/auth/me');
+      const res = await api.get('/auth/me', { timeout: 10000 });
       const user = res.data;
       localStorage.setItem('gundaling_user', JSON.stringify(user));
       

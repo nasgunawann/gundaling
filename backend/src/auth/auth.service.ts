@@ -4,12 +4,14 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { Role } from '@prisma/client';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private auditService: AuditService,
   ) {}
 
   async login(loginDto: LoginDto) {
@@ -17,15 +19,33 @@ export class AuthService {
       where: { employeeId: loginDto.employeeId },
     });
     if (!user) {
+      this.auditService.log({
+        action: 'LOGIN_FAILED',
+        entity: 'User',
+        detail: `Employee ID ${loginDto.employeeId} not found`,
+      }).catch(() => {});
       throw new UnauthorizedException('User not found or PIN is incorrect');
     }
     const isPinValid = await bcrypt.compare(loginDto.pin, user.pinHash);
     if (!isPinValid) {
+      this.auditService.log({
+        action: 'LOGIN_FAILED',
+        entity: 'User',
+        entityId: user.id,
+        detail: `Invalid PIN for employee ID ${loginDto.employeeId}`,
+      }).catch(() => {});
       throw new UnauthorizedException('User not found or PIN is incorrect');
     }
 
     const payload = { sub: user.id, username: user.name, role: user.role };
     const token = await this.jwtService.signAsync(payload);
+
+    this.auditService.log({
+      action: 'LOGIN_SUCCESS',
+      entity: 'User',
+      entityId: user.id,
+      detail: `${user.name} (${user.role}) logged in`,
+    }).catch(() => {});
 
     return {
       user: {
@@ -59,9 +79,20 @@ export class AuthService {
     for (const manager of managers) {
       const isPinValid = await bcrypt.compare(pin, manager.pinHash);
       if (isPinValid) {
+        this.auditService.log({
+          action: 'MANAGER_PIN_VERIFIED',
+          entity: 'User',
+          entityId: manager.id,
+          detail: `Manager PIN verified for ${manager.name}`,
+        }).catch(() => {});
         return true;
       }
     }
+    this.auditService.log({
+      action: 'MANAGER_PIN_FAILED',
+      entity: 'User',
+      detail: 'Invalid manager PIN attempt',
+    }).catch(() => {});
     return false;
   }
 }

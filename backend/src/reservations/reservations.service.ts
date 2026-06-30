@@ -4,12 +4,14 @@ import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { PosGateway } from '../events/pos.gateway';
 import { ReservationStatus } from '@prisma/client';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class ReservationsService {
   constructor(
     private prisma: PrismaService,
     private posGateway: PosGateway,
+    private auditService: AuditService,
   ) {}
 
   async findAll() {
@@ -50,6 +52,16 @@ export class ReservationsService {
       },
       include: { table: true },
     });
+
+    if (dto.status === 'Completed' || dto.status === 'Seated' || dto.status === 'Cancelled') {
+      await this.auditService.log({
+        action: 'RESERVATION_STATUS_CHANGED',
+        entity: 'Reservation',
+        entityId: id,
+        detail: `Reservation ${reservation.name} changed to ${dto.status}`,
+      });
+    }
+
     this.posGateway.emitEvent('reservation.updated', reservation);
     return reservation;
   }

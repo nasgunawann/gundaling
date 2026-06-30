@@ -8,12 +8,14 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { PosGateway } from '../events/pos.gateway';
 import { OrderStatus } from '@prisma/client';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class OrdersService {
   constructor(
     private prisma: PrismaService,
     private posGateway: PosGateway,
+    private auditService: AuditService,
   ) {}
 
   async findAll() {
@@ -41,6 +43,21 @@ export class OrdersService {
       throw new NotFoundException(`Table with ID ${dto.table_id} not found`);
     }
 
+    // Validate all product IDs exist before creating anything
+    const productIds = dto.items.map((i) => i.product_id);
+    const products = await this.prisma.product.findMany({
+      where: { id: { in: productIds } },
+    });
+    const productsMap = new Map(products.map((p) => [p.id, p]));
+
+    for (const item of dto.items) {
+      if (!productsMap.has(item.product_id)) {
+        throw new BadRequestException(
+          `Product with ID ${item.product_id} not found`,
+        );
+      }
+    }
+
     // Always create a new Order for split-ticket tracking
     const order = await this.prisma.order.create({
       data: {
@@ -56,24 +73,17 @@ export class OrdersService {
       data: { status: 'Occupied' },
     });
 
-    const productIds = dto.items.map((i) => i.product_id);
-    const products = await this.prisma.product.findMany({
-      where: { id: { in: productIds } },
-    });
-    const productsMap = new Map(products.map((p) => [p.id, p]));
-
     for (const item of dto.items) {
       const product = productsMap.get(item.product_id);
-      if (!product) continue;
       const sent = item.sent ?? false;
 
       await this.prisma.orderItem.create({
         data: {
           orderId: order.id,
           productId: item.product_id,
-          productName: product.name,
+          productName: product!.name,
           qty: item.qty,
-          unitPrice: product.price,
+          unitPrice: product!.price,
           sent,
           note: item.note ?? null,
         },
@@ -190,6 +200,12 @@ export class OrdersService {
       await this.prisma.orderItem.updateMany({
         where: { orderId: order.id },
         data: { sent: true },
+      });
+      await this.auditService.log({
+        action: 'BILL_SETTLED',
+        entity: 'Order',
+        entityId: order.id,
+        detail: `Order #${order.orderNumber} for table ${order.tableId} settled`,
       });
     }
 

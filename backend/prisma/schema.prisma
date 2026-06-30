@@ -146,3 +146,15 @@ enum ReservationStatus {
   Cancelled
   Completed
 }
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  entity    String
+  entityId  String?  @map("entity_id")
+  userId    String?  @map("user_id")
+  detail    String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("audit_logs")
+}

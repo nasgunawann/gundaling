@@ -12,7 +12,7 @@ import { SocketStateService } from './socket-state.service';
 
 @WebSocketGateway({
   cors: {
-    origin: '*',
+    origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
   },
 })
 @Injectable()
@@ -42,7 +42,7 @@ export class PosGateway
         sub: number;
         role: string;
       }>(token, {
-        secret: process.env.JWT_SECRET || 'restoran-secret-key-12345',
+        secret: process.env.JWT_SECRET,
       });
       client.data = { user: payload };
     } catch {

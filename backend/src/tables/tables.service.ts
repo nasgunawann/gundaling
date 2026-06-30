@@ -1,15 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTableDto } from './dto/create-table.dto';
 import { UpdateTableDto } from './dto/update-table.dto';
 import { PosGateway } from '../events/pos.gateway';
 import { TableStatus } from '@prisma/client';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class TablesService {
   constructor(
     private prisma: PrismaService,
     private posGateway: PosGateway,
+    private auditService: AuditService,
   ) {}
 
   async findAll() {
@@ -56,6 +58,33 @@ export class TablesService {
   }
 
   async remove(id: string) {
+    const table = await this.prisma.table.findUnique({
+      where: { id },
+      include: {
+        orders: { where: { status: { not: 'paid' } }, take: 1 },
+        reservations: { where: { status: { in: ['Confirmed', 'Seated'] } }, take: 1 },
+      },
+    });
+
+    if (!table) {
+      throw new NotFoundException(`Table with ID ${id} not found`);
+    }
+
+    if (table.orders.length > 0) {
+      throw new BadRequestException('Cannot delete table with active orders. Settle all bills first.');
+    }
+
+    if (table.reservations.length > 0) {
+      throw new BadRequestException('Cannot delete table with active reservations. Cancel or complete them first.');
+    }
+
+    await this.auditService.log({
+      action: 'TABLE_DELETED',
+      entity: 'Table',
+      entityId: id,
+      detail: `Table ${table.name} deleted`,
+    });
+
     await this.prisma.table.delete({ where: { id } });
     this.posGateway.emitEvent('table.deleted', id);
     return { success: true };
