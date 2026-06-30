@@ -48,7 +48,7 @@ model Product {
   createdAt  DateTime    @default(now()) @map("created_at")
   updatedAt  DateTime    @updatedAt @map("updated_at")
   items      OrderItem[]
-  category   Category    @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  category   Category    @relation(fields: [categoryId], references: [id])
 
   @@index([categoryId])
   @@map("products")
@@ -80,8 +80,8 @@ model Order {
   createdAt   DateTime    @default(now()) @map("created_at")
   updatedAt   DateTime    @updatedAt @map("updated_at")
   items       OrderItem[]
-  table       Table       @relation(fields: [tableId], references: [id], onDelete: Restrict)
-  user        User        @relation(fields: [userId], references: [id], onDelete: Restrict)
+  table       Table       @relation(fields: [tableId], references: [id])
+  user        User        @relation(fields: [userId], references: [id])
 
   @@index([tableId])
   @@index([userId])
@@ -89,16 +89,16 @@ model Order {
 }
 
 model OrderItem {
-  id          String   @id @default(uuid())
-  orderId     String   @map("order_id")
-  productId   String   @map("product_id")
-  productName String   @map("product_name")
+  id          String  @id @default(uuid())
+  orderId     String  @map("order_id")
+  productId   String  @map("product_id")
+  productName String  @map("product_name")
   qty         Int
-  unitPrice   Decimal  @map("unit_price") @db.Decimal(12, 2)
-  sent        Boolean  @default(false)
+  unitPrice   Decimal @map("unit_price") @db.Decimal(12, 2)
+  sent        Boolean @default(false)
   note        String?
-  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product     Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product     Product @relation(fields: [productId], references: [id])
 
   @@index([orderId])
   @@index([productId])
@@ -115,7 +115,7 @@ model Reservation {
   status    ReservationStatus @default(Confirmed)
   createdAt DateTime          @default(now()) @map("created_at")
   updatedAt DateTime          @updatedAt @map("updated_at")
-  table     Table             @relation(fields: [tableId], references: [id], onDelete: Restrict)
+  table     Table             @relation(fields: [tableId], references: [id])
 
   @@index([tableId])
   @@map("reservations")

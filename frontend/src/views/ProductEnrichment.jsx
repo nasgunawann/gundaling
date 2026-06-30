@@ -200,24 +200,32 @@ export default function ProductEnrichment({ products }) {
 
         {/* Filters Wrapper: Merged Categories and Search Bar into one block */}
         <div className="px-container_margin py-4 border-b border-outline-variant/10 bg-surface-container-lowest/15 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
-          {/* Category Horizontal Filters (scrollbar hidden) */}
-          <div className="flex gap-2 overflow-x-auto custom-scrollbar shrink-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border shrink-0 ${activeCategory === cat
-                    ? 'bg-primary text-on-primary border-primary shadow-sm'
-                    : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border-outline-variant/15'
-                  }`}
-              >
-                {cat}
-              </button>
-            ))}
+          {/* Category Horizontal Filters (scrollbar hidden, scrollable with fade masks) */}
+          <div className="relative flex-1 max-w-full md:max-w-[calc(100%-300px)] overflow-hidden">
+            {/* Left Fade Overlay */}
+            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none z-10"></div>
+            
+            <div className="flex gap-2 overflow-x-auto scrollbar-none py-1 px-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border shrink-0 ${activeCategory === cat
+                      ? 'bg-primary text-on-primary border-primary shadow-sm'
+                      : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border-outline-variant/15'
+                    }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Right Fade Overlay */}
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10"></div>
           </div>
 
           {/* Search bar positioned next to categories for consistency */}
-          <div className="relative w-full md:max-w-[280px]">
+          <div className="relative w-full md:max-w-[280px] shrink-0">
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-base">search</span>
             <input
               type="text"
