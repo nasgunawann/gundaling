@@ -274,7 +274,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
       {/* LEFT: Menu Products Catalog Grid */}
       <div className="flex-1 flex flex-col h-full overflow-hidden lg:border-r border-outline-variant/20">
 
-        {/* Header with Table Selection Selector */}
+        {/* Header with Table Selection Selector and View Bill */}
         <header className="h-20 bg-surface flex justify-between items-center px-container_margin border-b border-outline-variant/10 z-10 font-display shrink-0">
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-4">
@@ -296,6 +296,20 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
                 </div>
               </div>
             </div>
+
+            <button
+              onClick={() => setIsCartOpen(!isCartOpen)}
+              className="h-10 px-5 bg-primary hover:bg-primary-container text-on-primary rounded-full font-bold flex items-center justify-center gap-2 active:scale-95 transition-all shadow-sm"
+              title="View Cart Summary"
+            >
+              <span className="material-symbols-outlined text-lg font-bold">shopping_cart</span>
+              <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">View Bill</span>
+              {activeCart.length > 0 && (
+                <span className="w-5 h-5 bg-error text-on-error rounded-full flex items-center justify-center text-[10px] font-bold shadow-sm border border-primary animate-pulse">
+                  {activeCart.reduce((totalQty, item) => totalQty + item.qty, 0)}
+                </span>
+              )}
+            </button>
           </div>
         </header>
 
@@ -471,20 +485,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
         orderNumber={activeCart.find(i => i.sent)?.orderId ? storeOrders.find(o => o.id === activeCart.find(i => i.sent).orderId)?.orderNumber : null}
       />
 
-      {/* Floating Action Button (FAB) for Cart Summary in bottom-right */}
-      <button
-        onClick={() => setIsCartOpen(!isCartOpen)}
-        className="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 z-30 h-16 px-6 bg-primary hover:bg-primary-container text-on-primary rounded-full font-bold flex items-center justify-center gap-3 active:scale-95 transition-all shadow-xl hover:shadow-2xl hover:scale-105"
-        title="View Cart Summary"
-      >
-        <span className="material-symbols-outlined text-2xl font-bold">shopping_cart</span>
-        <span className="text-sm font-bold uppercase tracking-wider hidden sm:inline">View Bill</span>
-        {activeCart.length > 0 && (
-          <span className="w-6 h-6 bg-error text-on-error rounded-full flex items-center justify-center text-xs font-bold shadow-sm border border-primary animate-pulse">
-            {activeCart.reduce((totalQty, item) => totalQty + item.qty, 0)}
-          </span>
-        )}
-      </button>
+
     </div>
   );
 }

@@ -18,7 +18,7 @@ export default function ReceiptModal({
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
+    <div className="fixed inset-0 z-[55] flex items-center justify-center p-4 bg-black/60">
       <div className="receipt-modal-overlay w-full max-w-[420px] bg-surface rounded-3xl border border-outline-variant/20 shadow-2xl p-5">
         <div className="flex items-center justify-between mb-4">
           <div>

@@ -35,7 +35,7 @@ export default function CartDrawer({
     <>
       {/* RIGHT: High-density Collapsible Billing & Cart Summary Side Panel */}
       <div 
-        className={`fixed inset-y-0 right-0 z-50 w-[380px] sm:w-[420px] bg-surface flex flex-col h-full overflow-hidden shadow-[-8px_0_32px_rgba(0,0,0,0.12)] transition-transform duration-75 transform ${
+        className={`fixed inset-y-0 right-0 z-[52] w-[380px] sm:w-[420px] bg-surface flex flex-col h-full overflow-hidden shadow-[-8px_0_32px_rgba(0,0,0,0.12)] transition-transform duration-75 transform ${
           isCartOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
@@ -251,7 +251,7 @@ export default function CartDrawer({
       {isCartOpen && (
         <div 
           onClick={() => setIsCartOpen(false)}
-          className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
+          className="fixed inset-0 bg-black/50 z-[51] transition-opacity duration-300"
         />
       )}
 
