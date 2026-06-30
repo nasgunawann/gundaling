@@ -136,10 +136,13 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
     if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
 
     // Ignore sub-threshold movements (distinguish click vs drag)
-    const dx = Math.abs(e.clientX - dragStartRef.current.x);
-    const dy = Math.abs(e.clientY - dragStartRef.current.y);
-    if (dx < DRAG_THRESHOLD && dy < DRAG_THRESHOLD) return;
-    dragStartRef.current = null;
+    const start = dragStartRef.current;
+    if (start) {
+      const dx = Math.abs(e.clientX - start.x);
+      const dy = Math.abs(e.clientY - start.y);
+      if (dx < DRAG_THRESHOLD && dy < DRAG_THRESHOLD) return;
+      dragStartRef.current = null;
+    }
 
     const container = containerRef.current;
     if (!container) return;
