@@ -53,27 +53,11 @@ export class ReservationsService {
       throw new NotFoundException(`Reservation with ID ${id} not found`);
     }
 
-    // Check active orders if changing to a different table
-    if (dto.tableId !== undefined && dto.tableId !== resExists.tableId) {
-      const activeOrders = await this.prisma.order.count({
-        where: { tableId: dto.tableId, status: { not: 'paid' } },
-      });
-      if (activeOrders > 0) {
-        throw new BadRequestException('Cannot move reservation to a table with active orders.');
-      }
-    }
-
-    const data: any = {};
-    if (dto.name !== undefined) data.name = dto.name;
-    if (dto.phone !== undefined) data.phone = dto.phone;
-    if (dto.guests !== undefined) data.guests = dto.guests;
-    if (dto.tableId !== undefined) data.tableId = dto.tableId;
-    if (dto.time !== undefined) data.time = new Date(dto.time);
-    if (dto.status !== undefined) data.status = dto.status as ReservationStatus;
-
     const reservation = await this.prisma.reservation.update({
       where: { id },
-      data,
+      data: {
+        status: dto.status as ReservationStatus,
+      },
       include: { table: true },
     });
 
@@ -83,15 +67,6 @@ export class ReservationsService {
         entity: 'Reservation',
         entityId: id,
         detail: `Reservation ${reservation.name} changed to ${dto.status}`,
-      });
-    }
-
-    if (dto.name || dto.phone || dto.guests || dto.tableId || dto.time) {
-      await this.auditService.log({
-        action: 'RESERVATION_UPDATED',
-        entity: 'Reservation',
-        entityId: id,
-        detail: `Reservation ${reservation.name} details updated`,
       });
     }
 

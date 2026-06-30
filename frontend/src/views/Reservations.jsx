@@ -9,14 +9,12 @@ export default function Reservations({ reservations, onSeatGuest }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [showAddModal, setShowAddModal] = useState(false);
-  const [editingReservation, setEditingReservation] = useState(null);
   const [sortMode, setSortMode] = useState('nearest');
   
   const storeTables = useStore((state) => state.tables);
   const storeOrders = useStore((state) => state.orders);
   const addReservationStore = useStore((state) => state.addReservation);
   const updateReservationStore = useStore((state) => state.updateReservation);
-  const editReservationStore = useStore((state) => state.editReservation);
 
   // Form states for booking table
   const [newName, setNewName] = useState('');
@@ -74,59 +72,28 @@ export default function Reservations({ reservations, onSeatGuest }) {
     const bookingTime = `${newDate}T${newTime}:00`;
 
     try {
-      if (editingReservation) {
-        await editReservationStore(editingReservation.id, {
-          name: newName,
-          phone: newPhone,
-          guests: parseInt(newGuests),
-          tableId: selectedTableId,
-          time: bookingTime,
-        });
-        showToast(`Reservation updated for ${newName}!`, 'success');
-      } else {
-        await addReservationStore({
-          name: newName,
-          phone: newPhone,
-          guests: parseInt(newGuests),
-          tableId: selectedTableId,
-          time: bookingTime,
-          status: 'Confirmed'
-        });
+      await addReservationStore({
+        name: newName,
+        phone: newPhone,
+        guests: parseInt(newGuests),
+        tableId: selectedTableId,
+        time: bookingTime,
+        status: 'Confirmed'
+      });
 
-        const tableObj = storeTables.find(t => t.id === selectedTableId);
-        showToast(`Reservation booked successfully for ${newName} at ${tableObj?.name || 'Table'}!`, 'success');
-      }
+      const tableObj = storeTables.find(t => t.id === selectedTableId);
 
       setShowAddModal(false);
-      setEditingReservation(null);
       setNewName('');
       setNewPhone('');
+      showToast(`Reservation booked successfully for ${newName} at ${tableObj?.name || 'Table'}!`, 'success');
     } catch (err) {
       console.error(err);
-      showToast(err.response?.data?.message || err.message || 'Failed to save reservation.', 'error');
+      showToast(err.response?.data?.message || err.message || 'Failed to book reservation.', 'error');
     }
   };
 
-  const handleEditClick = (res) => {
-    const d = new Date(res.time);
-    setNewName(res.name);
-    setNewPhone(res.phone);
-    setNewGuests(String(res.guests));
-    setNewTable(res.tableId);
-    const pad = (n) => String(n).padStart(2, '0');
-    setNewDate(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`);
-    setNewTime(d.toTimeString().slice(0, 5));
-    setEditingReservation(res);
-    setShowAddModal(true);
-  };
-
-  const closeModal = () => {
-    setShowAddModal(false);
-    setEditingReservation(null);
-  };
-
   const openAddModal = () => {
-    setEditingReservation(null);
     if (storeTables.length > 0 && !newTable) {
       const firstAvailable = storeTables.find(t =>
         !(storeOrders || []).some(
@@ -308,12 +275,6 @@ export default function Reservations({ reservations, onSeatGuest }) {
                         <div className="flex gap-1.5 justify-end">
                           {res.status === 'Confirmed' && (
                             <>
-                              <button
-                                onClick={() => handleEditClick(res)}
-                                className="px-3 py-1.5 border border-outline-variant/30 text-on-surface-variant font-bold rounded-xl text-[11px] transition-colors shadow-sm hover:bg-surface-container-low active:scale-95"
-                              >
-                                Edit
-                              </button>
                               <button 
                                 onClick={() => handleStatusChange(res.id, 'Seated')}
                                 className="px-3 py-1.5 bg-status-success text-status-on-success font-bold rounded-xl text-[11px] transition-colors shadow-sm hover:opacity-90 active:scale-95"
@@ -364,11 +325,11 @@ export default function Reservations({ reservations, onSeatGuest }) {
         </div>
       </div>
 
-      {/* Book / Edit Table Modal */}
+      {/* Book Table Modal */}
       <Modal 
         isOpen={showAddModal} 
-        onClose={closeModal}
-        title={editingReservation ? 'Edit Reservation' : 'Book Table'}
+        onClose={() => setShowAddModal(false)} 
+        title="Book Table"
         maxWidth="max-w-md"
       >
         <form onSubmit={handleAddReservation} className="space-y-4">
@@ -456,7 +417,7 @@ export default function Reservations({ reservations, onSeatGuest }) {
             type="submit"
             className="w-full h-14 bg-primary text-on-primary rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-md mt-6 text-sm font-display"
           >
-            {editingReservation ? 'Update Reservation' : 'Confirm Table Reservation'}
+            Confirm Table Reservation
           </button>
         </form>
       </Modal>
