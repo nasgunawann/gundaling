@@ -142,6 +142,7 @@ const useStore = create((set, get) => ({
           const newRes = res.data;
           set((state) => {
             const filtered = state.reservations.filter((r) => r.id !== item.tempId);
+            if (filtered.some((r) => r.id === newRes.id)) return { reservations: filtered };
             return { reservations: [...filtered, newRes] };
           });
         } else if (item.action === 'updateReservation') {
@@ -496,6 +497,7 @@ const useStore = create((set, get) => ({
         const newRes = res.data;
         set((state) => {
           const filtered = state.reservations.filter((r) => r.id !== tempId);
+          if (filtered.some((r) => r.id === newRes.id)) return { reservations: filtered };
           return { reservations: [...filtered, newRes] };
         });
         idbSet('gundaling_cache_reservations', get().reservations);

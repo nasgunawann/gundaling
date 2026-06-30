@@ -169,14 +169,14 @@ export default function Reservations({ reservations, onSeatGuest }) {
       {/* Reservations Table list */}
       <div className="flex-1 p-container_margin overflow-y-auto custom-scrollbar bg-surface-container-lowest/30 pb-16">
         <div className="bg-surface rounded-3xl border border-outline-variant/30 shadow-[0_4px_12px_rgba(0,0,0,0.02)] overflow-x-auto">
-          <table className="w-full min-w-[700px] text-left border-collapse">
+          <table className="w-full min-w-[640px] text-left border-collapse">
             <thead>
               <tr className="border-b border-outline-variant/30 bg-surface-container-low/20">
-                <th className="py-4 px-6 font-bold text-xs uppercase tracking-wider text-on-surface-variant">Guest Info</th>
-                <th className="py-4 px-6 font-bold text-xs uppercase tracking-wider text-on-surface-variant">Time & Seats</th>
-                <th className="py-4 px-6 font-bold text-xs uppercase tracking-wider text-on-surface-variant">Table Details</th>
-                <th className="py-4 px-6 font-bold text-xs uppercase tracking-wider text-on-surface-variant text-center">Status</th>
-                <th className="py-4 px-6 font-bold text-xs uppercase tracking-wider text-on-surface-variant text-right">Quick Actions</th>
+                <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-on-surface-variant">Guest Info</th>
+                <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-on-surface-variant">Time & Seats</th>
+                <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-on-surface-variant">Table Details</th>
+                <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-on-surface-variant text-center">Status</th>
+                <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-on-surface-variant text-right">Quick Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-container/40">
@@ -188,7 +188,7 @@ export default function Reservations({ reservations, onSeatGuest }) {
                   return (
                     <tr key={res.id} className="hover:bg-surface-container-low/10 transition-colors">
                       {/* Guest Info */}
-                      <td className="py-5 px-6">
+                      <td className="py-3.5 px-4">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
                             {res.name.charAt(0)}
@@ -201,7 +201,7 @@ export default function Reservations({ reservations, onSeatGuest }) {
                       </td>
 
                       {/* Time & Seats */}
-                      <td className="py-5 px-6">
+                      <td className="py-3.5 px-4">
                         <div className="flex flex-col gap-0.5">
                           <div className="flex items-center gap-1.5 text-sm font-bold text-on-surface font-mono">
                             <span className="material-symbols-outlined text-sm text-primary">schedule</span>
@@ -212,14 +212,14 @@ export default function Reservations({ reservations, onSeatGuest }) {
                       </td>
 
                       {/* Table Details */}
-                      <td className="py-5 px-6">
+                      <td className="py-3.5 px-4">
                         <span className="bg-surface-container px-3.5 py-1.5 rounded-xl text-xs font-bold text-on-surface-variant border border-outline-variant/10 shadow-sm font-mono">
                           {res.table?.name || 'Table'}
                         </span>
                       </td>
 
                       {/* Status badge */}
-                      <td className="py-5 px-6 text-center">
+                      <td className="py-3.5 px-4 text-center">
                         <span className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm border ${
                           res.status === 'Seated' 
                             ? 'bg-status-success/10 border-status-success/20 text-status-success' 
@@ -234,7 +234,7 @@ export default function Reservations({ reservations, onSeatGuest }) {
                       </td>
 
                       {/* Actions */}
-                      <td className="py-5 px-6 text-right">
+                      <td className="py-3.5 px-4 text-right">
                         <div className="flex gap-2 justify-end">
                           {res.status === 'Confirmed' && (
                             <>
@@ -310,7 +310,7 @@ export default function Reservations({ reservations, onSeatGuest }) {
           <div className="flex flex-col gap-1.5">
             <label className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Contact Number</label>
             <input 
-              type="text" 
+              type="tel"
               value={newPhone} 
               onChange={(e) => setNewPhone(e.target.value)}
               placeholder="e.g. +62 812..."
