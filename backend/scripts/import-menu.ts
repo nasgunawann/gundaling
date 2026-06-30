@@ -32,14 +32,17 @@ async function main() {
   let categorySortOrder = 1;
 
   for (const line of menuLines) {
-    // Basic CSV splitting, assumes no nested commas in quotes
-    const parts = line.split(",");
+    // Advanced CSV split that ignores commas inside double-quotes
+    const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
     if (parts.length < 4) continue;
 
     const rawCategory = parts[0].trim();
     const rawName = parts[1].trim();
     const rawVariant = parts[2].trim();
     const rawPrice = parts[3].trim();
+    
+    // Extract description from 5th column and strip surrounding quotes
+    let rawDesc = parts[4] ? parts[4].replace(/^"|"$/g, '').trim() : "";
 
     // 1. Process Category
     let categoryId = categoryMap.get(rawCategory);
@@ -90,13 +93,15 @@ async function main() {
       placeholderImage = "/uploads/truffle_tagliatelle.png";
     }
 
+    const finalDesc = rawDesc || `${finalName} prepared fresh with premium farmstead ingredients.`;
+
     await prisma.product.create({
       data: {
         name: finalName,
         price: priceNum,
         categoryId: categoryId,
         image: placeholderImage,
-        desc: `${finalName} prepared fresh with premium farmstead ingredients.`,
+        desc: finalDesc,
         badge: rawVariant ? rawVariant.toUpperCase() : "FRESH",
         outOfStock: false,
         details: { temp: tempDetail, time: "10 min", calories: "350 kcal" },
