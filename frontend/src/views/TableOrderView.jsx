@@ -286,95 +286,101 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
 
         {/* Filters Wrapper: Merged Categories and Search Bar into one block */}
         <div className="px-container_margin py-4 border-b border-outline-variant/10 bg-surface-container-lowest/15 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
-          {/* Category Horizontal Filters (scrollbar hidden, scrollable with fade masks & navigation buttons) */}
-          <div className="relative flex-1 max-w-full md:max-w-[calc(100%-300px)] overflow-hidden flex items-center group/nav">
-            {/* Left Scroll Button */}
-            <button 
-              onClick={() => {
-                const container = document.getElementById('category-scroll-container-order');
-                if (container) container.scrollBy({ left: -200, behavior: 'smooth' });
-              }}
-              className="absolute left-1 z-20 flex items-center justify-center w-7 h-7 rounded-full bg-surface border border-outline-variant/20 shadow-sm text-on-surface-variant opacity-0 group-hover/nav:opacity-100 transition-opacity active:scale-90"
-              title="Scroll Left"
-            >
-              <span className="material-symbols-outlined text-sm font-bold">chevron_left</span>
-            </button>
-
-            {/* Left Fade Overlay */}
-            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none z-10"></div>
+          {/* Category Filters Container */}
+          <div className="flex-1 flex items-center gap-2 max-w-full md:max-w-[calc(100%-300px)]">
             
-            <div 
-              id="category-scroll-container-order"
-              className="flex gap-2 overflow-x-auto scrollbar-none py-1 px-8 w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth items-center"
-            >
-              {primaryCategories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => {
-                    setActiveCategory(cat);
-                    setShowMoreCategories(false);
-                  }}
-                  className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border shrink-0 ${activeCategory === cat
-                      ? 'bg-primary text-on-primary border-primary shadow-sm'
-                      : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border-outline-variant/15'
-                    }`}
-                >
-                  {cat}
-                </button>
-              ))}
+            {/* Scrollable primary categories */}
+            <div className="relative flex-grow overflow-hidden flex items-center group/nav">
+              {/* Left Scroll Button */}
+              <button 
+                onClick={() => {
+                  const container = document.getElementById('category-scroll-container-order');
+                  if (container) container.scrollBy({ left: -200, behavior: 'smooth' });
+                }}
+                className="absolute left-1 z-20 flex items-center justify-center w-7 h-7 rounded-full bg-surface border border-outline-variant/20 shadow-sm text-on-surface-variant opacity-0 group-hover/nav:opacity-100 transition-opacity active:scale-90"
+                title="Scroll Left"
+              >
+                <span className="material-symbols-outlined text-sm font-bold">chevron_left</span>
+              </button>
 
-              {secondaryCategories.length > 0 && (
-                <div className="relative shrink-0">
+              {/* Left Fade Overlay */}
+              <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none z-10"></div>
+              
+              <div 
+                id="category-scroll-container-order"
+                className="flex gap-2 overflow-x-auto scrollbar-none py-1 px-8 w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth items-center"
+              >
+                {primaryCategories.map((cat) => (
                   <button
-                    onClick={() => setShowMoreCategories(!showMoreCategories)}
-                    className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border flex items-center gap-1.5 ${
-                      secondaryCategories.includes(activeCategory)
+                    key={cat}
+                    onClick={() => {
+                      setActiveCategory(cat);
+                      setShowMoreCategories(false);
+                    }}
+                    className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border shrink-0 ${activeCategory === cat
                         ? 'bg-primary text-on-primary border-primary shadow-sm'
                         : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border-outline-variant/15'
-                    }`}
+                      }`}
                   >
-                    <span>{secondaryCategories.includes(activeCategory) ? activeCategory : 'More'}</span>
-                    <span className="material-symbols-outlined text-xs leading-none">expand_more</span>
+                    {cat}
                   </button>
+                ))}
+              </div>
 
-                  {showMoreCategories && (
-                    <div className="absolute left-0 mt-2 w-56 max-h-72 overflow-y-auto bg-surface border border-outline-variant/25 rounded-2xl shadow-xl z-30 p-2 custom-scrollbar scroll-smooth">
-                      {secondaryCategories.map((cat) => (
-                        <button
-                          key={cat}
-                          onClick={() => {
-                            setActiveCategory(cat);
-                            setShowMoreCategories(false);
-                          }}
-                          className={`w-full px-4 py-2.5 text-left text-xs font-bold uppercase rounded-xl transition-all ${
-                            activeCategory === cat
-                              ? 'bg-primary/10 text-primary'
-                              : 'text-on-surface-variant hover:bg-surface-container-low'
-                          }`}
-                        >
-                          {cat}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
+              {/* Right Fade Overlay */}
+              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10"></div>
+
+              {/* Right Scroll Button */}
+              <button 
+                onClick={() => {
+                  const container = document.getElementById('category-scroll-container-order');
+                  if (container) container.scrollBy({ left: 200, behavior: 'smooth' });
+                }}
+                className="absolute right-1 z-20 flex items-center justify-center w-7 h-7 rounded-full bg-surface border border-outline-variant/20 shadow-sm text-on-surface-variant opacity-0 group-hover/nav:opacity-100 transition-opacity active:scale-90"
+                title="Scroll Right"
+              >
+                <span className="material-symbols-outlined text-sm font-bold">chevron_right</span>
+              </button>
             </div>
 
-            {/* Right Fade Overlay */}
-            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10"></div>
+            {/* Non-scrollable More Dropdown wrapper placed outside of overflow-hidden container */}
+            {secondaryCategories.length > 0 && (
+              <div className="relative shrink-0 z-30">
+                <button
+                  onClick={() => setShowMoreCategories(!showMoreCategories)}
+                  className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border flex items-center gap-1.5 ${
+                    secondaryCategories.includes(activeCategory)
+                      ? 'bg-primary text-on-primary border-primary shadow-sm'
+                      : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border-outline-variant/15'
+                  }`}
+                >
+                  <span>{secondaryCategories.includes(activeCategory) ? activeCategory : 'More'}</span>
+                  <span className="material-symbols-outlined text-xs leading-none">expand_more</span>
+                </button>
 
-            {/* Right Scroll Button */}
-            <button 
-              onClick={() => {
-                const container = document.getElementById('category-scroll-container-order');
-                if (container) container.scrollBy({ left: 200, behavior: 'smooth' });
-              }}
-              className="absolute right-1 z-20 flex items-center justify-center w-7 h-7 rounded-full bg-surface border border-outline-variant/20 shadow-sm text-on-surface-variant opacity-0 group-hover/nav:opacity-100 transition-opacity active:scale-90"
-              title="Scroll Right"
-            >
-              <span className="material-symbols-outlined text-sm font-bold">chevron_right</span>
-            </button>
+                {showMoreCategories && (
+                  <div className="absolute right-0 mt-2 w-56 max-h-72 overflow-y-auto bg-surface border border-outline-variant/25 rounded-2xl shadow-xl p-2 custom-scrollbar scroll-smooth">
+                    {secondaryCategories.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => {
+                          setActiveCategory(cat);
+                          setShowMoreCategories(false);
+                        }}
+                        className={`w-full px-4 py-2.5 text-left text-xs font-bold uppercase rounded-xl transition-all ${
+                          activeCategory === cat
+                            ? 'bg-primary/10 text-primary'
+                            : 'text-on-surface-variant hover:bg-surface-container-low'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
           </div>
 
           {/* Search bar positioned next to categories for consistency */}
