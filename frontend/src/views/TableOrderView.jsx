@@ -357,16 +357,24 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
 
           </div>
 
-          {/* Search bar positioned next to categories for consistency */}
+          {/* Search bar with quick clear */}
           <div className="relative w-full md:max-w-[280px] shrink-0">
-            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-base">search</span>
+            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-base pointer-events-none">search</span>
             <input
               type="text"
               placeholder="Search menu..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-surface-container-low border-none rounded-full py-2.5 pl-11 pr-4 text-xs font-semibold focus:ring-2 focus:ring-primary/20 shadow-sm"
+              className="w-full bg-surface-container-low border-none rounded-full py-2.5 pl-11 pr-10 text-xs font-semibold focus:ring-2 focus:ring-primary/20 shadow-sm"
             />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-5 h-5 rounded-full bg-on-surface-variant/20 text-on-surface-variant hover:bg-on-surface-variant/40 active:scale-90 transition-all"
+              >
+                <span className="material-symbols-outlined text-sm font-bold">close</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -380,7 +388,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
                 <div
                   key={p.id}
                   onClick={() => handleAddToCart(p)}
-                  className={`rounded-2xl border ${colors.bg} shadow-sm flex flex-col group cursor-pointer active:scale-[0.97] transition-all min-h-[140px] ${
+                  className={`rounded-2xl border ${colors.bg} shadow-sm flex flex-col group cursor-pointer active:scale-[0.97] transition-all min-h-[156px] ${
                     p.outOfStock
                       ? 'opacity-50 cursor-not-allowed select-none'
                       : 'hover:shadow-md'
@@ -390,7 +398,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${colors.catBadge} leading-none self-start`}>
                       {catName}
                     </span>
-                    <h3 className={`text-sm font-bold leading-tight line-clamp-2 ${p.outOfStock ? 'text-on-surface/50' : 'text-on-surface'}`}>
+                    <h3 className={`text-sm font-bold leading-tight line-clamp-3 ${p.outOfStock ? 'text-on-surface/50' : 'text-on-surface'}`}>
                       {p.name}
                     </h3>
                   </div>
