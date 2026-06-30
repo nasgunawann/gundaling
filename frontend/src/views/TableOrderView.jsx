@@ -2,7 +2,24 @@ import React, { useState } from 'react'
 import { useNotification } from '../components/NotificationProvider'
 import useStore from '../store'
 import CartDrawer from '../components/CartDrawer'
-import NextImage from '../components/NextImage'
+
+const CATEGORY_PALETTE = [
+  { bg: 'bg-emerald-50', border: 'border-l-emerald-500', text: 'text-emerald-700', catBadge: 'bg-emerald-100 text-emerald-700' },
+  { bg: 'bg-amber-50', border: 'border-l-amber-500', text: 'text-amber-700', catBadge: 'bg-amber-100 text-amber-700' },
+  { bg: 'bg-violet-50', border: 'border-l-violet-500', text: 'text-violet-700', catBadge: 'bg-violet-100 text-violet-700' },
+  { bg: 'bg-orange-50', border: 'border-l-orange-500', text: 'text-orange-700', catBadge: 'bg-orange-100 text-orange-700' },
+  { bg: 'bg-cyan-50', border: 'border-l-cyan-500', text: 'text-cyan-700', catBadge: 'bg-cyan-100 text-cyan-700' },
+  { bg: 'bg-rose-50', border: 'border-l-rose-500', text: 'text-rose-700', catBadge: 'bg-rose-100 text-rose-700' },
+  { bg: 'bg-lime-50', border: 'border-l-lime-500', text: 'text-lime-700', catBadge: 'bg-lime-100 text-lime-700' },
+  { bg: 'bg-sky-50', border: 'border-l-sky-500', text: 'text-sky-700', catBadge: 'bg-sky-100 text-sky-700' },
+  { bg: 'bg-pink-50', border: 'border-l-pink-500', text: 'text-pink-700', catBadge: 'bg-pink-100 text-pink-700' },
+  { bg: 'bg-teal-50', border: 'border-l-teal-500', text: 'text-teal-700', catBadge: 'bg-teal-100 text-teal-700' },
+  { bg: 'bg-fuchsia-50', border: 'border-l-fuchsia-500', text: 'text-fuchsia-700', catBadge: 'bg-fuchsia-100 text-fuchsia-700' },
+  { bg: 'bg-yellow-50', border: 'border-l-yellow-500', text: 'text-yellow-700', catBadge: 'bg-yellow-100 text-yellow-700' },
+  { bg: 'bg-indigo-50', border: 'border-l-indigo-500', text: 'text-indigo-700', catBadge: 'bg-indigo-100 text-indigo-700' },
+  { bg: 'bg-red-50', border: 'border-l-red-500', text: 'text-red-700', catBadge: 'bg-red-100 text-red-700' },
+  { bg: 'bg-blue-50', border: 'border-l-blue-500', text: 'text-blue-700', catBadge: 'bg-blue-100 text-blue-700' },
+]
 
 export default function TableOrderView({ selectedTable, setSelectedTable, products, tableCarts, setTableCarts }) {
   const { showToast, showConfirm, requestManagerApproval } = useNotification()
@@ -34,6 +51,12 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
   // 6 Pinned Utama: All, Signature, Tea, Non Coffee, Coffee Based, Western
   const primaryCategories = allCategories.slice(0, 6)
   const secondaryCategories = allCategories.slice(6)
+
+  const getCategoryColor = (catName) => {
+    if (!catName) return CATEGORY_PALETTE[0]
+    const idx = allCategories.indexOf(catName)
+    return CATEGORY_PALETTE[(idx >= 0 ? idx : 0) % CATEGORY_PALETTE.length]
+  }
 
   // Load cart for active table
   const activeCart = tableCarts[selectedTable] || []
@@ -396,61 +419,52 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
           </div>
         </div>
 
-        {/* Product Cards Grid */}
+        {/* Product Cards Grid - Text-only with color-coded categories */}
         <div className="flex-grow p-container_margin overflow-y-auto custom-scrollbar pb-16 bg-surface-container-lowest/30">
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredProducts.length > 0 ? filteredProducts.map((p) => (
-              <div
-                key={p.id}
-                onClick={() => handleAddToCart(p)}
-                className={`bg-surface rounded-2xl overflow-hidden border border-outline-variant/35 shadow-sm flex flex-col justify-between group ${p.outOfStock
-                    ? 'opacity-50 cursor-not-allowed select-none'
-                    : 'cursor-pointer active:scale-[0.98]'
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 md:gap-4">
+            {filteredProducts.length > 0 ? filteredProducts.map((p) => {
+              const catName = p.category?.name || p.category || ''
+              const colors = getCategoryColor(catName)
+              return (
+                <div
+                  key={p.id}
+                  onClick={() => handleAddToCart(p)}
+                  className={`rounded-2xl border border-l-4 ${colors.border} ${colors.bg} shadow-sm flex flex-col justify-between group cursor-pointer active:scale-[0.97] transition-all min-h-[120px] ${
+                    p.outOfStock
+                      ? 'opacity-50 cursor-not-allowed select-none'
+                      : 'hover:shadow-md'
                   }`}
-              >
-                <div>
-                  <div className="aspect-[4/3] bg-surface-container-highest relative overflow-hidden">
-                    <NextImage
-                      alt={p.name}
-                      width={400}
-                      quality={75}
-                      className={`w-full h-full object-cover ${p.outOfStock ? 'grayscale' : ''}`}
-                      src={p.image}
-                    />
-                    <span className={`absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest shadow-sm ${p.outOfStock ? 'bg-error text-on-error' : 'bg-primary text-on-primary'
-                      }`}>
-                      {p.category?.name || p.category || ''}
-                    </span>
-                  </div>
-                  <div className="p-3 pb-2">
-                    <h3 className={`font-display font-bold text-xs mb-0.5 leading-snug truncate ${p.outOfStock ? 'text-on-surface/60' : 'text-on-surface'}`}>
+                >
+                  <div className="p-3 pb-1 flex flex-col gap-1.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${colors.catBadge} leading-none shrink-0`}>
+                        {catName}
+                      </span>
+                      <span className={`text-sm font-bold font-display whitespace-nowrap ${p.outOfStock ? 'text-on-surface-variant/50 line-through' : 'text-primary'}`}>
+                        Rp {Math.floor(p.price).toLocaleString('id-ID')}
+                      </span>
+                    </div>
+                    <h3 className={`text-sm leading-tight font-bold ${p.outOfStock ? 'text-on-surface/50' : 'text-on-surface'}`}>
                       {p.name}
                     </h3>
-                    <p className={`text-[10px] line-clamp-2 leading-relaxed ${p.outOfStock ? 'text-on-surface-variant/40' : 'text-on-surface-variant/80'
-                      }`}>
+                    <p className={`text-[10px] leading-tight line-clamp-2 ${p.outOfStock ? 'text-on-surface-variant/30' : 'text-on-surface-variant'}`}>
                       {p.desc}
                     </p>
                   </div>
+                  <div className="p-3 pt-0 flex justify-end">
+                    {p.outOfStock ? (
+                      <div className="w-9 h-9 bg-surface-container-high text-on-surface-variant/50 rounded-xl flex items-center justify-center">
+                        <span className="material-symbols-outlined text-base font-bold">block</span>
+                      </div>
+                    ) : (
+                      <div className="w-9 h-9 bg-primary text-on-primary rounded-xl flex items-center justify-center shadow-sm active:scale-90 transition-all opacity-80 group-hover:opacity-100">
+                        <span className="material-symbols-outlined text-base font-bold">add</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-
-                <div className="p-3 pt-0 flex justify-between items-center mt-1">
-                  <span className={`text-sm font-bold font-display ${p.outOfStock ? 'text-on-surface-variant/50 line-through' : 'text-primary'
-                    }`}>
-                    Rp {Math.floor(p.price).toLocaleString('id-ID')}
-                  </span>
-
-                  {p.outOfStock ? (
-                    <div className="w-11 h-11 bg-surface-container-high text-on-surface-variant/50 rounded-xl flex items-center justify-center shadow-sm">
-                      <span className="material-symbols-outlined text-base font-bold">block</span>
-                    </div>
-                  ) : (
-                    <div className="w-11 h-11 bg-primary/10 text-primary hover:bg-primary hover:text-on-primary rounded-xl transition-all flex items-center justify-center shadow-sm active:scale-90">
-                      <span className="material-symbols-outlined text-base font-bold">add</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )) : (
+              )
+            }) : (
               <div className="col-span-full rounded-3xl border border-dashed border-outline-variant/40 bg-surface-container-low p-10 text-center text-on-surface-variant">
                 <span className="material-symbols-outlined text-[40px] mb-4 inline-block">search_off</span>
                 <p className="text-sm font-bold">No matching menu items found</p>
