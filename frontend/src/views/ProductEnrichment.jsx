@@ -33,7 +33,10 @@ export default function ProductEnrichment({ products }) {
   const [formAllergen, setFormAllergen] = useState(false);
   const [formGarnish, setFormGarnish] = useState(false);
 
-  const categories = ['All', ...storeCategories.map(c => c.name)];
+  const allCategories = ['All', ...storeCategories.map(c => c.name)];
+  const primaryCategories = allCategories.slice(0, 6);
+  const secondaryCategories = allCategories.slice(6);
+  const [showMoreCategories, setShowMoreCategories] = useState(false);
 
   const handleSelectProduct = (product) => {
     setSelectedProduct(product);
@@ -224,12 +227,15 @@ export default function ProductEnrichment({ products }) {
             
             <div 
               id="category-scroll-container-enrich"
-              className="flex gap-2 overflow-x-auto scrollbar-none py-1 px-8 w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth"
+              className="flex gap-2 overflow-x-auto scrollbar-none py-1 px-8 w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth items-center"
             >
-              {categories.map((cat) => (
+              {primaryCategories.map((cat) => (
                 <button
                   key={cat}
-                  onClick={() => setActiveCategory(cat)}
+                  onClick={() => {
+                    setActiveCategory(cat);
+                    setShowMoreCategories(false);
+                  }}
                   className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border shrink-0 ${activeCategory === cat
                       ? 'bg-primary text-on-primary border-primary shadow-sm'
                       : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border-outline-variant/15'
@@ -238,6 +244,43 @@ export default function ProductEnrichment({ products }) {
                   {cat}
                 </button>
               ))}
+
+              {secondaryCategories.length > 0 && (
+                <div className="relative shrink-0">
+                  <button
+                    onClick={() => setShowMoreCategories(!showMoreCategories)}
+                    className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border flex items-center gap-1.5 ${
+                      secondaryCategories.includes(activeCategory)
+                        ? 'bg-primary text-on-primary border-primary shadow-sm'
+                        : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border-outline-variant/15'
+                    }`}
+                  >
+                    <span>{secondaryCategories.includes(activeCategory) ? activeCategory : 'More'}</span>
+                    <span className="material-symbols-outlined text-xs leading-none">expand_more</span>
+                  </button>
+
+                  {showMoreCategories && (
+                    <div className="absolute left-0 mt-2 w-56 max-h-72 overflow-y-auto bg-surface border border-outline-variant/25 rounded-2xl shadow-xl z-30 p-2 custom-scrollbar scroll-smooth">
+                      {secondaryCategories.map((cat) => (
+                        <button
+                          key={cat}
+                          onClick={() => {
+                            setActiveCategory(cat);
+                            setShowMoreCategories(false);
+                          }}
+                          className={`w-full px-4 py-2.5 text-left text-xs font-bold uppercase rounded-xl transition-all ${
+                            activeCategory === cat
+                              ? 'bg-primary/10 text-primary'
+                              : 'text-on-surface-variant hover:bg-surface-container-low'
+                          }`}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Right Fade Overlay */}

@@ -1,236 +1,236 @@
-Kategori,Nama Menu,Varian,Harga
-Signature,Sumatera Island,Cold,38K
-Signature,Strawberry Latte,Cold,38K
-Signature,Mystical Beet,Cold,35K
-Signature,Cinnamon Coffee,Cold,35K
-Tea,Regular Tea,Hot,18K
-Tea,Regular Tea,Cold,22K
-Tea,Rosemary Tea,Hot,20K
-Tea,Rosemary Tea,Cold,24K
-Tea,Daun Sirih Tea,Hot,20K
-Tea,Daun Sirih Tea,Cold,24K
-Tea,Cikala Tea,Hot,20K
-Tea,Cikala Tea,Cold,24K
-Tea,Pineapple Tea,Hot,20K
-Tea,Pineapple Tea,Cold,24K
-Tea,Markisa Tea,Hot,21K
-Tea,Markisa Tea,Cold,25K
-Tea,Cinnamon Tea,Hot,20K
-Tea,Cinnamon Tea,Cold,24K
-Non Coffee,Chocolate Latte,Hot,38K
-Non Coffee,Chocolate Latte,Cold,38K
-Non Coffee,Green Tea Latte,Hot,38K
-Non Coffee,Green Tea Latte,Cold,38K
-Non Coffee,Taro Latte,Hot,38K
-Non Coffee,Taro Latte,Cold,38K
-Non Coffee,Milo,Hot,38K
-Non Coffee,Milo,Cold,40K
-Non Coffee,Thai Tea Latte,Hot,38K
-Non Coffee,Thai Tea Latte,Cold,38K
-Coffee Based,Cold Brew,Cold,45K
-Coffee Based,Espresso,Hot,30K
-Coffee Based,Sanger,Hot,30K
-Coffee Based,Sanger,Cold,32K
-Coffee Based,Americano,Hot,23K
-Coffee Based,Americano,Cold,25K
-Coffee Based,Picollo,Hot,38K
-Coffee Based,Coffee Milk,Hot,35K
-Coffee Based,Coffee Milk,Cold,35K
-Coffee Based,Rempah Coffee,Hot,27K
-Coffee Based,Rempah Coffee,Cold,29K
-Coffee Based,Rempah Milk Coffee,Hot,32K
-Coffee Based,Rempah Milk Coffee,Cold,34K
-Coffee Based,Palm Sugar Coffee,Hot,35K
-Coffee Based,Palm Sugar Coffee,Cold,35K
-Coffee Based,Coffee Latte,Hot,35K
-Coffee Based,Coffee Latte,Cold,38K
-Coffee Based,Cappuccino,Hot,35K
-Coffee Based,Cappuccino,Cold,38K
-Coffee Based,Cinnamon Coffee,Hot,27K
-Coffee Based,Moccacino,Hot,38K
-Coffee Based,Moccacino,Cold,38K
-Coffee Based,White Mocca,Hot,38K
-Coffee Based,White Mocca,Cold,38K
-Coffee Based,Caramel Latte,Hot,38K
-Coffee Based,Caramel Latte,Cold,38K
-Coffee Based,Caramel Machiato,Hot,38K
-Coffee Based,Caramel Machiato,Cold,38K
-Coffee Based,Vanilla Latte,Hot,38K
-Coffee Based,Vanilla Latte,Cold,38K
-Coffee Based,Hazelnut Latte,Hot,38K
-Coffee Based,Hazelnut Latte,Cold,38K
-Coffee Based,Tiramisu Latte,Hot,38K
-Coffee Based,Tiramisu Latte,Cold,38K
-Coffee Dessert,Affogato,Cold,35K
-Coffee Dessert,Avocado,Cold,41K
-Smoothies,Banana,Cold,50K
-Smoothies,Strawberry,Cold,50K
-Smoothies,Pineapple,Cold,50K
-Smoothies,Tamarillo,Cold,50K
-MilkShakes,Vanilla,Cold,38K
-MilkShakes,Chocolate,Cold,38K
-MilkShakes,Strawberry,Cold,38K
-Blended,Taro Blended,Cold,45K
-Blended,Tamarillo Cookies,Cold,45K
-Blended,Markisa Cookies,Cold,45K
-Blended,Oreo Blended,Cold,45K
-Blended,Choco Brownie,Cold,45K
-Blended,Milo Dino Brownie,Cold,45K
-Blended,Green Tea Blended,Cold,45K
-Frappe,Choco Chip Frappuccino,Cold,45K
-Frappe,Frozen Cappuccino,Cold,45K
-Frappe,Banana Cappuccino,Cold,45K
-Milk,Fresh Milk,Hot,35K
-Milk,Fresh Milk,Cold,35K
-Milk,Honey Fresh Milk,Hot,38K
-Milk,Honey Fresh Milk,Cold,40K
-Milk,Ginger Fresh Milk,Hot,38K
-Milk,Ginger Fresh Milk,Cold,40K
-Milk,Honey Ginger Fresh Milk,Hot,38K
-Milk,Honey Ginger Fresh Milk,Cold,40K
-Milk,Fresh Milk Tea,Hot,38K
-Milk,Fresh Milk Tea,Cold,40K
-Milk,Cinnamon Milk Tea,Hot,38K
-Milk,Cinnamon Milk Tea,Cold,40K
-Beer,Beer Bintang Large,Regular,70K
-Beer,Beer Heineken Large,Regular,95K
-Beer,Beer Heineken Small,Regular,58K
-Cocktail,Wisky Sour,Regular,100K
-Cocktail,Gin Tonic,Regular,95K
-Cocktail,Screwdriver,Regular,80K
-Wine,Lindemans Chardonnay,Regular,667K
-Wine,Lindemans Sauvignon Blanc,Regular,667K
-Wine,Lindemans Shiraz,Regular,667K
-Wine,Lindemans Moscato,Regular,667K
-Wine,Jacob's Creek Cabernet Sauvignon,Regular,667K
-Wine,Jacob's Creek Shiraz,Regular,667K
-Wine,Cockburn Port,Regular,1.450K
-Wine,Nederbrug Cuvee Brut,Regular,754K
-Wine,Obikwa Shiraz,Regular,638K
-Wine,Obikwa Pinotage,Regular,638K
-Wine,Sarah's Creek Cabernet Sauvignon,Regular,928K
-Appetizer,Caprese Salad,Regular,40K
-Appetizer,House Salad,Regular,35K
-Appetizer,Grilled Chicken Salad,Regular,50K
-Appetizer,Mortadella Sandwich,Regular,50K
-Appetizer,Smoked Chicken Sandwich,Regular,50K
-Appetizer,Smoked Salmon Salad,Regular,70K
-Appetizer,Baked Cheese With Honey,Regular,50K
-Snack,Gundaling Cheese Platter,Regular,185K
-Snack,Gundaling Cheese Fondue,Regular,235K
-Snack,Mixed Platter,Regular,150K
-Snack,BBQ Chicken Wings,Regular,55K
-Snack,Popcorn Chicken,Regular,55K
-Snack,Poutine,Regular,55K
-Snack,Potato Wedges,Regular,45K
-Snack,Pastrami Chips,Regular,45K
-Snack,Chips And Salsa,Regular,40K
-Snack,Singkong Goreng,Regular,45K
-Snack,Crispy Edamame,Regular,30K
-Snack,Fried Mushroom,Regular,45K
-Snack,Mozzarella Stick,Regular,115K
-Soup,Pumpkin Cream Soup,Regular,40K
-Soup,Mushroom Cream Soup,Regular,50K
-Soup,Potatoes Cream Soup,Regular,50K
-Taste of Karo,Bakaran Karo,Regular,100K
-Taste of Karo,Nasi Campur Karo,Regular,90K
-Taste of Karo,Sapi Panggang Karo,Regular,100K
-Taste of Karo,Lidah Sapi Bakar,Regular,95K
-Taste of Karo,Iga Bakar Karo,Regular,160K
-Taste of Karo,Tasak Telu,Regular,87K
-Taste of Karo,Nasi Ayam Bakar Arsik,Regular,87K
-Taste of Karo,Sop Iga,Regular,95K
-Taste of Karo,Laksa Karo,Regular,65K
-Taste of Karo,Ikan Arsik,Regular,87K
-Taste of Karo,Nasi Ayam Cikala,Regular,87K
-Taste of Karo,Nasi Goreng Arsik,Regular,65K
-Taste of Karo,Ayam Nira,Regular,87K
-Fried Rice,Gundaling Steak Fried Rice,Regular,85K
-Fried Rice,Grilled Salmon Fried Rice,Regular,95K
-Fried Rice,Beef Kecombrang Fried Rice,Regular,85K
-Western,Gundaling Farmstead Steak,Regular,348K
-Western,Grilled Chicken Mustard,Regular,120K
-Western,BBQ Beef Ribs,Regular,255K
-Western,Crumb Chicken Steak,Regular,100K
-Western,Lemon Butter Salmon,Regular,170K
-Western,Gundaling Hot Dog,Regular,70K
-Western,Gundaling Pan Fried Dory,Regular,87K
-Western,Grilled Smoke Platter,Regular,120K
-Pasta,Aglio E Olio Chicken Pasta,Regular,80K
-Pasta,Aglio E Olio Salmon Pasta,Regular,90K
-Pasta,Grilled Chicken Pasta,Regular,90K
-Pasta,Sapi Panggang Karo Pasta,Regular,100K
-Pasta,Creamy Chicken Pasta,Regular,90K
-Pasta,Creamy Salmon Pasta,Regular,100K
-Pasta,Creamy Tomato Pasta,Regular,80K
-Pasta,Smoked Chicken Pasta,Regular,80K
-Pasta,Creamy Chicken Pesto Pasta,Regular,90K
-Pasta,Smoked Salmon Pasta,Regular,90K
-Pasta,Pepperoni Pasta,Regular,90K
-Pasta,Bolognese Pasta,Regular,80K
-Pizza,Three Cheese,Regular,120K
-Pizza,Margherita,Regular,105K
-Pizza,Carnivore,Regular,130K
-Pizza,Sapi Panggang Karo,Regular,140K
-Pizza,Beef Tongue,Regular,120K
-Pizza,Beef And Mushroom,Regular,120K
-Pizza,Chicken Ham And Cheese,Regular,100K
-Pizza,Arsik Smoked Chicken,Regular,100K
-Pizza,Sausage And Mushroom,Regular,120K
-Pizza,Mushroom,Regular,95K
-Pizza,Farmers Vegetarian,Regular,90K
-Pizza,Chicken And Mushroom,Regular,120K
-Pizza,Smoked Salmon,Regular,130K
-Pizza,Mortadella,Regular,110K
-Pizza,Pepperoni,Regular,110K
-Desserts,Pannacotta,Regular,40K
-Desserts,Bread Butter Pudding,Regular,40K
-Desserts,Pineapple Crumble,Regular,40K
-Desserts,Tanah Berastagi,Regular,50K
-Desserts,Avocado Mousse,Regular,45K
-Desserts,Crème Brûlée,Regular,40K
-Cake,Klepon Cake,Whole,300K
-Cake,Klepon Cake,Slice,47K
-Cake,Nastar Cake,Whole,300K
-Cake,Nastar Cake,Slice,47K
-Cake,Cheese Cake,Whole,395K
-Cake,Cheese Cake,Slice,55K
-Cake,Pound Cake Gula Aren,Regular,85K
-Cake,Pound Cake Pumpkin,Regular,85K
-Cake,Pound Cake Carrot,Regular,85K
-Cake,Moo Roll Cake Markisah,Regular,100K
-Cake,Moo Roll Cake Pandan,Regular,100K
-Cake,Lapis Moo,Regular,70K
-Frozen Food,Bakso Urat - 20 Pcs,Regular,116K
-Frozen Food,Bakso Halus - 30 Pcs,Regular,125K
-Frozen Food,Sosis Ayam - 5 Pcs,Regular,70K
-Frozen Food,Sosis Sapi - 5 Pcs,Regular,85K
-Frozen Food,Chicken Meatloaf - 250 Gr,Regular,87.5K
-Frozen Food,Beef Pastrami - 250 Gr,Regular,117.5K
-Frozen Food,Beef Mortadella - 250 Gr,Regular,87.5K
-Frozen Food,Pepperoni - 250 Gr,Regular,100K
-Paste,Cikala Paste,Regular,25K
-Paste,Arsik Paste,Regular,20K
-Paste,Tomato Basil Sauce,Regular,25K
-Gelato,Gelato Chocolate,Regular,40K
-Gelato,Gelato Strawberry,Regular,40K
-Gelato,Gelato Milk Honey,Regular,40K
-Gelato,Gelato Matcha,Regular,40K
-Gelato,Gelato Sweet Potato,Regular,40K
-Gelato,Gelato Corn,Regular,40K
-Gelato,Gelato Cheese,Regular,45K
-Gelato,Gelato Peanut Butter,Regular,45K
-Gelato,Gelato Coffee,Regular,40K
-Gelato,Sorbet Strawberry,Regular,40K
-Gelato,Sorbet Passion Fruit,Regular,40K
-Gelato,Sorbet Mango,Regular,40K
-Gelato,Sorbet Martabe,Regular,40K
-Cheese,Andaliman Cheese - 250 Gr,Regular,155K
-Cheese,Gundaling Cheese - 250 Gr,Regular,116K
-Cheese,Sinabung Cheese - 250 Gr,Regular,116K
-Cheese,Mozzarella Cheese - 250 Gr,Regular,92K
-Cheese,Camembert - 250 Gr,Regular,87K
-Jams,Strawberry Jam,Regular,45K
-Jams,Passionfruit Jam,Regular,45K
-Jams,Tammarillo Jam,Regular,45K
-Jams,Pinneapple Jam,Regular,45K
+Kategori,Nama Menu,Varian,Harga,Deskripsi
+Signature,Sumatera Island,Cold,38K,"Signature cold drink, likely featuring local Sumatran flavors"
+Signature,Strawberry Latte,Cold,38K,"Steamed milk infused with strawberry flavor"
+Signature,Mystical Beet,Cold,35K,"Signature drink featuring beetroot"
+Signature,Cinnamon Coffee,Cold,35K,"Coffee brewed or flavored with cinnamon"
+Tea,Regular Tea,Hot,18K,"Classic brewed black tea"
+Tea,Regular Tea,Cold,22K,"Classic cold brewed black tea"
+Tea,Rosemary Tea,Hot,20K,"Herbal tea infused with rosemary"
+Tea,Rosemary Tea,Cold,24K,"Herbal tea infused with rosemary"
+Tea,Daun Sirih Tea,Hot,20K,"Herbal tea infused with betel leaves"
+Tea,Daun Sirih Tea,Cold,24K,"Herbal tea infused with betel leaves"
+Tea,Cikala Tea,Hot,20K,"Tea infused with torch ginger (Cikala)"
+Tea,Cikala Tea,Cold,24K,"Tea infused with torch ginger (Cikala)"
+Tea,Pineapple Tea,Hot,20K,"Tea flavored with fresh pineapple"
+Tea,Pineapple Tea,Cold,24K,"Tea flavored with fresh pineapple"
+Tea,Markisa Tea,Hot,21K,"Tea flavored with passion fruit"
+Tea,Markisa Tea,Cold,25K,"Tea flavored with passion fruit"
+Tea,Cinnamon Tea,Hot,20K,"Tea steeped with cinnamon"
+Tea,Cinnamon Tea,Cold,24K,"Tea steeped with cinnamon"
+Non Coffee,Chocolate Latte,Hot,38K,"Steamed milk blended with chocolate"
+Non Coffee,Chocolate Latte,Cold,38K,"Cold milk blended with chocolate"
+Non Coffee,Green Tea Latte,Hot,38K,"Steamed milk blended with green tea or matcha powder"
+Non Coffee,Green Tea Latte,Cold,38K,"Cold milk blended with green tea or matcha powder"
+Non Coffee,Taro Latte,Hot,38K,"Steamed milk blended with sweet taro flavor"
+Non Coffee,Taro Latte,Cold,38K,"Cold milk blended with sweet taro flavor"
+Non Coffee,Milo,Hot,38K,"Classic hot Milo chocolate malt drink"
+Non Coffee,Milo,Cold,40K,"Classic cold Milo chocolate malt drink"
+Non Coffee,Thai Tea Latte,Hot,38K,"Brewed Thai tea mixed with steamed milk"
+Non Coffee,Thai Tea Latte,Cold,38K,"Brewed Thai tea mixed with cold milk"
+Coffee Based,Cold Brew,Cold,45K,"Coffee steeped in cold water for an extended period"
+Coffee Based,Espresso,Hot,30K,"Concentrated coffee brewed by forcing hot water through finely-ground beans"
+Coffee Based,Sanger,Hot,30K,"Traditional Acehnese coffee mixed with a small amount of condensed milk"
+Coffee Based,Sanger,Cold,32K,"Traditional Acehnese iced coffee mixed with a small amount of condensed milk"
+Coffee Based,Americano,Hot,23K,"Espresso diluted with hot water"
+Coffee Based,Americano,Cold,25K,"Espresso diluted with cold water"
+Coffee Based,Picollo,Hot,38K,"A ristretto shot topped with warm, silky milk"
+Coffee Based,Coffee Milk,Hot,35K,"Classic coffee mixed with steamed milk"
+Coffee Based,Coffee Milk,Cold,35K,"Classic iced coffee mixed with milk"
+Coffee Based,Rempah Coffee,Hot,27K,"Coffee brewed with traditional mixed spices"
+Coffee Based,Rempah Coffee,Cold,29K,"Iced coffee brewed with traditional mixed spices"
+Coffee Based,Rempah Milk Coffee,Hot,32K,"Spiced coffee mixed with steamed milk"
+Coffee Based,Rempah Milk Coffee,Cold,34K,"Iced spiced coffee mixed with milk"
+Coffee Based,Palm Sugar Coffee,Hot,35K,"Coffee mixed with steamed milk and sweet palm sugar"
+Coffee Based,Palm Sugar Coffee,Cold,35K,"Iced coffee mixed with milk and sweet palm sugar"
+Coffee Based,Coffee Latte,Hot,35K,"Espresso mixed with steamed milk and a light layer of foam"
+Coffee Based,Coffee Latte,Cold,38K,"Espresso mixed with cold milk and ice"
+Coffee Based,Cappuccino,Hot,35K,"Espresso mixed with steamed milk and a thick layer of foam"
+Coffee Based,Cappuccino,Cold,38K,"Espresso mixed with cold milk and a thick layer of foam"
+Coffee Based,Cinnamon Coffee,Hot,27K,"Coffee brewed or flavored with cinnamon"
+Coffee Based,Moccacino,Hot,38K,"A blend of espresso, steamed milk, and chocolate"
+Coffee Based,Moccacino,Cold,38K,"A blend of espresso, cold milk, and chocolate"
+Coffee Based,White Mocca,Hot,38K,"A blend of espresso, steamed milk, and white chocolate"
+Coffee Based,White Mocca,Cold,38K,"A blend of espresso, cold milk, and white chocolate"
+Coffee Based,Caramel Latte,Hot,38K,"Espresso and steamed milk flavored with caramel syrup"
+Coffee Based,Caramel Latte,Cold,38K,"Espresso and cold milk flavored with caramel syrup"
+Coffee Based,Caramel Machiato,Hot,38K,"Steamed milk flavored with vanilla, topped with a shot of espresso and caramel drizzle"
+Coffee Based,Caramel Machiato,Cold,38K,"Cold milk flavored with vanilla, topped with a shot of espresso and caramel drizzle"
+Coffee Based,Vanilla Latte,Hot,38K,"Espresso and steamed milk flavored with vanilla syrup"
+Coffee Based,Vanilla Latte,Cold,38K,"Espresso and cold milk flavored with vanilla syrup"
+Coffee Based,Hazelnut Latte,Hot,38K,"Espresso and steamed milk flavored with hazelnut syrup"
+Coffee Based,Hazelnut Latte,Cold,38K,"Espresso and cold milk flavored with hazelnut syrup"
+Coffee Based,Tiramisu Latte,Hot,38K,"Espresso and steamed milk with tiramisu flavor"
+Coffee Based,Tiramisu Latte,Cold,38K,"Espresso and cold milk with tiramisu flavor"
+Coffee Dessert,Affogato,Cold,35K,"A scoop of gelato or ice cream topped with a shot of hot espresso"
+Coffee Dessert,Avocado,Cold,41K,"Coffee dessert featuring blended avocado"
+Smoothies,Banana,Cold,50K,"Blended sweet beverage made with fresh banana"
+Smoothies,Strawberry,Cold,50K,"Blended sweet beverage made with fresh strawberry"
+Smoothies,Pineapple,Cold,50K,"Blended sweet beverage made with fresh pineapple"
+Smoothies,Tamarillo,Cold,50K,"Blended sweet beverage made with fresh tamarillo"
+MilkShakes,Vanilla,Cold,38K,"Sweet beverage blended with milk and vanilla ice cream"
+MilkShakes,Chocolate,Cold,38K,"Sweet beverage blended with milk and chocolate ice cream"
+MilkShakes,Strawberry,Cold,38K,"Sweet beverage blended with milk and strawberry ice cream"
+Blended,Taro Blended,Cold,45K,"Ice-blended sweet beverage featuring taro flavor"
+Blended,Tamarillo Cookies,Cold,45K,"Ice-blended beverage featuring tamarillo and cookies"
+Blended,Markisa Cookies,Cold,45K,"Ice-blended beverage featuring passion fruit and cookies"
+Blended,Oreo Blended,Cold,45K,"Ice-blended beverage featuring Oreo cookies"
+Blended,Choco Brownie,Cold,45K,"Ice-blended beverage featuring chocolate brownie flavor"
+Blended,Milo Dino Brownie,Cold,45K,"Ice-blended beverage featuring Milo chocolate and brownie"
+Blended,Green Tea Blended,Cold,45K,"Ice-blended sweet beverage featuring green tea"
+Frappe,Choco Chip Frappuccino,Cold,45K,"Ice-blended sweet drink with chocolate chips, topped with whipped cream"
+Frappe,Frozen Cappuccino,Cold,45K,"Ice-blended cold cappuccino drink"
+Frappe,Banana Cappuccino,Cold,45K,"Ice-blended cold cappuccino with banana flavor"
+Milk,Fresh Milk,Hot,35K,"Warm farm-fresh milk"
+Milk,Fresh Milk,Cold,35K,"Cold farm-fresh milk"
+Milk,Honey Fresh Milk,Hot,38K,"Warm farm-fresh milk sweetened with honey"
+Milk,Honey Fresh Milk,Cold,40K,"Cold farm-fresh milk sweetened with honey"
+Milk,Ginger Fresh Milk,Hot,38K,"Warm farm-fresh milk infused with ginger"
+Milk,Ginger Fresh Milk,Cold,40K,"Cold farm-fresh milk infused with ginger"
+Milk,Honey Ginger Fresh Milk,Hot,38K,"Warm farm-fresh milk infused with ginger and honey"
+Milk,Honey Ginger Fresh Milk,Cold,40K,"Cold farm-fresh milk infused with ginger and honey"
+Milk,Fresh Milk Tea,Hot,38K,"Warm farm-fresh milk blended with tea"
+Milk,Fresh Milk Tea,Cold,40K,"Cold farm-fresh milk blended with tea"
+Milk,Cinnamon Milk Tea,Hot,38K,"Warm farm-fresh milk blended with tea and cinnamon"
+Milk,Cinnamon Milk Tea,Cold,40K,"Cold farm-fresh milk blended with tea and cinnamon"
+Beer,Beer Bintang Large,Regular,70K,"Refreshing alcoholic lager beer"
+Beer,Beer Heineken Large,Regular,95K,"Refreshing alcoholic lager beer"
+Beer,Beer Heineken Small,Regular,58K,"Refreshing alcoholic lager beer"
+Cocktail,Wisky Sour,Regular,100K,"Classic cocktail made with whiskey, citrus juice, and sugar"
+Cocktail,Gin Tonic,Regular,95K,"Classic highball cocktail made with gin and tonic water"
+Cocktail,Screwdriver,Regular,80K,"Classic cocktail made with vodka and orange juice"
+Wine,Lindemans Chardonnay,Regular,667K,"White wine selection from Lindemans"
+Wine,Lindemans Sauvignon Blanc,Regular,667K,"Crisp white wine selection from Lindemans"
+Wine,Lindemans Shiraz,Regular,667K,"Red wine selection from Lindemans"
+Wine,Lindemans Moscato,Regular,667K,"Sweet white wine selection from Lindemans"
+Wine,Jacob's Creek Cabernet Sauvignon,Regular,667K,"Red wine selection from Jacob's Creek"
+Wine,Jacob's Creek Shiraz,Regular,667K,"Red wine selection from Jacob's Creek"
+Wine,Cockburn Port,Regular,1.450K,"Fortified sweet red wine"
+Wine,Nederbrug Cuvee Brut,Regular,754K,"Sparkling white wine"
+Wine,Obikwa Shiraz,Regular,638K,"Red wine selection from Obikwa"
+Wine,Obikwa Pinotage,Regular,638K,"Red wine selection from Obikwa"
+Wine,Sarah's Creek Cabernet Sauvignon,Regular,928K,"Red wine selection from Sarah's Creek"
+Appetizer,Caprese Salad,Regular,40K,"Bocconcini, Sliced Tomato, Basil, Extra Virgin Olive Oil, Balsamic Vinegar (Seasonal)"
+Appetizer,House Salad,Regular,35K,"Mixed Garden Greens, Mozzarella Cubes, Onion, Tomatoes, Cikala Vinaigrette"
+Appetizer,Grilled Chicken Salad,Regular,50K,"Grilled Chicken Breast, Romain Lettuce, Half Avocado, Garlic Crouton, Pastrami Chips, In-House Cheese Dressing"
+Appetizer,Mortadella Sandwich,Regular,50K,"A Grilled Sliced Mortadella with Green Lettuce, Onions, Avocadoes, Tomatoes, a Spread of Mustard and Focaccia Bread"
+Appetizer,Smoked Chicken Sandwich,Regular,50K,"A Grilled Smoked Chicken with Green Lettuce, Onions, Avocadoes, Tomatoes, a Spread of Mustard and Focaccia Bread"
+Appetizer,Smoked Salmon Salad,Regular,70K,"Smoked Salmon, Roman Lettuce, Half Avocado, Garlic Crouton, Poached Egg and Mayonaise Mustard Sauce"
+Appetizer,Baked Cheese With Honey,Regular,50K,"Our Baked Camembert Cheese served with Honey"
+Snack,Gundaling Cheese Platter,Regular,185K,"Gundaling Farmstead Mozzarella, Tomme, Provolone and Camembert Cheese with Condiments"
+Snack,Gundaling Cheese Fondue,Regular,235K,"Deliciously Gooey Cheese Dip made from Gundaling Farmstead's Tomme, Caciocavallo and Mozzarella Cheese. Served with Sausage, Tortilla Chips and Croutons"
+Snack,Mixed Platter,Regular,150K,"Gundaling Farmstead Artisan Sausage and fried Mozzarella Stick, Fried Tortilla, Deep-Fried Berastagi Redskin Potato and Chicken Wings Served with Coleslaw and Dipping"
+Snack,BBQ Chicken Wings,Regular,55K,"Deep-fried Chicken Wings BBQ Sauce mixed with Passion Fruit Sauce Served with Mayonaise Sauce"
+Snack,Popcorn Chicken,Regular,55K,"A Basket of Breaded Chicken served with Tar-tar sauce"
+Snack,Poutine,Regular,55K,"A Thick Cut Deep Fried Fries served with Mozzarella and Hot Brown Gravy"
+Snack,Potato Wedges,Regular,45K,"Deep-Fried Berastagi Redskin Potato, served with Chilli Sauce"
+Snack,Pastrami Chips,Regular,45K,"Deep Fried Sliced Pastrami Served with Mayonaise Mustard Dip"
+Snack,Chips And Salsa,Regular,40K,"A Basket of Crispy Flour Tortilla, served with Avocado Guacamole and Tomato Salsa"
+Snack,Singkong Goreng,Regular,45K,"Deepfried Garlic Flavour Cassava served with Sambal Terasi"
+Snack,Crispy Edamame,Regular,30K,"Deep Fried Battered Edamame with a Touch of Chilli Flake"
+Snack,Fried Mushroom,Regular,45K,"Deepfried Oyster Mushrooms served with Spicy Mayonaise Sauce"
+Snack,Mozzarella Stick,Regular,115K,"Deepfried breaded Mozzarella Stick Served with Tomato Basil Dip"
+Soup,Pumpkin Cream Soup,Regular,40K,"A Cream Soup Consist of Pumpkin Puree"
+Soup,Mushroom Cream Soup,Regular,50K,"A Cream Soup Consist of Mushrooms"
+Soup,Potatoes Cream Soup,Regular,50K,"A Cream Soup Consist of Chunk Potatoes"
+Taste of Karo,Bakaran Karo,Regular,100K,"Gundaling Local Steak, Free Range Chicken and Gundaling Farmstead Artisan Arsik Sausage Served with Arsik Fried Rice, Vegetables and Condiments"
+Taste of Karo,Nasi Campur Karo,Regular,90K,"Steamed Rice Served with Essential Karo Dishes, Grilled Chicken Arsik, Artisan Arsik Sausage, Vegetables and Egg Balado"
+Taste of Karo,Sapi Panggang Karo,Regular,100K,"Our Halal Version of Lokal Karo Favourite Dish Served with Steamed Rice, Gatgat Karo Vegetables, Kecombrang Clear Soup and Sambal Andaliman"
+Taste of Karo,Lidah Sapi Bakar,Regular,95K,"Grill Arsik Beef Tounge, Served with Vegetables and Steamed Rice"
+Taste of Karo,Iga Bakar Karo,Regular,160K,"Grill Beef Ribs with Authentic Karo Seasoning Served with Steamed Rice"
+Taste of Karo,Tasak Telu,Regular,87K,"'Cooked Three Ways' Served with the Chicken Rice of Karo, Boiled Chicken, Traditional Cipera and Cassava Leaves"
+Taste of Karo,Nasi Ayam Bakar Arsik,Regular,87K,"Grill Arsik Chicken, Served with Vegetables and Steamed Rice"
+Taste of Karo,Sop Iga,Regular,95K,"Beef Ribs In Clear Soup Served with Vegetables, Crackers, Steamed Rice and Condiments"
+Taste of Karo,Laksa Karo,Regular,65K,"Spicy Coconut broth, Sliced Beef, Tofu, Boiled Egg, Beansprout, Pumpkin, Served on a bed of Noodles"
+Taste of Karo,Ikan Arsik,Regular,87K,"Dori Fish Fillet Poached on Arsik Broth, Served with Steamed Rice and Condiments"
+Taste of Karo,Nasi Ayam Cikala,Regular,87K,"Soup Chicken with Traditional Karo Spiced Served with Steamed Rice and Condiments"
+Taste of Karo,Nasi Goreng Arsik,Regular,65K,"Taste of Karo Fried Rice Served with Fried Chicken, Fried Egg and Condiments"
+Taste of Karo,Ayam Nira,Regular,87K,"Free-Range Chicken Marinated Over Night In Nira , Slow Cooked In Spicy Arsik Coconut Milk, Served with Vegetables, Steamed Rice and Condiments"
+Fried Rice,Gundaling Steak Fried Rice,Regular,85K,"Grilled Local Steak with Oriental Fried Rice Served with Sunny Side Up, Mixed Green and Condiments"
+Fried Rice,Grilled Salmon Fried Rice,Regular,95K,"Grilled Salmon with Oriental Fried Rice, Sunny Side Up Egg, Mixed Greens and Condiments"
+Fried Rice,Beef Kecombrang Fried Rice,Regular,85K,"Karo Smoked Beef with Oriental Fried Rice, Served with Mixed Green and Condiments"
+Western,Gundaling Farmstead Steak,Regular,348K,"250gr Grilled to Perfection Imported Beef, Served with Mashed Pumpkin, Homefried Potatoes and Backyard Greens with Choices of Sauce"
+Western,Grilled Chicken Mustard,Regular,120K,"Half Chicken Marinated in Mustard, Served with Backyard Mixed Greens, Homefried Potatoes and Tar-tar Sauce"
+Western,BBQ Beef Ribs,Regular,255K,"Farmer Style BBQ Ribs, Served with Coleslaw, Homefried Potatoes, Mixed Greens and Passion Fruit BBQ Sauce"
+Western,Crumb Chicken Steak,Regular,100K,"Fried Breaded Chicken Breast Served with Tomato Basil and Melted Mozzarella, Coleslaw, Potato Salad and Tar-tar Sauce"
+Western,Lemon Butter Salmon,Regular,170K,"Pan-Fried Salmon Fillet Served with Mashed Pumpkin, Potato Salad, Mixed Greens and Lemon Butter Sauce"
+Western,Gundaling Hot Dog,Regular,70K,"Gundaling Homemade Sausage Served with Onion, Backyard Greens, Coleslaw and Homemade Potato Fries on the Side"
+Western,Gundaling Pan Fried Dory,Regular,87K,"150gr Dory Fillet, Mashed Pumpkin, Potato Salad, Coleslaw, Mixed Greens served with Lemon Butter Sauce"
+Western,Grilled Smoke Platter,Regular,120K,"Gundaling Farmstead Smoked Dish Consist of Chicken Sausage, Beef Sausage, Beef Pastrami, Chicken Ham and Mortadella Served with Mixed Greens, Coleslaw, Potato Salad and Brown Gravy"
+Pasta,Aglio E Olio Chicken Pasta,Regular,80K,"A Classic Pasta recipe Cooked with Olive Oil and Garlic Served with Sliced Chicken and Garlic Bread"
+Pasta,Aglio E Olio Salmon Pasta,Regular,90K,"A Classic Pasta recipe Cooked with Olive Oil and Garlic Served with Diced Salmon and Garlic Bread"
+Pasta,Grilled Chicken Pasta,Regular,90K,"Creamy Mushroom Spaghetti Served with Grilled Chicken Mustard and Garlic Bread"
+Pasta,Sapi Panggang Karo Pasta,Regular,100K,"A Pasta Recipe Cooked With Olive Oil and Garlic Served with Smoked Beef, Sambal Kecombrang and Garlic Bread"
+Pasta,Creamy Chicken Pasta,Regular,90K,"A Sauce Consist of Cream and Parmesan Cheese Served with Sliced Chicken and Garlic Bread"
+Pasta,Creamy Salmon Pasta,Regular,100K,"A Sauce Consist of Cream and Parmesan Cheese Served with Diced Salmon and Garlic Butter"
+Pasta,Creamy Tomato Pasta,Regular,80K,"A Combination of Tomato and Cream Sauce, Served with Sliced Beef, Oyster Mushroom and Garlic Bread"
+Pasta,Smoked Chicken Pasta,Regular,80K,"Aglio E Olio Style Cooked with Smoked Chicken and Served with Garlic Bread"
+Pasta,Creamy Chicken Pesto Pasta,Regular,90K,"A Combination of Pesto and Cream Sauce, Served with Sliced Chicken and Garlic Bread"
+Pasta,Smoked Salmon Pasta,Regular,90K,"Aglio E Olio Style Cooked with Smoked Salmon and Served with Garlic Bread"
+Pasta,Pepperoni Pasta,Regular,90K,"Aglio E Olio Style Cooked with Pepperoni and Served with Garlic Bread"
+Pasta,Bolognese Pasta,Regular,80K,"A Sauce Made from Tomatoes, Minced Beef, Garlic and Herbs Served with Garlic Bread"
+Pizza,Three Cheese,Regular,120K,"Tomato Sauce, Mixed Hard Cheese and Mozzarella Cheese"
+Pizza,Margherita,Regular,105K,"Tomato Sauce, Basil, Mixed Hard Cheese and Mozzarella Cheese"
+Pizza,Carnivore,Regular,130K,"Tomato Sauce, Beef, Chicken Sausage, Arsik Smoked Chicken, Mixed Hard Cheese and Mozzarella Cheese"
+Pizza,Sapi Panggang Karo,Regular,140K,"Tomato Sauce, Smoked Beef, Sambal Kecombrang, Mixed Hard Cheese and Mozzarella Cheese"
+Pizza,Beef Tongue,Regular,120K,"Tomato Sauce, Beef Tounge, Onion, Oven Dried Tomato, Mushroom, Mixed Hard Cheese and Mozzarella Cheese"
+Pizza,Beef And Mushroom,Regular,120K,"Tomato Sauce, Beef, Mushroom, Mixed Hard Cheese and Mozzarella Cheese"
+Pizza,Chicken Ham And Cheese,Regular,100K,"Bechamel, Chicken Ham, Mixed Hard Cheese and Mozzarella Cheese"
+Pizza,Arsik Smoked Chicken,Regular,100K,"Arsik Basting Sauce, Onion, Tomato Sauce, Slices Smoked Chicken Arsik, Mixed Hard Cheese and Mozzarella Cheese"
+Pizza,Sausage And Mushroom,Regular,120K,"Tomato Sauce, Chicken Sausage, Mushroom, Mixed Hard Cheese and Mozzarella Cheese"
+Pizza,Mushroom,Regular,95K,"Bechamel, Oyster Mushroom, Mixed Hard Cheese and Mozzarella Cheese"
+Pizza,Farmers Vegetarian,Regular,90K,"Tomato Sauce, Carrot, Pumpkin, Onion, Mushroom, Mixed Hard Cheese and Mozzarella Cheese"
+Pizza,Chicken And Mushroom,Regular,120K,"Tomato Sauce, Arsik Smoked Chicken, Mushroom, Mixed Hard Cheese and Mozzarella Cheese"
+Pizza,Smoked Salmon,Regular,130K,"Tomato Sauce, Smoked Salmon, Mixed Hard Cheese and Mozzarella Cheese"
+Pizza,Mortadella,Regular,110K,"Tomato Sauce, Mortadella, Mixed Hard Cheese and Mozzarella Cheese"
+Pizza,Pepperoni,Regular,110K,"Tomato Sauce, Pepperoni, Mixed Hard Cheese and Mozzarella Cheese"
+Desserts,Pannacotta,Regular,40K,"Vanilla Milk Pudding with a Choice of Tamarillo Sauce or Passion Fruit Sauce"
+Desserts,Bread Butter Pudding,Regular,40K,"A Classic Comfort Dessert, Custardy on the Inside of Our Fresh Baked Bread, Golden and Buttery on Top Served with 3 Choices of Gelato"
+Desserts,Pineapple Crumble,Regular,40K,"Compound Pineapple and Raisin with Herbs, Served with 3 Choices of Gelato"
+Desserts,Tanah Berastagi,Regular,50K,"Chocolate Mousse with Brownies Served with Crumble and A Choice of Gelato"
+Desserts,Avocado Mousse,Regular,45K,"A Dessert of Creamy Avocado with Cookie Layers, Crumble and Ganache Chocolate on Top"
+Desserts,Crème Brûlée,Regular,40K,"A Rich Custard and Sugar on Top, Served with Chunky Strawberry and Meringue"
+Cake,Klepon Cake,Whole,300K,"Cake inspired by traditional Indonesian Klepon, featuring pandan, coconut, and palm sugar flavors"
+Cake,Klepon Cake,Slice,47K,"Cake inspired by traditional Indonesian Klepon, featuring pandan, coconut, and palm sugar flavors"
+Cake,Nastar Cake,Whole,300K,"Cake inspired by classic Nastar, featuring pineapple jam flavors"
+Cake,Nastar Cake,Slice,47K,"Cake inspired by classic Nastar, featuring pineapple jam flavors"
+Cake,Cheese Cake,Whole,395K,"Rich and creamy dessert made with cheese"
+Cake,Cheese Cake,Slice,55K,"Rich and creamy dessert made with cheese"
+Cake,Pound Cake Gula Aren,Regular,85K,"Dense and moist pound cake sweetened with palm sugar"
+Cake,Pound Cake Pumpkin,Regular,85K,"Dense and moist pound cake featuring pumpkin"
+Cake,Pound Cake Carrot,Regular,85K,"Dense and moist pound cake featuring carrot"
+Cake,Moo Roll Cake Markisah,Regular,100K,"Rolled sponge cake with passion fruit filling"
+Cake,Moo Roll Cake Pandan,Regular,100K,"Rolled sponge cake with pandan filling"
+Cake,Lapis Moo,Regular,70K,"Layered cake dessert"
+Frozen Food,Bakso Urat - 20 Pcs,Regular,116K,"Category: 90% Local Meatball; Storing: 0° - 5° Celsius"
+Frozen Food,Bakso Halus - 30 Pcs,Regular,125K,"Category: 90% Local Meatball; Storing: 0° - 5° Celsius"
+Frozen Food,Sosis Ayam - 5 Pcs,Regular,70K,"Category: Sausage; Storing: 0° - 5° Celsius"
+Frozen Food,Sosis Sapi - 5 Pcs,Regular,85K,"Category: Sausage; Storing: 0° - 5° Celsius"
+Frozen Food,Chicken Meatloaf - 250 Gr,Regular,87.5K,"Category: Ham; Storing: 0° - 5° Celsius"
+Frozen Food,Beef Pastrami - 250 Gr,Regular,117.5K,"Category: Ham; Storing: 0° - 5° Celsius"
+Frozen Food,Beef Mortadella - 250 Gr,Regular,87.5K,"Category: Sausage; Storing: 0° - 5° Celsius"
+Frozen Food,Pepperoni - 250 Gr,Regular,100K,"Category: Dry Sausage; Storing: 0° - 5° Celsius"
+Paste,Cikala Paste,Regular,25K,"150 ML; Our Homemade Paste using natural ingredients"
+Paste,Arsik Paste,Regular,20K,"150 ML; Our Homemade Paste using natural ingredients"
+Paste,Tomato Basil Sauce,Regular,25K,"150 ML; Our Homemade Paste using natural ingredients"
+Gelato,Gelato Chocolate,Regular,40K,"Rich Italian-style ice cream featuring chocolate flavor"
+Gelato,Gelato Strawberry,Regular,40K,"Rich Italian-style ice cream featuring strawberry flavor"
+Gelato,Gelato Milk Honey,Regular,40K,"Rich Italian-style ice cream featuring milk and honey flavor"
+Gelato,Gelato Matcha,Regular,40K,"Rich Italian-style ice cream featuring matcha green tea flavor"
+Gelato,Gelato Sweet Potato,Regular,40K,"Rich Italian-style ice cream featuring sweet potato flavor"
+Gelato,Gelato Corn,Regular,40K,"Rich Italian-style ice cream featuring sweet corn flavor"
+Gelato,Gelato Cheese,Regular,45K,"Rich Italian-style ice cream featuring cheese flavor"
+Gelato,Gelato Peanut Butter,Regular,45K,"Rich Italian-style ice cream featuring peanut butter flavor"
+Gelato,Gelato Coffee,Regular,40K,"Rich Italian-style ice cream featuring coffee flavor"
+Gelato,Sorbet Strawberry,Regular,40K,"Dairy-free frozen dessert featuring strawberry flavor"
+Gelato,Sorbet Passion Fruit,Regular,40K,"Dairy-free frozen dessert featuring passion fruit flavor"
+Gelato,Sorbet Mango,Regular,40K,"Dairy-free frozen dessert featuring mango flavor"
+Gelato,Sorbet Martabe,Regular,40K,"Dairy-free frozen dessert featuring passion fruit and tamarillo (Martabe) flavor"
+Cheese,Andaliman Cheese - 250 Gr,Regular,155K,"Style: Tomme Andallman Style; Category: Hard Cheese; Storing: 5°-10° Celsius; Age: 8 Months - 3 Years"
+Cheese,Gundaling Cheese - 250 Gr,Regular,116K,"Style: Tomme Style; Category: Hard Cheese; Storing: 5°-10° Celsius; Age: 8 Months - 3 Years"
+Cheese,Sinabung Cheese - 250 Gr,Regular,116K,"Style: Tomme Style; Category: Semi - Hard Cheese; Storing: 5°-10° Celsius; Age: 8 Months - 2 Years"
+Cheese,Mozzarella Cheese - 250 Gr,Regular,92K,"Style: Mozzarella; Category: Soft Cheese; Storing: 5°-10° Celsius; Age: 3 Months - 6 Months"
+Cheese,Camembert - 250 Gr,Regular,87K,"Style: Camembert; Category: Soft Cheese; Storing: 5°-10° Celsius; Age: 2 Weeks - 2 Months"
+Jams,Strawberry Jam,Regular,45K,"150 ML; Our Homemade Jams using natural ingredients"
+Jams,Passionfruit Jam,Regular,45K,"150 ML; Our Homemade Jams using natural ingredients"
+Jams,Tammarillo Jam,Regular,45K,"150 ML; Our Homemade Jams using natural ingredients"
+Jams,Pinneapple Jam,Regular,45K,"150 ML; Our Homemade Jams using natural ingredients"
