@@ -1,0 +1,236 @@
+Kategori,Nama Menu,Varian,Harga
+Signature,Sumatera Island,Cold,38K
+Signature,Strawberry Latte,Cold,38K
+Signature,Mystical Beet,Cold,35K
+Signature,Cinnamon Coffee,Cold,35K
+Tea,Regular Tea,Hot,18K
+Tea,Regular Tea,Cold,22K
+Tea,Rosemary Tea,Hot,20K
+Tea,Rosemary Tea,Cold,24K
+Tea,Daun Sirih Tea,Hot,20K
+Tea,Daun Sirih Tea,Cold,24K
+Tea,Cikala Tea,Hot,20K
+Tea,Cikala Tea,Cold,24K
+Tea,Pineapple Tea,Hot,20K
+Tea,Pineapple Tea,Cold,24K
+Tea,Markisa Tea,Hot,21K
+Tea,Markisa Tea,Cold,25K
+Tea,Cinnamon Tea,Hot,20K
+Tea,Cinnamon Tea,Cold,24K
+Non Coffee,Chocolate Latte,Hot,38K
+Non Coffee,Chocolate Latte,Cold,38K
+Non Coffee,Green Tea Latte,Hot,38K
+Non Coffee,Green Tea Latte,Cold,38K
+Non Coffee,Taro Latte,Hot,38K
+Non Coffee,Taro Latte,Cold,38K
+Non Coffee,Milo,Hot,38K
+Non Coffee,Milo,Cold,40K
+Non Coffee,Thai Tea Latte,Hot,38K
+Non Coffee,Thai Tea Latte,Cold,38K
+Coffee Based,Cold Brew,Cold,45K
+Coffee Based,Espresso,Hot,30K
+Coffee Based,Sanger,Hot,30K
+Coffee Based,Sanger,Cold,32K
+Coffee Based,Americano,Hot,23K
+Coffee Based,Americano,Cold,25K
+Coffee Based,Picollo,Hot,38K
+Coffee Based,Coffee Milk,Hot,35K
+Coffee Based,Coffee Milk,Cold,35K
+Coffee Based,Rempah Coffee,Hot,27K
+Coffee Based,Rempah Coffee,Cold,29K
+Coffee Based,Rempah Milk Coffee,Hot,32K
+Coffee Based,Rempah Milk Coffee,Cold,34K
+Coffee Based,Palm Sugar Coffee,Hot,35K
+Coffee Based,Palm Sugar Coffee,Cold,35K
+Coffee Based,Coffee Latte,Hot,35K
+Coffee Based,Coffee Latte,Cold,38K
+Coffee Based,Cappuccino,Hot,35K
+Coffee Based,Cappuccino,Cold,38K
+Coffee Based,Cinnamon Coffee,Hot,27K
+Coffee Based,Moccacino,Hot,38K
+Coffee Based,Moccacino,Cold,38K
+Coffee Based,White Mocca,Hot,38K
+Coffee Based,White Mocca,Cold,38K
+Coffee Based,Caramel Latte,Hot,38K
+Coffee Based,Caramel Latte,Cold,38K
+Coffee Based,Caramel Machiato,Hot,38K
+Coffee Based,Caramel Machiato,Cold,38K
+Coffee Based,Vanilla Latte,Hot,38K
+Coffee Based,Vanilla Latte,Cold,38K
+Coffee Based,Hazelnut Latte,Hot,38K
+Coffee Based,Hazelnut Latte,Cold,38K
+Coffee Based,Tiramisu Latte,Hot,38K
+Coffee Based,Tiramisu Latte,Cold,38K
+Coffee Dessert,Affogato,Cold,35K
+Coffee Dessert,Avocado,Cold,41K
+Smoothies,Banana,Cold,50K
+Smoothies,Strawberry,Cold,50K
+Smoothies,Pineapple,Cold,50K
+Smoothies,Tamarillo,Cold,50K
+MilkShakes,Vanilla,Cold,38K
+MilkShakes,Chocolate,Cold,38K
+MilkShakes,Strawberry,Cold,38K
+Blended,Taro Blended,Cold,45K
+Blended,Tamarillo Cookies,Cold,45K
+Blended,Markisa Cookies,Cold,45K
+Blended,Oreo Blended,Cold,45K
+Blended,Choco Brownie,Cold,45K
+Blended,Milo Dino Brownie,Cold,45K
+Blended,Green Tea Blended,Cold,45K
+Frappe,Choco Chip Frappuccino,Cold,45K
+Frappe,Frozen Cappuccino,Cold,45K
+Frappe,Banana Cappuccino,Cold,45K
+Milk,Fresh Milk,Hot,35K
+Milk,Fresh Milk,Cold,35K
+Milk,Honey Fresh Milk,Hot,38K
+Milk,Honey Fresh Milk,Cold,40K
+Milk,Ginger Fresh Milk,Hot,38K
+Milk,Ginger Fresh Milk,Cold,40K
+Milk,Honey Ginger Fresh Milk,Hot,38K
+Milk,Honey Ginger Fresh Milk,Cold,40K
+Milk,Fresh Milk Tea,Hot,38K
+Milk,Fresh Milk Tea,Cold,40K
+Milk,Cinnamon Milk Tea,Hot,38K
+Milk,Cinnamon Milk Tea,Cold,40K
+Beer,Beer Bintang Large,Regular,70K
+Beer,Beer Heineken Large,Regular,95K
+Beer,Beer Heineken Small,Regular,58K
+Cocktail,Wisky Sour,Regular,100K
+Cocktail,Gin Tonic,Regular,95K
+Cocktail,Screwdriver,Regular,80K
+Wine,Lindemans Chardonnay,Regular,667K
+Wine,Lindemans Sauvignon Blanc,Regular,667K
+Wine,Lindemans Shiraz,Regular,667K
+Wine,Lindemans Moscato,Regular,667K
+Wine,Jacob's Creek Cabernet Sauvignon,Regular,667K
+Wine,Jacob's Creek Shiraz,Regular,667K
+Wine,Cockburn Port,Regular,1.450K
+Wine,Nederbrug Cuvee Brut,Regular,754K
+Wine,Obikwa Shiraz,Regular,638K
+Wine,Obikwa Pinotage,Regular,638K
+Wine,Sarah's Creek Cabernet Sauvignon,Regular,928K
+Appetizer,Caprese Salad,Regular,40K
+Appetizer,House Salad,Regular,35K
+Appetizer,Grilled Chicken Salad,Regular,50K
+Appetizer,Mortadella Sandwich,Regular,50K
+Appetizer,Smoked Chicken Sandwich,Regular,50K
+Appetizer,Smoked Salmon Salad,Regular,70K
+Appetizer,Baked Cheese With Honey,Regular,50K
+Snack,Gundaling Cheese Platter,Regular,185K
+Snack,Gundaling Cheese Fondue,Regular,235K
+Snack,Mixed Platter,Regular,150K
+Snack,BBQ Chicken Wings,Regular,55K
+Snack,Popcorn Chicken,Regular,55K
+Snack,Poutine,Regular,55K
+Snack,Potato Wedges,Regular,45K
+Snack,Pastrami Chips,Regular,45K
+Snack,Chips And Salsa,Regular,40K
+Snack,Singkong Goreng,Regular,45K
+Snack,Crispy Edamame,Regular,30K
+Snack,Fried Mushroom,Regular,45K
+Snack,Mozzarella Stick,Regular,115K
+Soup,Pumpkin Cream Soup,Regular,40K
+Soup,Mushroom Cream Soup,Regular,50K
+Soup,Potatoes Cream Soup,Regular,50K
+Taste of Karo,Bakaran Karo,Regular,100K
+Taste of Karo,Nasi Campur Karo,Regular,90K
+Taste of Karo,Sapi Panggang Karo,Regular,100K
+Taste of Karo,Lidah Sapi Bakar,Regular,95K
+Taste of Karo,Iga Bakar Karo,Regular,160K
+Taste of Karo,Tasak Telu,Regular,87K
+Taste of Karo,Nasi Ayam Bakar Arsik,Regular,87K
+Taste of Karo,Sop Iga,Regular,95K
+Taste of Karo,Laksa Karo,Regular,65K
+Taste of Karo,Ikan Arsik,Regular,87K
+Taste of Karo,Nasi Ayam Cikala,Regular,87K
+Taste of Karo,Nasi Goreng Arsik,Regular,65K
+Taste of Karo,Ayam Nira,Regular,87K
+Fried Rice,Gundaling Steak Fried Rice,Regular,85K
+Fried Rice,Grilled Salmon Fried Rice,Regular,95K
+Fried Rice,Beef Kecombrang Fried Rice,Regular,85K
+Western,Gundaling Farmstead Steak,Regular,348K
+Western,Grilled Chicken Mustard,Regular,120K
+Western,BBQ Beef Ribs,Regular,255K
+Western,Crumb Chicken Steak,Regular,100K
+Western,Lemon Butter Salmon,Regular,170K
+Western,Gundaling Hot Dog,Regular,70K
+Western,Gundaling Pan Fried Dory,Regular,87K
+Western,Grilled Smoke Platter,Regular,120K
+Pasta,Aglio E Olio Chicken Pasta,Regular,80K
+Pasta,Aglio E Olio Salmon Pasta,Regular,90K
+Pasta,Grilled Chicken Pasta,Regular,90K
+Pasta,Sapi Panggang Karo Pasta,Regular,100K
+Pasta,Creamy Chicken Pasta,Regular,90K
+Pasta,Creamy Salmon Pasta,Regular,100K
+Pasta,Creamy Tomato Pasta,Regular,80K
+Pasta,Smoked Chicken Pasta,Regular,80K
+Pasta,Creamy Chicken Pesto Pasta,Regular,90K
+Pasta,Smoked Salmon Pasta,Regular,90K
+Pasta,Pepperoni Pasta,Regular,90K
+Pasta,Bolognese Pasta,Regular,80K
+Pizza,Three Cheese,Regular,120K
+Pizza,Margherita,Regular,105K
+Pizza,Carnivore,Regular,130K
+Pizza,Sapi Panggang Karo,Regular,140K
+Pizza,Beef Tongue,Regular,120K
+Pizza,Beef And Mushroom,Regular,120K
+Pizza,Chicken Ham And Cheese,Regular,100K
+Pizza,Arsik Smoked Chicken,Regular,100K
+Pizza,Sausage And Mushroom,Regular,120K
+Pizza,Mushroom,Regular,95K
+Pizza,Farmers Vegetarian,Regular,90K
+Pizza,Chicken And Mushroom,Regular,120K
+Pizza,Smoked Salmon,Regular,130K
+Pizza,Mortadella,Regular,110K
+Pizza,Pepperoni,Regular,110K
+Desserts,Pannacotta,Regular,40K
+Desserts,Bread Butter Pudding,Regular,40K
+Desserts,Pineapple Crumble,Regular,40K
+Desserts,Tanah Berastagi,Regular,50K
+Desserts,Avocado Mousse,Regular,45K
+Desserts,Crème Brûlée,Regular,40K
+Cake,Klepon Cake,Whole,300K
+Cake,Klepon Cake,Slice,47K
+Cake,Nastar Cake,Whole,300K
+Cake,Nastar Cake,Slice,47K
+Cake,Cheese Cake,Whole,395K
+Cake,Cheese Cake,Slice,55K
+Cake,Pound Cake Gula Aren,Regular,85K
+Cake,Pound Cake Pumpkin,Regular,85K
+Cake,Pound Cake Carrot,Regular,85K
+Cake,Moo Roll Cake Markisah,Regular,100K
+Cake,Moo Roll Cake Pandan,Regular,100K
+Cake,Lapis Moo,Regular,70K
+Frozen Food,Bakso Urat - 20 Pcs,Regular,116K
+Frozen Food,Bakso Halus - 30 Pcs,Regular,125K
+Frozen Food,Sosis Ayam - 5 Pcs,Regular,70K
+Frozen Food,Sosis Sapi - 5 Pcs,Regular,85K
+Frozen Food,Chicken Meatloaf - 250 Gr,Regular,87.5K
+Frozen Food,Beef Pastrami - 250 Gr,Regular,117.5K
+Frozen Food,Beef Mortadella - 250 Gr,Regular,87.5K
+Frozen Food,Pepperoni - 250 Gr,Regular,100K
+Paste,Cikala Paste,Regular,25K
+Paste,Arsik Paste,Regular,20K
+Paste,Tomato Basil Sauce,Regular,25K
+Gelato,Gelato Chocolate,Regular,40K
+Gelato,Gelato Strawberry,Regular,40K
+Gelato,Gelato Milk Honey,Regular,40K
+Gelato,Gelato Matcha,Regular,40K
+Gelato,Gelato Sweet Potato,Regular,40K
+Gelato,Gelato Corn,Regular,40K
+Gelato,Gelato Cheese,Regular,45K
+Gelato,Gelato Peanut Butter,Regular,45K
+Gelato,Gelato Coffee,Regular,40K
+Gelato,Sorbet Strawberry,Regular,40K
+Gelato,Sorbet Passion Fruit,Regular,40K
+Gelato,Sorbet Mango,Regular,40K
+Gelato,Sorbet Martabe,Regular,40K
+Cheese,Andaliman Cheese - 250 Gr,Regular,155K
+Cheese,Gundaling Cheese - 250 Gr,Regular,116K
+Cheese,Sinabung Cheese - 250 Gr,Regular,116K
+Cheese,Mozzarella Cheese - 250 Gr,Regular,92K
+Cheese,Camembert - 250 Gr,Regular,87K
+Jams,Strawberry Jam,Regular,45K
+Jams,Passionfruit Jam,Regular,45K
+Jams,Tammarillo Jam,Regular,45K
+Jams,Pinneapple Jam,Regular,45K
