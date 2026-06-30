@@ -25,7 +25,8 @@ export default function CartDrawer({
   isSendingToKitchen,
   showReceiptModal,
   setShowReceiptModal,
-  handleTriggerSystemPrint
+  handleTriggerSystemPrint,
+  orderNumber
 }) {
   const user = useStore((state) => state.user)
   const isManager = user?.role === 'Manager'
@@ -263,6 +264,7 @@ export default function CartDrawer({
         subtotal={subtotal}
         serviceCharge={serviceCharge}
         grandTotal={grandTotal}
+        orderNumber={orderNumber}
       />
     </>
   );

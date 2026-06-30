@@ -388,6 +388,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
         showReceiptModal={showReceiptModal}
         setShowReceiptModal={setShowReceiptModal}
         handleTriggerSystemPrint={handleTriggerSystemPrint}
+        orderNumber={activeCart.find(i => i.sent)?.orderId ? storeOrders.find(o => o.id === activeCart.find(i => i.sent).orderId)?.orderNumber : null}
       />
 
       {/* Floating Action Button (FAB) for Cart Summary in bottom-right */}

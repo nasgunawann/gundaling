@@ -31,7 +31,7 @@ export default function TicketCard({
               )}
             </div>
             <p className="text-[9px] font-bold opacity-80 uppercase tracking-wider mt-0.5 font-mono">
-              Order #{order.id}
+              Order #{order.orderNumber || order.order_number || order.id}
             </p>
           </div>
           <span className={`text-[10px] font-mono rounded-full px-2.5 py-0.5 select-none ${order.isPendingSync ? 'bg-status-warning/20 text-status-warning font-bold' : styles.timerBadge}`}>

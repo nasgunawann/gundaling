@@ -9,7 +9,8 @@ export default function ReceiptModal({
   activeCart,
   subtotal,
   serviceCharge,
-  grandTotal
+  grandTotal,
+  orderNumber
 }) {
   const now = React.useMemo(() => new Date(), [open])
   const invoiceNumber = React.useMemo(() => `GND-${Math.floor(1000 + Math.random() * 9000)}`, [open])
@@ -50,6 +51,12 @@ export default function ReceiptModal({
             <div className="text-right">{selectedTable}</div>
             <div>Invoice</div>
             <div className="text-right">{invoiceNumber}</div>
+            {orderNumber && (
+              <>
+                <div>Order No</div>
+                <div className="text-right">#{orderNumber}</div>
+              </>
+            )}
           </div>
 
           <div className="space-y-3 mb-4">
