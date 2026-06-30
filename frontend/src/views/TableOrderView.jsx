@@ -421,7 +421,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
 
         {/* Product Cards Grid - Text-only with color-coded categories */}
         <div className="flex-grow p-container_margin overflow-y-auto custom-scrollbar pb-16 bg-surface-container-lowest/30">
-          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 md:gap-4">
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
             {filteredProducts.length > 0 ? filteredProducts.map((p) => {
               const catName = p.category?.name || p.category || ''
               const colors = getCategoryColor(catName)
@@ -429,36 +429,31 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
                 <div
                   key={p.id}
                   onClick={() => handleAddToCart(p)}
-                  className={`rounded-2xl border border-l-4 ${colors.border} ${colors.bg} shadow-sm flex flex-col justify-between group cursor-pointer active:scale-[0.97] transition-all min-h-[120px] ${
+                  className={`rounded-2xl border ${colors.bg} shadow-sm flex flex-col group cursor-pointer active:scale-[0.97] transition-all min-h-[140px] ${
                     p.outOfStock
                       ? 'opacity-50 cursor-not-allowed select-none'
                       : 'hover:shadow-md'
                   }`}
                 >
-                  <div className="p-3 pb-1 flex flex-col gap-1.5">
-                    <div className="flex items-start justify-between gap-2">
-                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${colors.catBadge} leading-none shrink-0`}>
-                        {catName}
-                      </span>
-                      <span className={`text-sm font-bold font-display whitespace-nowrap ${p.outOfStock ? 'text-on-surface-variant/50 line-through' : 'text-primary'}`}>
-                        Rp {Math.floor(p.price).toLocaleString('id-ID')}
-                      </span>
-                    </div>
-                    <h3 className={`text-sm leading-tight font-bold ${p.outOfStock ? 'text-on-surface/50' : 'text-on-surface'}`}>
+                  <div className="p-4 pb-1 flex flex-col gap-1.5 flex-1">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${colors.catBadge} leading-none self-start`}>
+                      {catName}
+                    </span>
+                    <h3 className={`text-sm font-bold leading-tight line-clamp-2 ${p.outOfStock ? 'text-on-surface/50' : 'text-on-surface'}`}>
                       {p.name}
                     </h3>
-                    <p className={`text-[10px] leading-tight line-clamp-2 ${p.outOfStock ? 'text-on-surface-variant/30' : 'text-on-surface-variant'}`}>
-                      {p.desc}
-                    </p>
                   </div>
-                  <div className="p-3 pt-0 flex justify-end">
+                  <div className="px-4 pb-3 flex items-center justify-between">
+                    <span className={`text-sm font-bold font-display ${p.outOfStock ? 'text-on-surface-variant/50 line-through' : 'text-primary'}`}>
+                      Rp {Math.floor(p.price).toLocaleString('id-ID')}
+                    </span>
                     {p.outOfStock ? (
-                      <div className="w-9 h-9 bg-surface-container-high text-on-surface-variant/50 rounded-xl flex items-center justify-center">
-                        <span className="material-symbols-outlined text-base font-bold">block</span>
+                      <div className="w-8 h-8 bg-surface-container-high text-on-surface-variant/50 rounded-xl flex items-center justify-center">
+                        <span className="material-symbols-outlined text-sm font-bold">block</span>
                       </div>
                     ) : (
-                      <div className="w-9 h-9 bg-primary text-on-primary rounded-xl flex items-center justify-center shadow-sm active:scale-90 transition-all opacity-80 group-hover:opacity-100">
-                        <span className="material-symbols-outlined text-base font-bold">add</span>
+                      <div className="w-8 h-8 bg-primary text-on-primary rounded-xl flex items-center justify-center shadow-sm active:scale-90 transition-all opacity-80 group-hover:opacity-100">
+                        <span className="material-symbols-outlined text-sm font-bold">add</span>
                       </div>
                     )}
                   </div>
