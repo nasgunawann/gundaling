@@ -23,33 +23,9 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
   const [localTables, setLocalTables] = useState([]);
   const [draggedTableId, setDraggedTableId] = useState(null);
   const [snapEnabled, setSnapEnabled] = useState(true);
-  const [isPlacingTable, setIsPlacingTable] = useState(false);
-  const [placeCoords, setPlaceCoords] = useState({ x: 45, y: 40 });
   const SNAP_GRID = 5;
 
   const snapToGrid = (val) => Math.round(val / SNAP_GRID) * SNAP_GRID;
-
-  const OVERLAP_THRESHOLD = 18;
-  const getOverlappingIds = (tables) => {
-    const ids = new Set();
-    for (let i = 0; i < tables.length; i++) {
-      for (let j = i + 1; j < tables.length; j++) {
-        const a = tables[i];
-        const b = tables[j];
-        const ax = a.posX !== undefined ? a.posX : (a.pos_x || 0);
-        const ay = a.posY !== undefined ? a.posY : (a.pos_y || 0);
-        const bx = b.posX !== undefined ? b.posX : (b.pos_x || 0);
-        const by = b.posY !== undefined ? b.posY : (b.pos_y || 0);
-        const dx = ax - bx;
-        const dy = ay - by;
-        if (Math.sqrt(dx * dx + dy * dy) < OVERLAP_THRESHOLD) {
-          ids.add(a.id);
-          ids.add(b.id);
-        }
-      }
-    }
-    return ids;
-  };
   
   // Create table modal states
   const [showAddModal, setShowAddModal] = useState(false);
@@ -130,6 +106,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
 
   const handlePointerDown = (e, table) => {
     if (!isEditMode) return;
+    if (e.target.closest('button')) return;
     e.preventDefault();
 
     const container = containerRef.current;
@@ -194,23 +171,6 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
     await updateTablePosition(tableId, x, y);
   };
 
-  const handleCanvasClick = (e) => {
-    if (!isPlacingTable) return;
-    if (e.target !== e.currentTarget) return;
-
-    const container = containerRef.current;
-    if (!container) return;
-    const rect = container.getBoundingClientRect();
-    let x = ((e.clientX - rect.left) / rect.width) * 100;
-    let y = ((e.clientY - rect.top) / rect.height) * 100;
-    if (snapEnabled) { x = snapToGrid(x); y = snapToGrid(y); }
-    x = Math.max(1, Math.min(88, parseFloat(x.toFixed(2))));
-    y = Math.max(1, Math.min(85, parseFloat(y.toFixed(2))));
-    setPlaceCoords({ x, y });
-    setIsPlacingTable(false);
-    setShowAddModal(true);
-  };
-
   const handleAddTableSubmit = async (e) => {
     e.preventDefault();
     if (!newTableName.trim()) {
@@ -223,8 +183,8 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
         name: newTableName,
         seats: parseInt(newTableSeats),
         shape: newTableShape,
-        posX: placeCoords.x,
-        posY: placeCoords.y,
+        posX: 45.00,
+        posY: 40.00,
         status: 'Available'
       });
 
@@ -353,20 +313,11 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                 <span className="material-symbols-outlined text-sm">grid_on</span>
               </button>
               <button
-                onClick={() => {
-                  setIsPlacingTable(!isPlacingTable);
-                  if (!isPlacingTable) setShowAddModal(false);
-                }}
-                className={`h-12 px-4 rounded-xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-all text-xs uppercase tracking-wider ${
-                  isPlacingTable
-                    ? 'bg-primary text-on-primary shadow-lg scale-105 ring-2 ring-primary ring-offset-2'
-                    : 'bg-secondary text-on-secondary hover:opacity-90'
-                }`}
+                onClick={() => setShowAddModal(true)}
+                className="h-12 px-4 bg-secondary text-on-secondary rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all text-xs uppercase tracking-wider"
               >
-                <span className="material-symbols-outlined text-sm">
-                  {isPlacingTable ? 'touch_app' : 'add_box'}
-                </span>
-                {isPlacingTable ? 'Tap Canvas' : 'Add Table'}
+                <span className="material-symbols-outlined text-sm">add_box</span>
+                Add Table
               </button>
               </>
             )}
@@ -413,12 +364,9 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
         {/* Floor Canvas container */}
         <div 
           ref={containerRef}
-          onClick={handleCanvasClick}
           className={`flex-grow w-full rounded-[36px] relative overflow-hidden border-2 border-dashed transition-all duration-300 ${
             isEditMode 
-              ? isPlacingTable
-                ? 'border-primary bg-primary/5 shadow-inner cursor-crosshair'
-                : 'border-amber-500 bg-amber-500/5 shadow-inner'
+              ? 'border-amber-500 bg-amber-500/5 shadow-inner' 
               : 'border-outline-variant/30 bg-surface-container-lowest/30 shadow-sm'
           }`}
           style={{
@@ -438,10 +386,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
               </p>
             </div>
           ) : (
-            (() => {
-              const overlappingIds = isEditMode ? getOverlappingIds(localTables) : new Set();
-              return localTables.map((table) => {
-              const isOverlapping = overlappingIds.has(table.id);
+            localTables.map((table) => {
               // Standardized responsive layout sizes
               const shapeClass = table.shape === 'circle' 
                 ? 'rounded-full aspect-square w-28 h-28 flex flex-col items-center justify-center text-center p-3' 
@@ -473,13 +418,10 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                   }}
                   className={`${isEditMode
                     ? draggedTableId === table.id
-                      ? 'cursor-grabbing scale-105 shadow-2xl'
-                      : isOverlapping
-                        ? 'cursor-grab ring-2 ring-error ring-offset-2 ring-offset-transparent animate-pulse'
-                        : 'cursor-grab hover:shadow-xl'
+                      ? 'cursor-grabbing scale-105'
+                      : 'cursor-grab'
                     : 'cursor-pointer'
                   }`}
-                  title={isOverlapping ? 'Table overlaps with another table!' : undefined}
                 >
                   {isTablePendingSync && (
                     <span className="absolute -top-3 -right-1 bg-status-warning text-status-on-warning text-[8px] font-extrabold p-1 rounded-full uppercase tracking-wider shadow-md animate-pulse z-30 border border-surface flex items-center justify-center" title="Pending Sync">
@@ -495,7 +437,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                   <button
                     onClick={() => handleTableClick(table)}
                     disabled={isEditMode}
-                    className={`border group shadow-sm select-none ${shapeClass} ${getStatusColor(table.status)}`}
+                    className={`border group select-none ${shapeClass} ${getStatusColor(table.status)}`}
                   >
                     {table.shape === 'circle' ? (
                       // Circle Centered Content
@@ -582,7 +524,6 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                 </div>
               );
             })
-          })()
           )}
         </div>
       </div>
@@ -629,29 +570,6 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
               <option value="square">Square</option>
               <option value="rectangle">Rectangle</option>
             </select>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Position X%</label>
-              <input 
-                type="number" 
-                step="0.5" min="1" max="88"
-                value={placeCoords.x} 
-                onChange={(e) => setPlaceCoords(prev => ({ ...prev, x: parseFloat(e.target.value) || 0 }))}
-                className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-xs font-semibold shadow-sm focus:ring-2 focus:ring-primary"
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Position Y%</label>
-              <input 
-                type="number" 
-                step="0.5" min="1" max="85"
-                value={placeCoords.y} 
-                onChange={(e) => setPlaceCoords(prev => ({ ...prev, y: parseFloat(e.target.value) || 0 }))}
-                className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-xs font-semibold shadow-sm focus:ring-2 focus:ring-primary"
-              />
-            </div>
           </div>
 
           <button 
