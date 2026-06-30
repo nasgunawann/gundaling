@@ -95,7 +95,12 @@ export default function Reservations({ reservations, onSeatGuest }) {
 
   const openAddModal = () => {
     if (storeTables.length > 0 && !newTable) {
-      setNewTable(storeTables[0].id.toString());
+      const firstAvailable = storeTables.find(t =>
+        !(storeOrders || []).some(
+          (o) => (o.tableId === t.id || o.table_id === t.id) && o.status !== 'paid'
+        )
+      );
+      setNewTable((firstAvailable || storeTables[0]).id.toString());
     }
     setShowAddModal(true);
   };

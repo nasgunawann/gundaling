@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
@@ -22,6 +22,14 @@ export class ReservationsService {
   }
 
   async create(dto: CreateReservationDto) {
+    // Prevent reserving a table with active unpaid orders
+    const activeOrders = await this.prisma.order.count({
+      where: { tableId: dto.tableId, status: { not: 'paid' } },
+    });
+    if (activeOrders > 0) {
+      throw new BadRequestException('Cannot reserve a table with active orders. Please seat the guest at an available table.');
+    }
+
     const reservation = await this.prisma.reservation.create({
       data: {
         name: dto.name,
