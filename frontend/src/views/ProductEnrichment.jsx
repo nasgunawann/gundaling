@@ -353,7 +353,7 @@ export default function ProductEnrichment({ products }) {
                     <h3 className="font-display font-bold text-xs mb-0.5 leading-snug truncate text-on-surface">
                       {p.name}
                     </h3>
-                    <p className="text-[10px] line-clamp-1 leading-relaxed text-on-surface-variant/85">
+                    <p className="text-[10px] line-clamp-2 leading-relaxed text-on-surface-variant/85">
                       {p.desc}
                     </p>
                   </div>

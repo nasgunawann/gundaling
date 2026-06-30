@@ -426,7 +426,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
                     <h3 className={`font-display font-bold text-xs mb-0.5 leading-snug truncate ${p.outOfStock ? 'text-on-surface/60' : 'text-on-surface'}`}>
                       {p.name}
                     </h3>
-                    <p className={`text-[10px] line-clamp-1 leading-relaxed ${p.outOfStock ? 'text-on-surface-variant/40' : 'text-on-surface-variant/80'
+                    <p className={`text-[10px] line-clamp-2 leading-relaxed ${p.outOfStock ? 'text-on-surface-variant/40' : 'text-on-surface-variant/80'
                       }`}>
                       {p.desc}
                     </p>

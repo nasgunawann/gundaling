@@ -1,6 +1,7 @@
 import React from 'react';
 import ReceiptModal from './ReceiptModal';
 import useStore from '../store';
+import InlineNoteTextarea from './InlineNoteTextarea';
 
 export default function CartDrawer({
   isCartOpen,
@@ -118,14 +119,14 @@ export default function CartDrawer({
                     ) : (
                       <>
                         {item.note || activeNoteItemId === item.cartItemId ? (
-                          <textarea
-                            value={item.note || ''}
-                            onChange={(e) => handleUpdateItemNote(item.cartItemId, e.target.value)}
-                            placeholder="Tulis catatan..."
-                            className="min-h-[48px] w-full rounded-xl border border-outline-variant/10 bg-surface-container-low px-3 py-2 text-[10px] leading-snug text-on-surface resize-none outline-none focus:border-primary/15 focus:ring-1 focus:ring-primary/15 mt-1"
-                            autoFocus={activeNoteItemId === item.cartItemId}
-                            onBlur={() => {
-                              if (!item.note) setActiveNoteItemId(null);
+                          <InlineNoteTextarea
+                            itemId={item.cartItemId}
+                            initialValue={item.note || ''}
+                            onSave={(val) => {
+                              handleUpdateItemNote(item.cartItemId, val);
+                              if (!val) {
+                                setActiveNoteItemId(null);
+                              }
                             }}
                           />
                         ) : (
