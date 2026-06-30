@@ -12,6 +12,8 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
   const dragOffsetRef = useRef({ x: 0, y: 0 });
   const dragTableIdRef = useRef(null);
   const dragLatestPosRef = useRef({ x: 0, y: 0 });
+  const dragStartRef = useRef({ x: 0, y: 0 });
+  const DRAG_THRESHOLD = 4;
 
   const updateTablePosition = useStore((state) => state.updateTablePosition);
   const fetchInitialData = useStore((state) => state.fetchInitialData);
@@ -39,8 +41,6 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
   const [editTableName, setEditTableName] = useState('');
   const [editTableSeats, setEditTableSeats] = useState(4);
   const [editTableShape, setEditTableShape] = useState('square');
-  const [editPosX, setEditPosX] = useState(45);
-  const [editPosY, setEditPosY] = useState(40);
 
   const isLoading = loading && (!backendTables || backendTables.length === 0);
 
@@ -106,12 +106,12 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
 
   const handlePointerDown = (e, table) => {
     if (!isEditMode) return;
-    if (e.target.closest('button')) return;
     e.preventDefault();
 
     const container = containerRef.current;
     if (!container) return;
 
+    dragStartRef.current = { x: e.clientX, y: e.clientY };
     e.currentTarget.setPointerCapture(e.pointerId);
 
     const rect = container.getBoundingClientRect();
@@ -134,6 +134,12 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
   const handlePointerMove = (e) => {
     if (!isDraggingRef.current) return;
     if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
+
+    // Ignore sub-threshold movements (distinguish click vs drag)
+    const dx = Math.abs(e.clientX - dragStartRef.current.x);
+    const dy = Math.abs(e.clientY - dragStartRef.current.y);
+    if (dx < DRAG_THRESHOLD && dy < DRAG_THRESHOLD) return;
+    dragStartRef.current = null;
 
     const container = containerRef.current;
     if (!container) return;
@@ -159,7 +165,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
     );
   };
 
-  const handlePointerUp = async () => {
+  const handlePointerUp = () => {
     if (!isDraggingRef.current) return;
 
     const tableId = dragTableIdRef.current;
@@ -167,8 +173,11 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
     dragTableIdRef.current = null;
     setDraggedTableId(null);
 
+    // Threshold was never crossed → just a click, not a drag
+    if (dragStartRef.current) return;
+
     const { x, y } = dragLatestPosRef.current;
-    await updateTablePosition(tableId, x, y);
+    updateTablePosition(tableId, x, y);
   };
 
   const handleAddTableSubmit = async (e) => {
@@ -204,8 +213,6 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
     setEditTableName(table.name);
     setEditTableSeats(table.seats);
     setEditTableShape(table.shape);
-    setEditPosX(table.posX !== undefined ? table.posX : (table.pos_x || 45));
-    setEditPosY(table.posY !== undefined ? table.posY : (table.pos_y || 40));
     setShowEditModal(true);
   };
 
@@ -221,8 +228,6 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
         name: editTableName,
         seats: parseInt(editTableSeats),
         shape: editTableShape,
-        pos_x: parseFloat(editPosX),
-        pos_y: parseFloat(editPosY),
       });
 
       showToast(`Table "${editTableName}" updated successfully!`, 'success');
@@ -626,29 +631,6 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
               <option value="square">Square</option>
               <option value="rectangle">Rectangle</option>
             </select>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Position X%</label>
-              <input 
-                type="number" 
-                step="0.5" min="1" max="88"
-                value={editPosX} 
-                onChange={(e) => setEditPosX(parseFloat(e.target.value) || 0)}
-                className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-xs font-semibold shadow-sm focus:ring-2 focus:ring-primary"
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider ml-0.5">Position Y%</label>
-              <input 
-                type="number" 
-                step="0.5" min="1" max="85"
-                value={editPosY} 
-                onChange={(e) => setEditPosY(parseFloat(e.target.value) || 0)}
-                className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-xs font-semibold shadow-sm focus:ring-2 focus:ring-primary"
-              />
-            </div>
           </div>
 
           <button 
