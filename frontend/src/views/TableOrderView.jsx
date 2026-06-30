@@ -41,16 +41,8 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
   const updateReservationStore = useStore((state) => state.updateReservation)
   const user = useStore((state) => state.user)
 
-  // More Categories dropdown state
-  const [showMoreCategories, setShowMoreCategories] = useState(false)
-
   const tablesList = storeTables && storeTables.length > 0 ? storeTables.map(t => t.name) : []
   const allCategories = ['All', ...storeCategories.map(c => c.name)]
-  
-  // Opsi 1: Pinned Primary Categories + More Dropdown
-  // 6 Pinned Utama: All, Signature, Tea, Non Coffee, Coffee Based, Western
-  const primaryCategories = allCategories.slice(0, 6)
-  const secondaryCategories = allCategories.slice(6)
 
   const getCategoryColor = (catName) => {
     if (!catName) return CATEGORY_PALETTE[0]
@@ -312,7 +304,7 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
           {/* Category Filters Container */}
           <div className="flex-1 flex items-center gap-2 max-w-full md:max-w-[calc(100%-300px)]">
             
-            {/* Scrollable primary categories */}
+            {/* Scrollable all categories */}
             <div className="relative flex-grow overflow-hidden flex items-center group/nav">
               {/* Left Scroll Button */}
               <button 
@@ -333,13 +325,10 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
                 id="category-scroll-container-order"
                 className="flex gap-2 overflow-x-auto scrollbar-none py-1 px-8 w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth items-center"
               >
-                {primaryCategories.map((cat) => (
+                {allCategories.map((cat) => (
                   <button
                     key={cat}
-                    onClick={() => {
-                      setActiveCategory(cat);
-                      setShowMoreCategories(false);
-                    }}
+                    onClick={() => setActiveCategory(cat)}
                     className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border shrink-0 ${activeCategory === cat
                         ? 'bg-primary text-on-primary border-primary shadow-sm'
                         : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border-outline-variant/15'
@@ -365,44 +354,6 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
                 <span className="material-symbols-outlined text-sm font-bold">chevron_right</span>
               </button>
             </div>
-
-            {/* Non-scrollable More Dropdown wrapper placed outside of overflow-hidden container */}
-            {secondaryCategories.length > 0 && (
-              <div className="relative shrink-0 z-30">
-                <button
-                  onClick={() => setShowMoreCategories(!showMoreCategories)}
-                  className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border flex items-center gap-1.5 ${
-                    secondaryCategories.includes(activeCategory)
-                      ? 'bg-primary text-on-primary border-primary shadow-sm'
-                      : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border-outline-variant/15'
-                  }`}
-                >
-                  <span>{secondaryCategories.includes(activeCategory) ? activeCategory : 'More'}</span>
-                  <span className="material-symbols-outlined text-xs leading-none">expand_more</span>
-                </button>
-
-                {showMoreCategories && (
-                  <div className="absolute right-0 mt-2 w-56 max-h-72 overflow-y-auto bg-surface border border-outline-variant/25 rounded-2xl shadow-xl p-2 custom-scrollbar scroll-smooth">
-                    {secondaryCategories.map((cat) => (
-                      <button
-                        key={cat}
-                        onClick={() => {
-                          setActiveCategory(cat);
-                          setShowMoreCategories(false);
-                        }}
-                        className={`w-full px-4 py-2.5 text-left text-xs font-bold uppercase rounded-xl transition-all ${
-                          activeCategory === cat
-                            ? 'bg-primary/10 text-primary'
-                            : 'text-on-surface-variant hover:bg-surface-container-low'
-                        }`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
 
           </div>
 
