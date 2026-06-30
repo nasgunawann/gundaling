@@ -200,12 +200,27 @@ export default function ProductEnrichment({ products }) {
 
         {/* Filters Wrapper: Merged Categories and Search Bar into one block */}
         <div className="px-container_margin py-4 border-b border-outline-variant/10 bg-surface-container-lowest/15 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
-          {/* Category Horizontal Filters (scrollbar hidden, scrollable with fade masks) */}
-          <div className="relative flex-1 max-w-full md:max-w-[calc(100%-300px)] overflow-hidden">
+          {/* Category Horizontal Filters (scrollbar hidden, scrollable with fade masks & navigation buttons) */}
+          <div className="relative flex-1 max-w-full md:max-w-[calc(100%-300px)] overflow-hidden flex items-center group/nav">
+            {/* Left Scroll Button */}
+            <button 
+              onClick={() => {
+                const container = document.getElementById('category-scroll-container-enrich');
+                if (container) container.scrollBy({ left: -200, behavior: 'smooth' });
+              }}
+              className="absolute left-1 z-20 flex items-center justify-center w-7 h-7 rounded-full bg-surface border border-outline-variant/20 shadow-sm text-on-surface-variant opacity-0 group-hover/nav:opacity-100 transition-opacity active:scale-95"
+              title="Scroll Left"
+            >
+              <span className="material-symbols-outlined text-sm font-bold">chevron_left</span>
+            </button>
+
             {/* Left Fade Overlay */}
             <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none z-10"></div>
             
-            <div className="flex gap-2 overflow-x-auto scrollbar-none py-1 px-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <div 
+              id="category-scroll-container-enrich"
+              className="flex gap-2 overflow-x-auto scrollbar-none py-1 px-8 w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth"
+            >
               {categories.map((cat) => (
                 <button
                   key={cat}
@@ -222,6 +237,18 @@ export default function ProductEnrichment({ products }) {
 
             {/* Right Fade Overlay */}
             <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10"></div>
+
+            {/* Right Scroll Button */}
+            <button 
+              onClick={() => {
+                const container = document.getElementById('category-scroll-container-enrich');
+                if (container) container.scrollBy({ left: 200, behavior: 'smooth' });
+              }}
+              className="absolute right-1 z-20 flex items-center justify-center w-7 h-7 rounded-full bg-surface border border-outline-variant/20 shadow-sm text-on-surface-variant opacity-0 group-hover/nav:opacity-100 transition-opacity active:scale-95"
+              title="Scroll Right"
+            >
+              <span className="material-symbols-outlined text-sm font-bold">chevron_right</span>
+            </button>
           </div>
 
           {/* Search bar positioned next to categories for consistency */}
