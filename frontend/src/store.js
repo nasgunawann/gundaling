@@ -559,19 +559,20 @@ const useStore = create((set, get) => ({
 
   editReservation: async (id, data) => {
     const isTemp = typeof id === 'string' && id.startsWith('temp-');
+    const { status: _status, ...safeData } = data;
 
     set((state) => ({
-      reservations: state.reservations.map((r) => r.id === id ? { ...r, ...data, isPendingSync: true } : r),
+      reservations: state.reservations.map((r) => r.id === id ? { ...r, ...safeData, isPendingSync: true } : r),
     }));
 
     if (isTemp) {
-      get().addToQueue('editReservation', { id, ...data });
+      get().addToQueue('editReservation', { id, ...safeData });
       return get().reservations.find(r => r.id === id);
     }
 
     if (navigator.onLine) {
       try {
-        const res = await api.put(`/reservations/${id}`, data);
+        const res = await api.put(`/reservations/${id}`, safeData);
         const updated = res.data;
         set((state) => ({
           reservations: state.reservations.map((r) => r.id === id ? updated : r),
@@ -580,13 +581,13 @@ const useStore = create((set, get) => ({
         return updated;
       } catch (err) {
         if (!err.response || err.code === 'ERR_NETWORK') {
-          get().addToQueue('editReservation', { id, ...data });
+          get().addToQueue('editReservation', { id, ...safeData });
           return get().reservations.find(r => r.id === id);
         }
         throw err;
       }
     } else {
-      get().addToQueue('editReservation', { id, ...data });
+      get().addToQueue('editReservation', { id, ...safeData });
       return get().reservations.find(r => r.id === id);
     }
   },
