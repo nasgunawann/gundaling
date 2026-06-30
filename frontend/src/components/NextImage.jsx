@@ -11,7 +11,7 @@ export default function NextImage({ src, width, quality = 75, alt, className }) 
   
   const optimizedSrc = isExternal 
     ? src 
-    : `${apiBase}/image?url=${encodeURIComponent(src)}&w=${width}&q=${quality}`;
+    : `${apiBase}/api/image?url=${encodeURIComponent(src)}&w=${width}&q=${quality}`;
 
   return (
     <img 
