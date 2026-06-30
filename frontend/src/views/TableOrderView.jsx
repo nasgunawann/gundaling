@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNotification } from '../components/NotificationProvider'
 import useStore from '../store'
 import CartDrawer from '../components/CartDrawer'
+import NextImage from '../components/NextImage'
 
 export default function TableOrderView({ selectedTable, setSelectedTable, products, tableCarts, setTableCarts }) {
   const { showToast, showConfirm, requestManagerApproval } = useNotification()
@@ -315,8 +316,10 @@ export default function TableOrderView({ selectedTable, setSelectedTable, produc
               >
                 <div>
                   <div className="aspect-[4/3] bg-surface-container-highest relative overflow-hidden">
-                    <img
+                    <NextImage
                       alt={p.name}
+                      width={400}
+                      quality={75}
                       className={`w-full h-full object-cover ${p.outOfStock ? 'grayscale' : ''}`}
                       src={p.image}
                     />

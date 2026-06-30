@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNotification } from '../components/NotificationProvider';
 import useStore from '../store';
 import api from '../api';
+import NextImage from '../components/NextImage';
 
 export default function ProductEnrichment({ products }) {
   const { showToast, showConfirm } = useNotification();
@@ -241,8 +242,10 @@ export default function ProductEnrichment({ products }) {
               >
                 <div>
                   <div className="aspect-[4/3] bg-surface-container-highest relative overflow-hidden">
-                    <img
+                    <NextImage
                       alt={p.name}
+                      width={400}
+                      quality={75}
                       className={`w-full h-full object-cover ${p.outOfStock ? 'grayscale' : ''}`}
                       src={p.image}
                     />
@@ -352,7 +355,7 @@ export default function ProductEnrichment({ products }) {
               {/* Product Image preview */}
               {!isAddingNew && selectedProduct && (
                 <div className="aspect-video bg-surface-container rounded-2xl overflow-hidden border border-outline-variant/10 mb-2 shadow-inner shrink-0">
-                  <img src={formImage} alt={formName} className="w-full h-full object-cover" />
+                  <NextImage src={formImage} width={600} quality={80} alt={formName} className="w-full h-full object-cover" />
                 </div>
               )}
 
