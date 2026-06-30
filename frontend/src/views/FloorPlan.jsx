@@ -46,13 +46,10 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
 
   // Helper to check if a date is today
   const isToday = (dateInput) => {
+    if (!dateInput) return false;
     const d = new Date(dateInput);
     const today = new Date();
-    return (
-      d.getDate() === today.getDate() &&
-      d.getMonth() === today.getMonth() &&
-      d.getFullYear() === today.getFullYear()
-    );
+    return d.toDateString() === today.toDateString();
   };
 
   // Process live dynamic status based on orders & reservations
@@ -85,7 +82,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
       } else if (hasConfirmedToday) {
         status = 'Reserved';
       } else {
-        status = t.status === 'Reserved' ? 'Reserved' : 'Available';
+        status = 'Available';
       }
     }
 
@@ -284,13 +281,6 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
     if (status === 'Reserved') return 'bg-status-reserved border-status-reserved text-status-on-reserved';
     if (status === 'Ready') return 'bg-status-success border-status-success text-status-on-success animate-pulse shadow-[0_0_15px_rgba(45,106,79,0.8)]';
     return 'bg-surface border-outline-variant/35 text-on-surface';
-  };
-
-  const getBadgeStyle = (status) => {
-    if (status.startsWith('Occupied') || status === 'Pending Kitchen' || status === 'Reserved') {
-      return 'bg-white/20 text-white border-transparent';
-    }
-    return 'bg-surface-container-low border-outline-variant/10 text-on-surface-variant';
   };
 
   const isManager = user?.role === 'Manager';

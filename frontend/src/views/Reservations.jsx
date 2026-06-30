@@ -81,7 +81,7 @@ export default function Reservations({ reservations, onSeatGuest }) {
         status: 'Confirmed'
       });
 
-      const tableObj = storeTables.find(t => t.id === parseInt(selectedTableId));
+      const tableObj = storeTables.find(t => t.id === selectedTableId);
 
       setShowAddModal(false);
       setNewName('');
@@ -370,18 +370,18 @@ export default function Reservations({ reservations, onSeatGuest }) {
                 className="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-sm font-semibold shadow-sm focus:ring-2 focus:ring-primary cursor-pointer"
               >
                 {storeTables.map(t => {
-                  const capacityOk = t.seats >= parseInt(newGuests || 1);
-                  const prefix = capacityOk ? '' : '⚠️ [Capacity Low] ';
-                  const hasActiveOrders = (storeOrders || []).some(
-                    (o) => (o.tableId === t.id || o.table_id === t.id) && o.status !== 'paid'
-                  );
-                  const dynamicStatus = hasActiveOrders ? 'Dining' : t.status;
-                  return (
-                    <option key={t.id} value={t.id} className="text-on-surface bg-surface font-semibold">
-                      {prefix}{t.name} ({t.seats} Seats) — {dynamicStatus}
-                    </option>
-                  );
-                })}
+                    const capacityOk = t.seats >= parseInt(newGuests || 1);
+                    const prefix = capacityOk ? '' : '⚠️ [Capacity Low] ';
+                    const hasActiveOrders = (storeOrders || []).some(
+                      (o) => (o.tableId === t.id || o.table_id === t.id) && o.status !== 'paid'
+                    );
+                    const dynamicStatus = hasActiveOrders ? 'Dining' : t.status;
+                    return (
+                      <option key={t.id} value={t.id} disabled={hasActiveOrders} className={`text-on-surface bg-surface font-semibold ${hasActiveOrders ? 'line-through opacity-50' : ''}`}>
+                        {prefix}{t.name} ({t.seats} Seats) — {dynamicStatus}
+                      </option>
+                    );
+                  })}
               </select>
             </div>
           </div>
