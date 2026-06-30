@@ -18,31 +18,6 @@ export default function ReceiptModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
-      <style>{`
-        @media print {
-          body * {
-            visibility: hidden !important;
-          }
-          #receipt-print-sheet, #receipt-print-sheet * {
-            visibility: visible !important;
-          }
-          #receipt-print-sheet {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100% !important;
-            margin: 0 !important;
-            padding: 16px !important;
-            box-shadow: none !important;
-            background: white !important;
-            color: black !important;
-          }
-          .receipt-modal-overlay {
-            display: none !important;
-          }
-        }
-      `}</style>
-
       <div className="receipt-modal-overlay w-full max-w-[420px] bg-surface rounded-3xl border border-outline-variant/20 shadow-2xl p-5">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -60,7 +35,7 @@ export default function ReceiptModal({
           </button>
         </div>
 
-        <div id="receipt-print-sheet" className="rounded-3xl border border-outline-variant/20 bg-white p-4 text-[11px] text-on-surface">
+        <div id="receipt-print-sheet" className="print-receipt-view rounded-3xl border border-outline-variant/20 bg-white p-4 text-[11px] text-on-surface">
           <div className="mb-4 space-y-1">
             <p className="text-sm font-bold">Gundaling Farmstead</p>
             <p className="text-[10px] text-on-surface-variant">Berastagi, North Sumatra</p>
