@@ -106,6 +106,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
 
   const handlePointerDown = (e, table) => {
     if (!isEditMode) return;
+    if (e.target.closest('[data-action]')) return;
     e.preventDefault();
 
     const container = containerRef.current;
@@ -514,6 +515,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                   {isEditMode && (
                     <>
                       <button
+                        data-action="edit"
                         onClick={(e) => handleEditTableClick(table, e)}
                         className="absolute -top-2 -left-2 w-6 h-6 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-md hover:scale-110 active:scale-95 transition-all border border-surface"
                         title="Edit Table Properties"
@@ -521,6 +523,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                         <span className="material-symbols-outlined text-[10px] font-bold">edit</span>
                       </button>
                       <button
+                        data-action="delete"
                         onClick={(e) => handleDeleteTable(table, e)}
                         className="absolute -top-2 -right-2 w-6 h-6 bg-error text-on-error rounded-full flex items-center justify-center shadow-md hover:scale-110 active:scale-95 transition-all border border-surface"
                         title="Delete Table"
