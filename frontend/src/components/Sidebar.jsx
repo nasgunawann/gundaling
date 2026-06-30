@@ -27,7 +27,8 @@ export default function Sidebar({ currentView, onViewChange, user, onLogout, isC
       items: [
         ...(isManager ? [
           { id: 'product-enrichment', label: 'Product Management', icon: 'inventory_2' },
-          { id: 'staff-management', label: 'Staff Management', icon: 'badge' }
+          { id: 'staff-management', label: 'Staff Management', icon: 'badge' },
+          { id: 'daily-report', label: 'Daily Report', icon: 'analytics' }
         ] : []),
       ]
     }
