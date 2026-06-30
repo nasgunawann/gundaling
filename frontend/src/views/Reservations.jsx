@@ -68,14 +68,14 @@ export default function Reservations({ reservations, onSeatGuest }) {
       return;
     }
 
-    const bookingTime = `${newDate} ${newTime}:00`;
+    const bookingTime = `${newDate}T${newTime}:00`;
 
     try {
       await addReservationStore({
         name: newName,
         phone: newPhone,
         guests: parseInt(newGuests),
-        tableId: parseInt(selectedTableId),
+        tableId: selectedTableId,
         time: bookingTime,
         status: 'Confirmed'
       });
@@ -128,15 +128,24 @@ export default function Reservations({ reservations, onSeatGuest }) {
 
       {/* Filter and Search Bar */}
       <div className="px-container_margin py-4 flex flex-wrap gap-4 items-center justify-between border-b border-outline-variant/20 bg-surface-container-lowest/10">
-        <div className="relative w-full max-w-xs">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+        <div className="relative w-full md:max-w-[280px]">
+          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-base pointer-events-none">search</span>
           <input 
             type="text" 
             placeholder="Search by name or phone..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-surface-container-low border-none rounded-full py-2 pl-12 pr-4 text-xs font-semibold focus:ring-2 focus:ring-primary/20 shadow-sm"
+            onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur() }}
+            className="w-full bg-surface-container-low border-none rounded-full py-2.5 pl-11 pr-10 text-xs font-semibold focus:ring-2 focus:ring-primary/20 shadow-sm"
           />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-5 h-5 rounded-full bg-on-surface-variant/20 text-on-surface-variant hover:bg-on-surface-variant/40 active:scale-90 transition-all"
+            >
+              <span className="material-symbols-outlined text-sm font-bold">close</span>
+            </button>
+          )}
         </div>
 
         {/* Status Filters */}
