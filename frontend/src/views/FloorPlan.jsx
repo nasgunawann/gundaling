@@ -404,7 +404,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                           </div>
                         ) : (
                           <div className="text-[8px] font-bold opacity-60 uppercase tracking-wider mt-1">
-                            {table.status === 'Reserved' ? 'Reserved' : 'Available'}
+                            {table.status}
                           </div>
                         )}
                       </div>
@@ -425,7 +425,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                           </div>
                         ) : (
                           <div className="text-[8px] font-bold opacity-60 uppercase tracking-widest">
-                            {table.status === 'Reserved' ? 'Reserved' : 'Available'}
+                            {table.status}
                           </div>
                         )}
                       </div>
@@ -446,7 +446,7 @@ export default function FloorPlan({ onTableClick, user, tableCarts, tables: back
                           </div>
                         ) : (
                           <div className="text-[8px] font-bold opacity-60 uppercase tracking-widest">
-                            {table.status === 'Reserved' ? 'Reserved' : 'Available'}
+                            {table.status}
                           </div>
                         )}
                       </div>

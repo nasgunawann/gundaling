@@ -31,26 +31,68 @@ export default function WebsocketStatus({ showLabel = true }) {
   }, [socket]);
 
   const getStatusDetails = () => {
-    if (syncQueue.length > 0) {
-      return { color: 'bg-status-warning animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.5)]', label: `Syncing (${syncQueue.length})` };
+    const isDisconnected = !socket || !socket.connected;
+
+    if (syncQueue.length > 0 && isDisconnected) {
+      return {
+        icon: 'sync',
+        iconAnim: 'animate-spin',
+        color: 'text-status-warning',
+        label: `Offline (${syncQueue.length})`,
+        tooltip: `Connection lost — ${syncQueue.length} change${syncQueue.length > 1 ? 's' : ''} queued, will sync automatically`,
+      };
     }
+
+    if (syncQueue.length > 0) {
+      return {
+        icon: 'sync',
+        iconAnim: 'animate-spin',
+        color: 'text-status-warning',
+        label: `Syncing (${syncQueue.length})`,
+        tooltip: `Syncing ${syncQueue.length} pending change${syncQueue.length > 1 ? 's' : ''} to server`,
+      };
+    }
+
     switch (status) {
       case 'connected':
-        return { color: 'bg-status-success shadow-[0_0_8px_rgba(45,106,79,0.5)]', label: 'Live' };
+        return {
+          icon: 'cloud_done',
+          iconAnim: '',
+          color: 'text-status-success',
+          label: 'Live',
+          tooltip: 'Connected — real-time updates active',
+        };
       case 'connecting':
-        return { color: 'bg-status-warning animate-pulse', label: 'Connecting' };
+        return {
+          icon: 'sync',
+          iconAnim: 'animate-spin',
+          color: 'text-status-warning',
+          label: 'Connecting',
+          tooltip: 'Reconnecting to server...',
+        };
       default:
-        return { color: 'bg-status-danger animate-pulse shadow-[0_0_8px_rgba(186,26,26,0.5)]', label: 'Offline' };
+        return {
+          icon: 'cloud_off',
+          iconAnim: '',
+          color: 'text-status-danger',
+          label: 'Offline',
+          tooltip: 'Connection lost — changes saved locally, will sync automatically',
+        };
     }
   };
 
   const details = getStatusDetails();
 
   return (
-    <div className={`flex items-center gap-2 bg-surface-container-low rounded-full border border-outline-variant/10 shadow-sm ${
-      showLabel ? 'px-3 py-1.5' : 'w-10 h-10 items-center justify-center'
-    }`} title={!showLabel ? details.label : undefined}>
-      <span className={`w-2 h-2 rounded-full ${details.color}`} />
+    <div
+      className={`flex items-center gap-2 bg-surface-container-low rounded-full border border-outline-variant/10 shadow-sm ${
+        showLabel ? 'px-3 py-1.5' : 'w-10 h-10 items-center justify-center'
+      }`}
+      title={details.tooltip}
+    >
+      <span className={`material-symbols-outlined text-sm ${details.iconAnim} ${details.color}`}>
+        {details.icon}
+      </span>
       {showLabel && (
         <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider leading-none">
           {details.label}

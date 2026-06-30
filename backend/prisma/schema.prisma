@@ -144,4 +144,5 @@ enum ReservationStatus {
   Confirmed
   Seated
   Cancelled
+  Completed
 }

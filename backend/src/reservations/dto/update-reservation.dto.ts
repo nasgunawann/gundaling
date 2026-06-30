@@ -3,6 +3,6 @@ import { IsString, IsNotEmpty, IsIn } from 'class-validator';
 export class UpdateReservationDto {
   @IsString()
   @IsNotEmpty()
-  @IsIn(['Confirmed', 'Seated', 'Cancelled'])
+  @IsIn(['Confirmed', 'Seated', 'Cancelled', 'Completed'])
   status: string;
 }
